@@ -1,3 +1,12 @@
 [submodule "caching"]
 	path = caching
 	url = https://github.com/sudo-dirk/caching.git
+[submodule "osm"]
+	path = osm
+	url = https://github.com/sudo-dirk/osm.git
+[submodule "multimedia"]
+	path = multimedia
+	url = https://github.com/sudo-dirk/multimedia.git
+[submodule "fstools"]
+	path = fstools
+	url = https://github.com/sudo-dirk/fstools.git
