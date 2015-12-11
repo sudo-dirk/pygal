@@ -1,0 +1,18 @@
+<div id="moin-page" lang="en" dir="ltr">
+
+  <div id="moin-content">
+
+    <div class="moin-form">
+      <h2>Delete '{{ input.this.name() }}'</h2>
+      
+      <center><img src="{{ input.this.webnail_url() }}"></center>
+      
+      <form name="delete" action="{{ input.this.delete_url() }}" method="post">
+        <input type="hidden" name="delete_submit" value="1" class="" id="f_delete_submit" />
+        <input type="submit" value="Delete" class="button" />
+      </form>
+    </div>
+
+  </div>
+
+</div>

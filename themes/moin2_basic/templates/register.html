@@ -1,0 +1,39 @@
+<div id="moin-page" lang="en" dir="ltr">
+  <div id="moin-content">
+    <div id="moin-flash">  
+    </div>
+    
+    <h1>{{ input.lang.create_account }}</h1>
+    <div class="moin-form">
+      <form name="register" action="{{ input.url_prefix }}/_register_{{ input.url_extention }}" method="post">
+        <dl>
+          <dt>
+            <label class="required" for="f_register_username">Name</label>
+          </dt>
+          <dd>
+            <input type="text" name="register_username" value="" class="required" id="f_register_username" placeholder="{{ input.lang.login_desc }}" required="required" />
+          </dd>
+          <dt>
+            <label class="required" for="f_register_password1">Password</label>
+          </dt>
+          <dd>
+            <input type="password" name="register_password1" class="required" id="f_register_password1" placeholder="{{ input.lang.password_desc }}" required="required" />
+          </dd>
+          <dt>
+            <label class="required" for="f_register_password2">Password</label>
+          </dt>
+          <dd>
+            <input type="password" name="register_password2" class="required" id="f_register_password2" placeholder="{{ input.lang.password2_desc }}" required="required" />
+          </dd>
+          <dt>
+            <label class="required" for="f_register_email">E-Mail</label>
+          </dt>
+          <dd>
+            <input type="email" name="register_email" value="" class="required" id="f_register_email" placeholder="{{ input.lang.email_desc }}" required="required" />
+          </dd>
+        </dl>
+        <input type="submit" value="Register" class="button" />
+      </form>
+    </div>
+  </div>
+</div>

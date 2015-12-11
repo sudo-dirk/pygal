@@ -1,0 +1,31 @@
+
+  <div id="moin-page" lang="en" dir="ltr">
+    <div id="moin-content">
+      <div id="moin-flash"></div>
+      <div id="moin-content-data"></div>
+
+        <h1>{{ input.this.name() }}</h1>
+        <div id="main" class="thumb_border" style="width: {{input.this.thumbnail_x() + 12}}px; height: {{input.this.thumbnail_y() + 12}}px;">
+          <div class="thumb_image_bg" style="width: {{input.this.thumbnail_x() + 12}}px; height: {{input.this.thumbnail_y() + 12}}px;">
+            <a href="{{ input.this.url() }}"><img src="{{ input.this.thumbnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ input.this.name() }}"></a>
+          </div>
+        </div>
+
+        <br>
+		<table>
+		  <tbody>
+          {% for desc, info in input.this.get_infos() %}
+              <tr>
+                <td>{{ desc }}</td>
+                {% if info is string %}
+                  <td style="text-align:right;">{{ info }}</td>
+                {% else %}
+                  <td style="text-align:right;"><a href="{{ info[0] }}">{{ info[1] }}</a></td>
+                {% endif %}
+              </tr>
+	      {% endfor %}
+		  </tbody>
+		</table>
+
+    </div>
+  </div>

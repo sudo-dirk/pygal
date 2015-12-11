@@ -1,0 +1,30 @@
+
+  <div id="moin-page" lang="en" dir="ltr">
+    <div id="moin-content">
+      <div id="moin-flash"></div>
+      <div id="moin-content-data"></div>
+
+    <div id="thumb_overview">
+
+        <div class="thumb_border" style="width: {{input.this.prv().thumbnail_xy_max() + 12}}px; height: {{input.this.prv().thumbnail_xy_max() + 12}}px;">
+          <div class="thumb_image_bg" style="width: {{input.this.prv().thumbnail_x() + 12}}px; height: {{input.this.prv().thumbnail_y() + 12}}px;">
+            <a href="{{ input.this.prv().url() }}"><img 175 src="{{ input.this.prv().thumbnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ input.this.prv().name() }}"></a>
+          </div>
+        </div>
+
+        <div id="main" class="thumb_border" style="width: {{input.this.webnail_x() + 12}}px; height: {{input.this.webnail_y() + 12}}px;">
+          <div class="thumb_image_bg" style="width: {{input.this.webnail_x() + 12}}px; height: {{input.this.webnail_y() + 12}}px;">
+            {% if input.this.user_may_download() %}<a href="{{ input.this.raw_url() }}">{% endif %}<img src="{{ input.this.webnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ input.this.name() }}">{% if input.this.user_may_download() %}</a>{% endif %}
+          </div>
+        </div>
+
+        <div class="thumb_border" style="width: {{input.this.nxt().thumbnail_xy_max() + 12}}px; height: {{input.this.nxt().thumbnail_xy_max() + 12}}px;">
+          <div class="thumb_image_bg" style="width: {{input.this.nxt().thumbnail_x() + 12}}px; height: {{input.this.nxt().thumbnail_y() + 12}}px;">
+            <a href="{{ input.this.nxt().url() }}"><img src="{{ input.this.nxt().thumbnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ input.this.nxt().name() }}"></a>
+          </div>
+        </div>
+    <div id="thumb_footer"></div>
+    </div>
+
+    </div>
+  </div>

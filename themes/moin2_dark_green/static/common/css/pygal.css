@@ -1,0 +1,15 @@
+/* pygal.css
+ *
+ * Copyright: 2013 Dirk Alders
+ * License: GNU GPL v2 or later, see COPYING for details.
+ */ 
+
+#thumb_overview { background: transparent; width: 100%; }
+.thumb_border   { background: transparent; vertical-align: bottom; float: left; text-align: left; margin: 20px; }
+.thumb_image_bg { background: linear-gradient(-45deg, #669900, #334C00); border-radius: 5px; }
+#pygal-actions {clear:both;display:block;margin:0;padding:4px 4px;font-size:.82em;color:#008b8b;height: 18px}
+#pygal-actions li{float:left;display:inline;margin:0 0px;padding:2px 2.5px;border:1px solid #669900;border-bottom:none;white-space:nowrap;font-size:.88em;border-top-left-radius:5px;border-top-right-radius:5px;height: 18px}
+#pygal-actions li.wikilink{background: linear-gradient(to bottom, #334C00, #669900)}
+#pygal-actions li.userlink{background: linear-gradient(to bottom, #334C00, #669900)}
+#pygal-actions a,#moin-navibar a:visited{color:#99e500;text-decoration:none}
+#pygal-actions li:hover{background:#334c00}
