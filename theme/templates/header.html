@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if input.this and input.this.slideshow() %}
+      <meta http-equiv="refresh" content="{{ input.this.stay_time() }};url={{ input.this.prv().slideshow_url() }}">
+    {% endif %}
+    <title>{{ input.title }}</title>
+    <link rel="shortcut icon" href="{{input.url_prefix}}/static/common/logos/favicon.ico" />
+    <link media="all" rel="stylesheet" href="{{input.url_prefix}}/static/common/css/theme.css" />
+    <link media="all" rel="stylesheet" href="{{input.url_prefix}}/static/common/css/pygal.css" />
+
+    <link href="{{ input.url_prefix }}/static/video-js/video-js.css" rel="stylesheet">
+    <script src="{{ input.url_prefix }}/static/video-js/video.js"></script>
+  </head>
+  <body lang="en" dir="ltr">
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <nav class="navbar moin-navbar-inverse">
+        <div class="row">
+          <div class="col-md-1 col-sm-1 col-xs-1">
+            <!div class="moin-logo">
+              <a href="{{ input.url_prefix }}/"><img src="{{ input.url_prefix }}/static/common/logos/pygal_logo.png" id="moin-img-logo" alt="Logo"></a>
+            <!/div>
+          </div>
+
+          <div class="col-md-4 col-sm-4 col-xs-6">
+            <div class="moin-navbar-header">
+              <a class="navbar-brand">{{ input.title }}</a>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-4 col-xs-5 moin-loginsettings">
+            <div class="moin-navbar-collapse navbar-collapse collapse in">
+              <ul class="nav navbar-nav moin-pull-right">
+                {% if input.pygal_user.is_a_user_logged_in() %}
+                  <li><a href="{{ input.pygal_user.user_url(input.url_extention) }}" rel="nofollow"><img src="{{input.url_prefix}}/static/common/img/user.png">{{ input.pygal_user.get_session_user() }}</a></li>
+                  <li><a href="{{ input.url_prefix }}/_logout_{{ input.url_extention }}" rel="nofollow"><img src="{{input.url_prefix}}/static/common/img/logout.png">{{ input.lang.logout }}</a></li>
+                {% else %}
+                  <li><a href="{{ input.url_prefix }}/_login_{{ input.url_extention }}" rel="nofollow">{{ input.lang.login }}</a></li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-sm-3 hidden-xs">
+            <form class="moin-navbar-form" action="{{ input.url_prefix }}/_search_" method="get" role="search">
+              <div class="input-group">
+                <input name='q' type="text" class="form-control" placeholder="{{ input.lang.search }}...">
+                <div class="input-group-btn">
+                  <button class="btn btn-primary" type="submit">
+                    <img src="{{ input.url_prefix }}/static/common/img/search.png">
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+
+        </div>
+      </nav> 
+
+      <ul class="moin-breadcrumb">
+        {% if input.this %}
+          {% for navi in input.this.navigation_list() %}
+            <li>
+              <h4 class="moin-location-breadcrumb">
+                <small> / </small>
+                <a href="{{navi.url}}">{{navi.name}}</a>
+              </h4>
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ul> 
+    
+      <div class="moin-content">
+        <div id="moin-flash">
+        </div>
+        
+        <ul class="moin-nav nav-tabs moin-shadow">
+        {% if input.this %}
+          {% for action in input.this.actions() %}
+            <li>
+              <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">
+                <span><img src="{{action.pic}}"></span>
+                <span class="hidden-sm hidden-xs">{{action.name}}</span>
+              </a>
+            </li>
+          {% endfor %}
+        {% endif %}
+        </ul>
