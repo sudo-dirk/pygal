@@ -82,6 +82,7 @@ app.register_blueprint(item, url_prefix=url_prefix)
 
 
 if __name__ == "__main__":
+    import pygal_config as config
     from items import cached_itemlist
 
     parser = optparse.OptionParser("usage: %prog [options] arg1 arg2")
@@ -92,7 +93,4 @@ if __name__ == "__main__":
         il.create_thumbnail()
         il.create_webnail()
     else:
-        try:
-            app.run('192.168.0.15', 8080)
-        except:
-            app.run()
+        app.run(config.ip_to_serve_from, 5000)
