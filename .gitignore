@@ -1,5 +1,5 @@
 # eclipse stuff
-.settings/#
+.settings/
 
 # pygal files
 auth/*.json
