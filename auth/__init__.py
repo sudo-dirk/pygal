@@ -8,8 +8,6 @@ import fstools
 user_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'users.json')
 user_permission_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'users_%s.json')
 
-# TODO: ggf. jeden User in ein eigenes File speichern (Zeitgleiche Zugriffe...)
-
 
 class pygal_auth(object):
     def users(self):
