@@ -4,8 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - "python pygal.py -c" zum Erzeugen des Cache funktioniert nicht...
-#       - pylibs in Orner pylibs verschieben und anpassen
+# TODO: - pylibs in Orner pylibs verschieben und anpassen
 #       - Berechtigungen im Auth File mit regex? statt Liste von Startwith...
 #       - Suche führt zu Elementen, die wiederum zu einer Exception führen.
 #       - Bei Suche die Actions Info, Download korrigieren (Info und Download der Suchergebnisse)
@@ -88,10 +87,10 @@ if __name__ == "__main__":
     from items import cached_itemlist
 
     parser = optparse.OptionParser("usage: %prog [options] arg1 arg2")
-    parser.add_option("-c", "--cache", action="store_true", dest="cache", default=False, help="create the complete cached files (only)")
+    parser.add_option("-c", "--cache", action="store_true", dest="cache", default=False, help="create the cache files for all items (thumbnails, webnails, property cache)")
     (options, args) = parser.parse_args()
     if options.cache:
-        il = cached_itemlist("", ignore_rights=True)
+        il = cached_itemlist("", create_cache=True)
         il.create_thumbnail()
         il.create_webnail()
     else:

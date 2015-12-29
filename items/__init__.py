@@ -67,13 +67,13 @@ class itemlist(base_list):
     PROP_FILESIZE = 'filesize'
     PROPERTIES = [PROP_LEN, PROP_TIME, PROP_THUMB_XY_MAX, PROP_THUMB_X, PROP_THUMB_Y, PROP_THUMB_URL, PROP_NUM_PICS, PROP_NUM_VIDS, PROP_NUM_GALS, PROP_FILESIZE]
 
-    def __init__(self, rel_path, request_args={}, prefix='', parent=None, ignore_rights=False):
+    def __init__(self, rel_path, request_args={}, prefix='', parent=None, create_cache=False):
         base_list.__init__(self, rel_path, request_args=request_args, prefix=prefix, parent=parent)
         self._rel_path = rel_path
         self._request_args = request_args
         self._prefix = prefix
         self._parent = parent
-        self._ignore_rights = ignore_rights
+        self._create_cache = create_cache
 
     def __init_itemlist__(self):
         base_list.__init_itemlist__(self)
@@ -96,10 +96,10 @@ class itemlist(base_list):
                     if c:
                         if self._prefix == prefix_search:
                             self._prefix = ''
-                        item = c(os.path.join(self._rel_path, entry), request_args=self._request_args, prefix=self._prefix, parent=self, ignore_rights=self._ignore_rights)
+                        item = c(os.path.join(self._rel_path, entry), request_args=self._request_args, prefix=self._prefix, parent=self, create_cache=self._create_cache)
                         if item.exists():
                             if type(item) not in [itemlist, cached_itemlist]:
-                                if self._ignore_rights or item.user_may_view():
+                                if self._create_cache or item.user_may_view():
                                     self._len += 1
                                     self._itemlist.append(item)
                             else:
@@ -286,11 +286,15 @@ class itemlist(base_list):
 
 class cached_itemlist(itemlist):
     def __init__(self, *args, **kwargs):
-        from pygal import logger
-        self.logger = logger
         itemlist.__init__(self, *args, **kwargs)
-        self._cached_data = caching.property_cache_json(itemlist(*args, **kwargs), self.prop_item_path(), load_all_on_init=True, logger=self.logger)
+        if not self._create_cache:
+            from pygal import logger
+            self.logger = logger
+            self._cached_data = caching.property_cache_json(itemlist(*args, **kwargs), self.prop_item_path(), load_all_on_init=True, logger=self.logger)
 
     def get(self, key, default=None):
-        self.logger.debug("Property request (%s) for %s", key, self.name())
-        return self._cached_data.get(key, default)
+        if not self._create_cache:
+            self.logger.debug("Property request (%s) for %s", key, self.name())
+            return self._cached_data.get(key, default)
+        else:
+            return itemlist.get(self, key, default)
