@@ -67,7 +67,7 @@ class picture(base_item_props):
         return rv
 
     def aperture(self):
-        fn = self._info.get(self._info.FNUMBER, (None, None))
+        fn = self._info.get(self._info.FNUMBER, None)
         if fn is None:
             return None
         else:
@@ -107,7 +107,7 @@ class picture(base_item_props):
         return self._info.get(self._info.FLASH, None)
 
     def focal_length(self):
-        fl = self._info.get(self._info.FOCAL_LENGTH, (None, None))
+        fl = self._info.get(self._info.FOCAL_LENGTH, None)
         if fl is None:
             return None
         else:
