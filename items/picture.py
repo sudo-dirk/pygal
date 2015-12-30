@@ -67,10 +67,11 @@ class picture(base_item_props):
         return rv
 
     def aperture(self):
-        num, denum = self._info.get(self._info.FNUMBER, (None, None))
-        if num is None or denum is None:
+        fn = self._info.get(self._info.FNUMBER, (None, None))
+        if fn is None:
             return None
         else:
+            num, denum = fn
             return 'F%.1f' % (float(num) / float(denum))
 
     def camera(self):
@@ -106,10 +107,11 @@ class picture(base_item_props):
         return self._info.get(self._info.FLASH, None)
 
     def focal_length(self):
-        num, denum = self._info.get(self._info.FOCAL_LENGTH, (None, None))
-        if num is None or denum is None:
+        fl = self._info.get(self._info.FOCAL_LENGTH, (None, None))
+        if fl is None:
             return None
         else:
+            num, denum = fl
             return '%.2f mm' % (float(num) / float(denum))
 
     def get_infos(self):
