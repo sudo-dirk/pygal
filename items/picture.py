@@ -4,15 +4,15 @@
 from auth import pygal_user
 from items import base_item_props
 from items import itemlist
-import osm
+from pylibs import osm
 from app import piclink
 from app import prefix_info
 from app import prefix_thumbnail
 from app import prefix_webnail
-from multimedia.picture import picture_info_cached
-from multimedia.picture import picture_edit
-from multimedia.picture import __version__
-import fstools
+from pylibs.multimedia.picture import picture_info_cached
+from pylibs.multimedia.picture import picture_edit
+from pylibs.multimedia.picture import __version__
+from pylibs import fstools
 import json
 import os
 from pygal import logger

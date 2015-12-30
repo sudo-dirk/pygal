@@ -1,6 +1,6 @@
 from auth import pygal_user
 import flask
-import fstools
+from pylibs import fstools
 import os
 import shutil
 import pygal_config as config

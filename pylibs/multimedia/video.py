@@ -4,11 +4,11 @@
 
 # TODO: video_picture_edit kommentieren und subprocess statt os.popen
 
-import caching
+from pylibs import caching
 import calendar
 import logging
 import os
-import fstools
+from pylibs import fstools
 from PIL import Image
 from picture import picture_edit
 import StringIO

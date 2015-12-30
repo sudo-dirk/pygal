@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-import caching
+from pylibs import caching
 import calendar
-import fstools
+from pylibs import fstools
 import logging
 import os
 from PIL import Image

@@ -3,7 +3,7 @@ import hashlib
 import json
 import os
 import pygal_config as config
-import fstools
+from pylibs import fstools
 
 user_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'users.json')
 user_permission_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'users_%s.json')

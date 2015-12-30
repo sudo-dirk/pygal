@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 #
 from items import base_item_props
-from multimedia.picture import picture_edit
-from multimedia.video import video_info_cached
-from multimedia.video import video_picture_edit
-from multimedia.video import __version__
-import fstools
+from pylibs.multimedia.picture import picture_edit
+from pylibs.multimedia.video import video_info_cached
+from pylibs.multimedia.video import video_picture_edit
+from pylibs.multimedia.video import __version__
+from pylibs import fstools
 import json
 import os
 from picture import picture

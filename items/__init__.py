@@ -1,4 +1,4 @@
-import caching
+from pylibs import caching
 import os
 from app import base_item
 from app import base_list
@@ -9,7 +9,7 @@ from app import prefix_info
 from app import prefix_search
 from app import strargs
 from auth import pygal_user
-import fstools
+from pylibs import fstools
 import json
 import pygal_config as config
 import time

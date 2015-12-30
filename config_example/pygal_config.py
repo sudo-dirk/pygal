@@ -1,6 +1,6 @@
 import os
 
-DEBUG = False
+DEBUG = True
 ip_to_serve_from = '127.0.0.1'
 secret_key = 'This should be a real secret string including all kinds of characters'
 admin_group = []
