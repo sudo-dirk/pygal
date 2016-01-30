@@ -86,7 +86,7 @@ class video(picture):
                 self._citem_info = dict()
         VERSION = '__module_version_citem_creation_%d__' % size
         WATERMARK = '__watermark_uid_citem_creation_%d__' % size
-        watermark_path = os.path.join(config.basepath, 'theme', 'static', 'common', 'img', 'thumbnail_movie.png')
+        watermark_path = os.path.join(os.path.join(os.path.dirname(__file__), '..'), 'theme', 'static', 'common', 'img', 'thumbnail_movie.png')
         if force or not os.path.exists(self._cimage_item_path(size)) or self._citem_info.get(VERSION) != __version__ + this_method_version or self._citem_info.get(WATERMARK) != fstools.uid(watermark_path):
             logger.info('creating citem (%d) for %s', size, self.name())
             try:
