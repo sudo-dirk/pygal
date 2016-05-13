@@ -123,7 +123,7 @@ def delete(item_name):
         if item.exists() and type(item) is not itemlist:
             inp = collector(title='Delete: %s' % (item.name()), url_prefix=url_prefix, url_extention=url_extention(item_name), this=item, pygal_user=pygal_user, lang=lang)
             rv = flask.render_template('header.html', input=inp)
-            if item.user_may_write():
+            if item.user_may_delete():
                 if flask.request.method == 'GET':
                     rv += flask.render_template('delete.html', input=inp)
                 elif flask.request.method == 'POST' and flask.request.form.get('delete_submit') == '1':

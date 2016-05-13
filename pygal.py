@@ -4,8 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - pylibs in Orner pylibs verschieben und anpassen
-#       - Berechtigungen im Auth File mit regex? statt Liste von Startwith...
+# TODO: - Berechtigungen im Auth File mit regex? statt Liste von Startwith...
 #       - Suche führt zu Elementen, die wiederum zu einer Exception führen.
 #       - Bei Suche die Actions Info, Download korrigieren (Info und Download der Suchergebnisse)
 #       - Session nur für die jeweilige Unterseite anlegen (Test ob tiefere Seiten okay)

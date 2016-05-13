@@ -116,6 +116,9 @@ class itemlist(base_list):
     def user_may_download(self):
         return pygal_user.may_download(self)
 
+    def user_may_delete(self):
+        return pygal_user.may_delete(self)
+
     #
     # Methods for caching
     #
