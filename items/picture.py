@@ -44,7 +44,8 @@ class tags(dict):
 
     def get_tag_id_list(self):
         rv = self.keys()
-        rv.remove(self.DATA_ID)
+        if self.DATA_ID in rv:
+            rv.remove(self.DATA_ID)
         return rv
 
     def get_tag_wn_x(self, tag_id):
