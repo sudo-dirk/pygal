@@ -22,7 +22,7 @@ import time
 
 
 class tags(dict):
-    DATA_ID = '0'
+    DATA_ID = 'common'
 
     def __init__(self):
         self._id = 0
@@ -39,10 +39,12 @@ class tags(dict):
             self._save_tags()
 
     def tag_id_exists(self, tag_id):
-        return tag_id in self
+        return tag_id in self and tag_id != self.DATA_ID
 
     def get_tag_id_list(self):
-        return self.keys()
+        rv = self.keys()
+        rv.remove(self.DATA_ID)
+        return rv
 
     def get_tag_wn_x(self, tag_id):
         try:
