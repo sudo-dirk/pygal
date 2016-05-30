@@ -82,6 +82,7 @@ class tags(dict):
 
     def add_tag_wn_xywh(self, x, y, w, h, tag, ident=None):
         tag_dict = dict()
+        tag_dict['rel_path'] = self.rel_path()
         tag_dict['x'] = float(x) / self.webnail_x()
         tag_dict['y'] = float(y) / self.webnail_y()
         tag_dict['w'] = float(w) / self.webnail_x()

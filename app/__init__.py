@@ -66,6 +66,9 @@ class base_item(object):
         else:
             self._request_args = extend_args(request_args, {})
 
+    def rel_path(self):
+        return self._rel_path
+
     def base_url(self):
         return config.url_prefix + '/' + decode(self._rel_path)
 
