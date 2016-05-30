@@ -22,7 +22,7 @@ import time
 
 
 class tags(dict):
-    DATA_ID = 'common'
+    DATA_ID = '_common_'
 
     def __init__(self):
         self._id = 0
