@@ -12,5 +12,6 @@ url_prefix = ''
 basepath = os.path.abspath(os.path.dirname(__file__))
 trash_path = 'data/trash'
 item_folder = 'data/items'
+database_folder = 'data/database'
 citem_folder = os.path.join(basepath, 'data/cache/citems')
 iprop_folder = os.path.join(basepath, 'data/cache/iprops')

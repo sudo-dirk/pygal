@@ -13,6 +13,30 @@
 
     <link href="{{ input.url_prefix }}/static/video-js/video-js.css" rel="stylesheet">
     <script src="{{ input.url_prefix }}/static/video-js/video.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{{input.url_prefix}}/static/common/css/imgareaselect-default.css" />
+    <script type="text/javascript" src="{{input.url_prefix}}/static/imgareaselect-js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{input.url_prefix}}/static/imgareaselect-js/jquery.imgareaselect.pack.js"></script>
+    <script type="text/javascript">
+      function preview(img, selection) {}
+        $(function () {
+          $('#tag_img').imgAreaSelect({
+{% if input.this.tag_id_exists(input.tag_id) %}
+            x1: {{input.this.get_tag_wn_x(input.tag_id)}}, 
+            x2: {{input.this.get_tag_wn_x2(input.tag_id)}}, 
+            y1: {{input.this.get_tag_wn_y(input.tag_id)}}, 
+            y2: {{input.this.get_tag_wn_y2(input.tag_id)}}, 
+{% endif %}
+	        onSelectEnd: function (img, selection) {
+	          $('input[name="x1"]').val(selection.x1);
+	          $('input[name="y1"]').val(selection.y1);
+	          $('input[name="x2"]').val(selection.x2);
+	          $('input[name="y2"]').val(selection.y2);
+	        }
+          });
+        });
+      </script>
+
   </head>
   <body lang="en" dir="ltr">
 
@@ -62,16 +86,14 @@
       </nav> 
 
       <ul class="moin-breadcrumb">
-        {% if input.this %}
-          {% for navi in input.this.navigation_list() %}
-            <li>
-              <h4 class="moin-location-breadcrumb">
-                <small> / </small>
-                <a href="{{navi.url}}">{{navi.name}}</a>
-              </h4>
-            </li>
-          {% endfor %}
-        {% endif %}
+      {% for navi in input.this.navigation_list() %}
+          <li>
+            <h4 class="moin-location-breadcrumb">
+              <small> / </small>
+              <a href="{{navi.url}}">{{navi.name}}</a>
+            </h4>
+          </li>
+      {% endfor %}
       </ul> 
     
       <div class="moin-content">
@@ -79,14 +101,12 @@
         </div>
         
         <ul class="moin-nav nav-tabs moin-shadow">
-        {% if input.this %}
-          {% for action in input.this.actions() %}
-            <li>
-              <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">
-                <span><img src="{{action.pic}}"></span>
-                <span class="hidden-sm hidden-xs">{{action.name}}</span>
-              </a>
-            </li>
-          {% endfor %}
-        {% endif %}
+        {% for action in input.this.actions() %}
+          <li>
+            <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">
+              <span><img src="{{action.pic}}"></span>
+              <span class="hidden-sm hidden-xs">{{action.name}}</span>
+            </a>
+          </li>
+        {% endfor %}
         </ul>

@@ -5,6 +5,7 @@ import os
 import shutil
 import pygal_config as config
 
+prefix_add_tag = '/_add_tag_'                       # items
 prefix_delete = '/_delete_'                         # items
 prefix_download = '/_download_'                     # items
 prefix_edit = '/_edit_'                             # items

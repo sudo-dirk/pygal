@@ -3,6 +3,7 @@ import os
 from app import base_item
 from app import base_list
 from app import piclink
+from app import prefix_add_tag
 from app import prefix_delete
 from app import prefix_edit
 from app import prefix_info
@@ -14,7 +15,6 @@ import json
 import pygal_config as config
 import time
 
-
 class base_item_props(base_item):
     required_prop_keys = []
     prop_vers = 0.0
@@ -22,8 +22,17 @@ class base_item_props(base_item):
     def __init__(self, rel_path, request_args={}, prefix='', parent=None):
         base_item.__init__(self, rel_path, request_args=request_args, prefix=prefix, parent=parent)
 
-    def edit_url(self):
-        return config.url_prefix + prefix_edit + '/' + self.url(True) or ''
+    def add_tag_url(self, ident=None):
+        add_tag_url = config.url_prefix + prefix_add_tag
+        if self.url(True):
+            add_tag_url += '/' + self.url(True) or ''
+        if ident is not None:
+            add_tag_url += '?tag_id=%s' % str(ident)
+        return add_tag_url
+
+    def tag_path(self):
+        tagfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '.json'
+        return os.path.join(config.database_folder, tagfile)
 
     def delete_url(self):
         return config.url_prefix + prefix_delete + '/' + (self.url(True) or '') + strargs(self._request_args)
@@ -74,6 +83,9 @@ class itemlist(base_list):
         self._prefix = prefix
         self._parent = parent
         self._create_cache = create_cache
+
+    def tag_id_exists(self, tag_id):    # for compatibility with picture object
+        return False
 
     def __init_itemlist__(self):
         base_list.__init_itemlist__(self)
