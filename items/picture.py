@@ -22,6 +22,8 @@ import time
 
 
 class tags(dict):
+    DATA_ID = '0'
+
     def __init__(self):
         self._id = 0
         try:
@@ -31,6 +33,10 @@ class tags(dict):
                     self._id = int(ident)
         except:
             dict.__init__(self)
+        if self.DATA_ID not in self:
+            self[self.DATA_ID] = dict()
+            self[self.DATA_ID]['rel_path'] = self.rel_path()
+            self._save_tags()
 
     def tag_id_exists(self, tag_id):
         return tag_id in self
@@ -82,7 +88,6 @@ class tags(dict):
 
     def add_tag_wn_xywh(self, x, y, w, h, tag, ident=None):
         tag_dict = dict()
-        tag_dict['rel_path'] = self.rel_path()
         tag_dict['x'] = float(x) / self.webnail_x()
         tag_dict['y'] = float(y) / self.webnail_y()
         tag_dict['w'] = float(w) / self.webnail_x()
