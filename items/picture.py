@@ -33,10 +33,11 @@ class tags(dict):
                     self._id = int(ident)
         except:
             dict.__init__(self)
-        if self.DATA_ID not in self:
-            self[self.DATA_ID] = dict()
-            self[self.DATA_ID]['rel_path'] = self.rel_path()
-            self._save_tags()
+        else:
+            if self.DATA_ID not in self:
+                self[self.DATA_ID] = dict()
+                self[self.DATA_ID]['rel_path'] = self.rel_path()
+                self._save_tags()
 
     def tag_id_exists(self, tag_id):
         return tag_id in self and tag_id != self.DATA_ID
