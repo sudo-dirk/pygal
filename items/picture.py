@@ -5,9 +5,6 @@ from items import base_item_props
 from items import itemlist
 from pylibs import osm
 from app import piclink
-from app import prefix_add_tag
-from app import prefix_delete
-from app import prefix_info
 from app import prefix_thumbnail
 from app import prefix_webnail
 from pylibs.multimedia.picture import picture_info_cached
@@ -124,8 +121,8 @@ class picture(base_item_props, tags):
     required_prop_keys = ['raw_x', 'raw_y', 'time', 'orientation', 'manufactor', 'model']
     prop_vers = 0.1
 
-    def __init__(self, rel_path, request_args={}, prefix='', parent=None, **kwargs):
-        base_item_props.__init__(self, rel_path, request_args=request_args, prefix=prefix, parent=parent)
+    def __init__(self, rel_path, request_args={}, parent=None, **kwargs):
+        base_item_props.__init__(self, rel_path, request_args=request_args, parent=parent)
         tags.__init__(self)
         logger.debug('Initialising %s', self.name(True))
         self._info = picture_info_cached(self.raw_path(), self.prop_item_path(), logger=logger)
@@ -151,10 +148,8 @@ class picture(base_item_props, tags):
     def actions(self):
         rv = list()
         # rv.append(piclink(self.edit_url(), 'Edit', config.url_prefix + '/static/pygal_theme/img/edit.png'))
-        if self._prefix != prefix_info:
-            rv.append(piclink(self.info_url(), 'Info', config.url_prefix + '/static/common/img/info.png'))
-        if self._prefix != prefix_add_tag:
-            rv.append(piclink(self.add_tag_url(), 'Add Tag', config.url_prefix + '/static/common/img/edit.png'))
+        rv.append(piclink(self.info_url(), 'Info', config.url_prefix + '/static/common/img/info.png'))
+        rv.append(piclink(self.add_tag_url(), 'Add Tag', config.url_prefix + '/static/common/img/edit.png'))
         if self.user_may_download():
             rv.append(piclink(self.download_url(), 'Download', config.url_prefix + '/static/common/img/download.png'))
         if self.gps() is not None:
@@ -164,7 +159,7 @@ class picture(base_item_props, tags):
             rv.append(piclink(self.url(), 'Stop Slideshow', config.url_prefix + '/static/common/img/stop_slideshow.png'))
         else:
             rv.append(piclink(self.slideshow_url(), 'Start Slideshow', config.url_prefix + '/static/common/img/start_slideshow.png'))
-        if self.user_may_delete() and self._prefix != prefix_delete:
+        if self.user_may_delete():
             rv.append(piclink(self.delete_url(), 'Delete', config.url_prefix + '/static/common/img/delete.png'))
         return rv
 
@@ -275,7 +270,7 @@ class picture(base_item_props, tags):
 
     def parent(self):
         if self._parent is None:
-            self._parent = itemlist(os.path.dirname(self._rel_path), prefix=self._prefix, request_args=self._request_args)
+            self._parent = itemlist(os.path.dirname(self._rel_path), request_args=self._request_args)
         return self._parent
 
     def prop_citem_path(self):

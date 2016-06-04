@@ -19,8 +19,8 @@ class base_item_props(base_item):
     required_prop_keys = []
     prop_vers = 0.0
 
-    def __init__(self, rel_path, request_args={}, prefix='', parent=None):
-        base_item.__init__(self, rel_path, request_args=request_args, prefix=prefix, parent=parent)
+    def __init__(self, rel_path, request_args={}, parent=None):
+        base_item.__init__(self, rel_path, request_args=request_args, parent=parent)
 
     def add_tag_url(self, ident=None):
         add_tag_url = config.url_prefix + prefix_add_tag
@@ -76,11 +76,10 @@ class itemlist(base_list):
     PROP_FILESIZE = 'filesize'
     PROPERTIES = [PROP_LEN, PROP_TIME, PROP_THUMB_XY_MAX, PROP_THUMB_X, PROP_THUMB_Y, PROP_THUMB_URL, PROP_NUM_PICS, PROP_NUM_VIDS, PROP_NUM_GALS, PROP_FILESIZE]
 
-    def __init__(self, rel_path, request_args={}, prefix='', parent=None, create_cache=False):
-        base_list.__init__(self, rel_path, request_args=request_args, prefix=prefix, parent=parent)
+    def __init__(self, rel_path, request_args={}, parent=None, create_cache=False):
+        base_list.__init__(self, rel_path, request_args=request_args, parent=parent)
         self._rel_path = rel_path
         self._request_args = request_args
-        self._prefix = prefix
         self._parent = parent
         self._create_cache = create_cache
 
@@ -90,34 +89,19 @@ class itemlist(base_list):
     def __init_itemlist__(self):
         base_list.__init_itemlist__(self)
         if self.exists():
-            if self._prefix == prefix_search and self._parent is None:
-                if type(self) is itemlist:  # a searchlist should not be cached
-                    entries = fstools.filelist(self.raw_path())
-                    entries.extend(fstools.dirlist(self.raw_path()))
-                    for entry in entries:
-                        c = get_class_for_item(entry[len(self.raw_path()):])
-                        if c:
-                            item = c(entry[len(self.raw_path()):], request_args=self._request_args, prefix=self._prefix, parent=self)
-                            if item.user_may_view() and item.fits_search():
-                                if type(item) is not itemlist or len(item) > 0:
-                                        self._len += 1
-                                        self._itemlist.append(item)
-            else:
-                for entry in os.listdir(self.raw_path()):
-                    c = get_class_for_item(os.path.join(self._rel_path, entry))
-                    if c:
-                        if self._prefix == prefix_search:
-                            self._prefix = ''
-                        item = c(os.path.join(self._rel_path, entry), request_args=self._request_args, prefix=self._prefix, parent=self, create_cache=self._create_cache)
-                        if item.exists():
-                            if type(item) not in [itemlist, cached_itemlist]:
-                                if self._create_cache or item.user_may_view():
-                                    self._len += 1
-                                    self._itemlist.append(item)
-                            else:
-                                if item.len() > 0:
-                                    self._len += 1
-                                    self._itemlist.append(item)
+            for entry in os.listdir(self.raw_path()):
+                c = get_class_for_item(os.path.join(self._rel_path, entry))
+                if c:
+                    item = c(os.path.join(self._rel_path, entry), request_args=self._request_args, parent=self, create_cache=self._create_cache)
+                    if item.exists():
+                        if type(item) not in [itemlist, cached_itemlist]:
+                            if self._create_cache or item.user_may_view():
+                                self._len += 1
+                                self._itemlist.append(item)
+                        else:
+                            if item.len() > 0:
+                                self._len += 1
+                                self._itemlist.append(item)
             #
             self.sort()
             #
@@ -227,8 +211,7 @@ class itemlist(base_list):
     #
     def actions(self):
         rv = list()
-        if self._prefix != prefix_info:
-            rv.append(piclink(self.info_url(), 'Info', config.url_prefix + '/static/common/img/info.png'))
+        rv.append(piclink(self.info_url(), 'Info', config.url_prefix + '/static/common/img/info.png'))
         if self.user_may_download():
             rv.append(piclink(self.download_url(), 'Download', config.url_prefix + '/static/common/img/download.png'))
         return rv

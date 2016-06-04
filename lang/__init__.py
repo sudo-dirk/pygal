@@ -10,7 +10,7 @@ if LANGUAGE == 'DE':
     password_desc = 'Das "Login" - Passwort'
     password2_desc = 'Passwort Wiederholung'
     register = 'Benutzerregistrierung'
-    search = 'Suche'
+    search_results = 'Sucheergebnisse'
     userprofile = 'Benutzerprofil editieren...'
 else:
     create_account = 'Create Account'
@@ -22,5 +22,5 @@ else:
     password_desc = 'The login password'
     password2_desc = 'Repeat the same password'
     register = 'Register'
-    search = 'Search'
+    search_results = 'Search results'
     userprofile = 'Edit Userprofile...'

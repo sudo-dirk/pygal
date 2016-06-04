@@ -10,7 +10,6 @@ from pylibs import fstools
 import json
 import os
 from picture import picture
-import pygal_config as config
 from pygal import logger
 
 
@@ -20,8 +19,8 @@ class video(picture):
     internal_player = ['mp4', 'webm', 'ogv', 'flv', '3gp']
     prop_vers = 0.100
 
-    def __init__(self, rel_path, request_args={}, prefix='', parent=None, **kwargs):
-        base_item_props.__init__(self, rel_path, request_args=request_args, prefix=prefix, parent=parent)
+    def __init__(self, rel_path, request_args={}, parent=None, **kwargs):
+        base_item_props.__init__(self, rel_path, request_args=request_args, parent=parent)
         self._info = video_info_cached(self.raw_path(), self.prop_item_path(), logger=logger)
         self._citem_info = None
 

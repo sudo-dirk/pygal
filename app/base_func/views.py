@@ -1,10 +1,8 @@
 from app import collector
-from app import encode
 from app import url_extention
 from app.base_func import base_func
 from auth import pygal_user
 import flask
-from items import itemlist
 import lang
 from pygal_config import url_prefix
 
@@ -19,22 +17,11 @@ from app import prefix_userprofile
 @base_func.route(prefix_search + '/<itemname:item_name>', methods=['GET', 'POST'])
 @base_func.route(prefix_search, defaults=dict(item_name=u''), methods=['GET', 'POST'])
 def search(item_name):
-    item_name = encode(item_name)
-    if not item_name:
-        il = itemlist('', request_args=flask.request.args, prefix=prefix_search)
-    else:
-        il_root = itemlist('', request_args=flask.request.args, prefix=prefix_search)
-        index = il_root.index_by_rel_path(item_name)
-        if index >= 0:
-            il = il_root[index]
-        else:
-            return item_name
-    inp = collector(title=il.name(), url_prefix=url_prefix, url_extention=url_extention(item_name), this=il, pygal_user=pygal_user, lang=lang)
+    inp = collector(title=lang.search_results, url_prefix=url_prefix, url_extention=url_extention(item_name), pygal_user=pygal_user, lang=lang)
     rv = flask.render_template('header.html', input=inp)
-    rv += flask.render_template(il.template(), input=inp)
+    rv += "Not yet implemented!"
     rv += flask.render_template('footer.html', input=inp)
     return rv
-
 
 @base_func.route(prefix_login + '/<itemname:item_name>', methods=['GET', 'POST'])
 @base_func.route(prefix_login, defaults=dict(item_name=u''), methods=['GET', 'POST'])

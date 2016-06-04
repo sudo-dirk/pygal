@@ -26,7 +26,7 @@ def thumbnail(item_name):
     item_name = encode(item_name)
     c = get_class_for_item(item_name)
     if c:
-        item = c(item_name, flask.request.args, prefix=prefix_thumbnail)
+        item = c(item_name, flask.request.args)
         if item.user_may_view():
             item.create_thumbnail()
             thumbnail_item_path = item.thumbnail_item_path()
@@ -40,7 +40,7 @@ def webnail(item_name):
     item_name = encode(item_name)
     c = get_class_for_item(item_name)
     if c:
-        item = c(item_name, flask.request.args, prefix=prefix_webnail)
+        item = c(item_name, flask.request.args)
         if item.user_may_view():
             item.create_webnail()
             webnail_item_path = item.webnail_item_path()
@@ -54,7 +54,7 @@ def raw(item_name):
     item_name = encode(item_name)
     c = get_class_for_item(item_name)
     if c:
-        item = c(item_name, flask.request.args, prefix=prefix_raw)
+        item = c(item_name, flask.request.args)
         if item.user_may_download():
             raw_path = item.raw_path()
             if os.path.isfile(raw_path):
@@ -70,7 +70,7 @@ def download(item_name):
     item_name = encode(item_name)
     c = get_class_for_item(item_name)
     if c:
-        item = c(item_name, flask.request.args, prefix=prefix_download)
+        item = c(item_name, flask.request.args)
         if item.user_may_download():
             raw_path = item.raw_path()
             if os.path.isfile(raw_path):
@@ -102,7 +102,7 @@ def info(item_name):
     item_name = encode(item_name)
     c = get_class_for_item(item_name)
     if c:
-        item = c(item_name, flask.request.args, prefix=prefix_info)
+        item = c(item_name, flask.request.args)
         inp = collector(title='Info: %s' % item.name(), url_prefix=url_prefix, url_extention=url_extention(item_name), this=item, pygal_user=pygal_user, lang=lang)
         rv = flask.render_template('header.html', input=inp)
         if item.exists():
@@ -137,7 +137,7 @@ def delete(item_name):
     item_name = encode(item_name)
     c = get_class_for_item(item_name)
     if c:
-        item = c(item_name, flask.request.args, prefix=prefix_delete)
+        item = c(item_name, flask.request.args)
         if item.exists() and type(item) is not itemlist:
             inp = collector(title='Delete: %s' % (item.name()), url_prefix=url_prefix, url_extention=url_extention(item_name), this=item, pygal_user=pygal_user, lang=lang)
             rv = flask.render_template('header.html', input=inp)

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% if input.this and input.this.slideshow() %}
+    {% if input.has_attr('this') and input.this.slideshow() %}
       <meta http-equiv="refresh" content="{{ input.this.stay_time() }};url={{ input.this.prv().slideshow_url() }}">
     {% endif %}
     <title>{{ input.title }}</title>
@@ -21,7 +21,7 @@
       function preview(img, selection) {}
         $(function () {
           $('#tag_img').imgAreaSelect({
-{% if input.this.tag_id_exists(input.tag_id) %}
+{% if input.has_attr('this') and input.this.tag_id_exists(input.tag_id) %}
             x1: {{input.this.get_tag_wn_x(input.tag_id)}}, 
             x2: {{input.this.get_tag_wn_x2(input.tag_id)}}, 
             y1: {{input.this.get_tag_wn_y(input.tag_id)}}, 
@@ -86,14 +86,16 @@
       </nav> 
 
       <ul class="moin-breadcrumb">
-      {% for navi in input.this.navigation_list() %}
+      {% if input.has_attr('this') %}
+        {% for navi in input.this.navigation_list() %}
           <li>
             <h4 class="moin-location-breadcrumb">
               <small> / </small>
               <a href="{{navi.url}}">{{navi.name}}</a>
             </h4>
           </li>
-      {% endfor %}
+        {% endfor %}
+      {% endif %}
       </ul> 
     
       <div class="moin-content">
@@ -101,12 +103,14 @@
         </div>
         
         <ul class="moin-nav nav-tabs moin-shadow">
-        {% for action in input.this.actions() %}
+        {% if input.has_attr('this') %}
+          {% for action in input.this.actions() %}
           <li>
             <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">
               <span><img src="{{action.pic}}"></span>
               <span class="hidden-sm hidden-xs">{{action.name}}</span>
             </a>
           </li>
-        {% endfor %}
+          {% endfor %}
+        {% endif %}
         </ul>

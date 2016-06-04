@@ -57,14 +57,10 @@ class base_item(object):
     mime_types = {}
     default_mime_type = 'text/plain'
 
-    def __init__(self, rel_path, request_args={}, prefix='', parent=None):
+    def __init__(self, rel_path, request_args={}, parent=None):
         self._rel_path = rel_path
         self._parent = parent
-        self._prefix = prefix
-        if prefix and prefix != prefix_search:
-            self._request_args = extend_args(request_args, {'prefix': prefix})
-        else:
-            self._request_args = extend_args(request_args, {})
+        self._request_args = extend_args(request_args, {})
 
     def rel_path(self):
         return self._rel_path
@@ -161,7 +157,7 @@ class base_item(object):
         return os.path.getsize(self.raw_path())
 
     def parent_url(self):
-        return config.url_prefix + self._request_args.get('prefix', '') + '/' + decode(os.path.dirname(self._rel_path)) + strargs(self._request_args, exclude=['slideshow', 'prefix'])
+        return config.url_prefix + '/' + decode(os.path.dirname(self._rel_path)) + strargs(self._request_args, exclude=['slideshow'])
 
     def strfilesize(self):
         unit = {0: 'Byte', 1: 'kB', 2: 'MB', 3: 'GB', 4: 'TB'}
@@ -197,16 +193,12 @@ class base_item(object):
 class base_list(object):
     mime_types = {'': 'folder'}
 
-    def __init__(self, rel_path, request_args={}, prefix='', parent=None):
+    def __init__(self, rel_path, request_args={}, parent=None):
         self._rel_path = rel_path
-        self._prefix = prefix
         self._parent = parent
         self._itemlist = None
         self._len = None
-        if prefix != '' and prefix != prefix_search:
-            self._request_args = extend_args(request_args, {'prefix': prefix})
-        else:
-            self._request_args = extend_args(request_args, {})
+        self._request_args = extend_args(request_args, {})
 
     def __init_itemlist__(self):
         self._itemlist = list()
@@ -267,7 +259,7 @@ class base_list(object):
         if relative:
             return decode(self._rel_path)
         else:
-            return config.url_prefix + '/' + decode(self._rel_path) + strargs(self._request_args, exclude=['prefix'])
+            return config.url_prefix + '/' + decode(self._rel_path) + strargs(self._request_args)
 
 
 class collector(object):
@@ -275,6 +267,8 @@ class collector(object):
         for key in kwds:
             setattr(self, key, kwds[key])
 
+    def has_attr(self, name):
+        return hasattr(self, name)
 
 def decode(string):
     for i in ['utf-8', 'cp1252']:
