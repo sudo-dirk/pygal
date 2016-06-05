@@ -12,14 +12,15 @@ from app import prefix_logout
 from app import prefix_lostpass
 from app import prefix_register
 from app import prefix_userprofile
+import items
 
 
 @base_func.route(prefix_search + '/<itemname:item_name>', methods=['GET', 'POST'])
 @base_func.route(prefix_search, defaults=dict(item_name=u''), methods=['GET', 'POST'])
 def search(item_name):
-    inp = collector(title=lang.search_results, url_prefix=url_prefix, url_extention=url_extention(item_name), pygal_user=pygal_user, lang=lang)
+    inp = collector(title=lang.search_results, this=items.searchlist(flask.request.args.get('q')), url_prefix=url_prefix, url_extention=url_extention(item_name), pygal_user=pygal_user, lang=lang)
     rv = flask.render_template('header.html', input=inp)
-    rv += "Not yet implemented!"
+    rv += flask.render_template(inp.this.template(), input=inp)
     rv += flask.render_template('footer.html', input=inp)
     return rv
 

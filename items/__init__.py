@@ -15,12 +15,120 @@ import json
 import pygal_config as config
 import time
 
-class base_item_props(base_item):
+class tags(dict):
+    DATA_ID = '_common_'
+
+    def __init__(self, tag_path):
+        self._id = 0
+        self._tag_path = tag_path
+        try:
+            dict.__init__(self, json.loads(open(self._tag_path, 'r').read()))
+            for ident in self:
+                if int(ident) > self._id:
+                    self._id = int(ident)
+        except:
+            dict.__init__(self)
+        else:
+            if self.DATA_ID not in self:
+                self[self.DATA_ID] = dict()
+                self[self.DATA_ID]['rel_path'] = self.rel_path()
+                self._save_tags()
+
+    def get_rel_path(self):
+        return self.get(self.DATA_ID, {}).get('rel_path', '')
+
+    def matches(self, query):
+        for tag_id in self.get_tag_id_list():
+            if query in self.get_tag_text(tag_id):
+                return True
+        return False
+
+    def tag_id_exists(self, tag_id):
+        return tag_id in self and tag_id != self.DATA_ID
+
+    def get_tag_id_list(self):
+        rv = self.keys()
+        if self.DATA_ID in rv:
+            rv.remove(self.DATA_ID)
+        return rv
+
+    def get_tag_wn_x(self, tag_id):
+        try:
+            return int(self[tag_id]['x'] * self.webnail_x())
+        except:
+            return ''
+
+    def get_tag_wn_y(self, tag_id):
+        try:
+            return int(self[tag_id]['y'] * self.webnail_y())
+        except:
+            return ''
+
+    def get_tag_wn_w(self, tag_id):
+        try:
+            return int(self[tag_id]['w'] * self.webnail_x())
+        except:
+            return ''
+
+    def get_tag_wn_h(self, tag_id):
+        try:
+            return int(self[tag_id]['h'] * self.webnail_y())
+        except:
+            return ''
+
+    def get_tag_wn_x2(self, tag_id):
+        try:
+            return self.get_tag_wn_x(tag_id) + self.get_tag_wn_w(tag_id)
+        except:
+            return ''
+
+    def get_tag_wn_y2(self, tag_id):
+        try:
+            return self.get_tag_wn_y(tag_id) + self.get_tag_wn_h(tag_id)
+        except:
+            return ''
+
+    def get_tag_text(self, tag_id):
+        try:
+            return self[tag_id]['tag']
+        except:
+            return ''
+
+    def add_tag_wn_xywh(self, x, y, w, h, tag, ident=None):
+        tag_dict = dict()
+        tag_dict['x'] = float(x) / self.webnail_x()
+        tag_dict['y'] = float(y) / self.webnail_y()
+        tag_dict['w'] = float(w) / self.webnail_x()
+        tag_dict['h'] = float(h) / self.webnail_y()
+        tag_dict['tag'] = tag
+        if ident is None:
+            self._id += 1
+            self[str(self._id)] = tag_dict
+        else:
+            self[str(ident)] = tag_dict
+        self._save_tags()
+
+    def add_tag_wn_x1y1x2y2(self, x1, y1, x2, y2, tag_text, tag_id=None):
+        self.add_tag_wn_xywh(min(x1, x2), min(y1, y2), abs(x2-x1), abs(y2-y1), tag_text, tag_id)
+
+    def delete_tag(self, tag_id):
+        if self.tag_id_exists(tag_id):
+            del self[tag_id]
+            self._save_tags()
+
+    def _save_tags(self):
+        if self._tag_path is not None:
+            with open(self.tag_path(), 'w') as fh:
+                fh.write(json.dumps(self, indent=3, sort_keys=True))
+
+
+class base_item_props(base_item, tags):
     required_prop_keys = []
     prop_vers = 0.0
 
     def __init__(self, rel_path, request_args={}, parent=None):
         base_item.__init__(self, rel_path, request_args=request_args, parent=parent)
+        tags.__init__(self, self.tag_path())
 
     def add_tag_url(self, ident=None):
         add_tag_url = config.url_prefix + prefix_add_tag
@@ -280,6 +388,21 @@ class itemlist(base_list):
     def create_webnail(self):
         for item in self.itemlist():
             item.create_webnail()
+
+
+class searchlist(itemlist):
+    def __init__(self, searchquery):
+        itemlist.__init__(self, '')
+        self._searchquery = searchquery
+
+    def __init_itemlist__(self):
+        self._itemlist = list()
+        for f in fstools.filelist(config.database_folder, '*.json'):
+            t = tags(f)
+            if t.matches(self._searchquery):
+                c = get_class_for_item(t.get_rel_path())
+                if c:
+                    self._itemlist.append(c(t.get_rel_path()))
 
 
 class cached_itemlist(itemlist):

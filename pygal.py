@@ -4,7 +4,10 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Berechtigungen im Auth File mit regex? statt Liste von Startwith...
+# TODO: - Suche in Tag-Files verbessern (whoosh?) und nach Filenamen?
+#       - Umgang mit Suchergebnissen (z.B.: Download, info, ...)
+###############################################################################################################
+#       - Berechtigungen im Auth File mit regex? statt Liste von Startwith...
 #       - Suche führt zu Elementen, die wiederum zu einer Exception führen.
 #       - Bei Suche die Actions Info, Download korrigieren (Info und Download der Suchergebnisse)
 #       - Session nur für die jeweilige Unterseite anlegen (Test ob tiefere Seiten okay)
