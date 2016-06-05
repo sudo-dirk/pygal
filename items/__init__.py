@@ -31,8 +31,12 @@ class tags(dict):
         else:
             if self.DATA_ID not in self:
                 self[self.DATA_ID] = dict()
-                self[self.DATA_ID]['rel_path'] = self.rel_path()
-                self._save_tags()
+                try:
+                    self[self.DATA_ID]['rel_path'] = self.rel_path()
+                except:
+                    pass
+                else:
+                    self._save_tags()
 
     def get_rel_path(self):
         return self.get(self.DATA_ID, {}).get('rel_path', '')
