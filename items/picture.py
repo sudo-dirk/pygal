@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-from items import base_item_props
+from items import base_item_props, cached_itemlist
 from items import itemlist
 from pylibs import osm
 from app import piclink
@@ -164,21 +164,16 @@ class picture(base_item_props):
         return self._info.get(self._info.MODEL, None)
 
     def nxt(self):
-        return base_item_props.nxt(self, excluded_types=[itemlist])
+        return base_item_props.nxt(self, excluded_types=[itemlist, cached_itemlist])
 
     def orientation(self):
         return self._info.get(self._info.ORIENTATION, None)
-
-    def parent(self):
-        if self._parent is None:
-            self._parent = itemlist(os.path.dirname(self._rel_path), request_args=self._request_args)
-        return self._parent
 
     def prop_citem_path(self):
         return os.path.join(config.citem_folder, self.uid() + '.prop')
 
     def prv(self):
-        return base_item_props.prv(self, excluded_types=[itemlist])
+        return base_item_props.prv(self, excluded_types=[itemlist, cached_itemlist])
 
     def raw_x(self):
         return self._info.get(self._info.WIDTH, config.webnail_size)

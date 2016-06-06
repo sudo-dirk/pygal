@@ -3,7 +3,6 @@ from app import collector
 from app import prefix_add_tag
 from app import prefix_delete
 from app import prefix_download
-from app import prefix_edit
 from app import prefix_info
 from app import prefix_thumbnail
 from app import prefix_webnail
@@ -66,6 +65,7 @@ def raw(item_name):
 
 
 @item.route(prefix_download + '/<itemname:item_name>')
+@item.route(prefix_download, defaults=dict(item_name=u''))
 def download(item_name):
     item_name = encode(item_name)
     c = get_class_for_item(item_name)
@@ -95,12 +95,14 @@ def download(item_name):
         return '!!! not yet implemented !!!'
 
 
-@item.route(prefix_edit + '/<itemname:item_name>')
 @item.route(prefix_info + '/<itemname:item_name>')
 @item.route(prefix_info, defaults=dict(item_name=u''))
 def info(item_name):
     item_name = encode(item_name)
-    c = get_class_for_item(item_name)
+    if flask.request.args.get('q', None) is None:
+        c = get_class_for_item(item_name)
+    else:
+        c = get_class_for_item(item_name, force_uncached=True, force_list=True)
     if c:
         item = c(item_name, flask.request.args)
         inp = collector(title='Info: %s' % item.name(), url_prefix=url_prefix, url_extention=url_extention(item_name), this=item, pygal_user=pygal_user, lang=lang)
@@ -159,9 +161,15 @@ def delete(item_name):
 @item.route('/<itemname:item_name>', methods=['GET', 'POST'])
 def item(item_name):
     item_name = encode(item_name)
-    c = get_class_for_item(item_name)
+    if flask.request.args.get('search_request', None) is None:
+        c = get_class_for_item(item_name)
+    else:
+        c = get_class_for_item(item_name, force_uncached=True, force_list=True)
     if c:
         item = c(item_name, flask.request.args)
+        #
+        # Edit/ Add a tag if posted
+        #
         if flask.request.method == 'POST' and flask.request.form.get('tag_submit') == '1':
             # TODO: Right management for tagging
             tag_id = flask.request.form.get('tag_id', None)
@@ -175,6 +183,9 @@ def item(item_name):
                 item.add_tag_wn_x1y1x2y2(x1, y1, x2, y2, tag_text, tag_id)
             elif action == 'Delete Tag':     # DELETE
                 item.delete_tag(tag_id)
+        #
+        # Create Page
+        #
         inp = collector(title=item.name(), url_prefix=url_prefix, url_extention=url_extention(item_name), this=item, pygal_user=pygal_user, lang=lang)
         rv = flask.render_template('header.html', input=inp)
         if item.user_may_view():

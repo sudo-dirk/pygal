@@ -69,8 +69,13 @@
           </div>
 
           <div class="col-sm-3 hidden-xs">
-            <form class="moin-navbar-form" action="{{ input.url_prefix }}/_search_" method="get" role="search">
+            {% if input.has_attr('this') %}
+            <form class="moin-navbar-form" action="{{input.this.url()}}" method="get" role="search">
+            {% else %}
+            <form class="moin-navbar-form" action="{{input.url_prefix or '/'}}" method="get" role="search">
+            {% endif %}
               <div class="input-group">
+                <input name='search_request' type="hidden">
                 <input name='q' type="text" class="form-control" placeholder="{{ input.lang.search }}...">
                 <div class="input-group-btn">
                   <button class="btn btn-primary" type="submit">

@@ -8,14 +8,12 @@ import pygal_config as config
 prefix_add_tag = '/_add_tag_'                       # items
 prefix_delete = '/_delete_'                         # items
 prefix_download = '/_download_'                     # items
-prefix_edit = '/_edit_'                             # items
 prefix_info = '/_info_'                             # items
 prefix_login = '/_login_'                           # base_func
 prefix_logout = '/_logout_'                         # base_func
 prefix_lostpass = '/_lostpass_'                     # base_func
 prefix_raw = '/_raw_'                               # items
 prefix_register = '/_register_'                     # base_func
-prefix_search = '/_search_'                         # base_func
 prefix_thumbnail = '/_thumbnail_'                   # items
 prefix_userprofile = '/_userprofile_'               # base_func
 prefix_webnail = '/_webnail_'                       # items
@@ -59,8 +57,10 @@ class base_item(object):
 
     def __init__(self, rel_path, request_args={}, parent=None):
         self._rel_path = rel_path
-        self._parent = parent
         self._request_args = extend_args(request_args, {})
+
+    def str_request_args(self):
+        strargs(self._request_args)
 
     def rel_path(self):
         return self._rel_path
@@ -82,10 +82,6 @@ class base_item(object):
 
     def exists(self):
         return os.path.isfile(self.raw_path())
-
-    def fits_search(self):
-        q = self._request_args.get('q')
-        return q in self.name()
 
     def index_by_rel_path(self, rel_path):
         for index in range(0, len(self)):
@@ -112,37 +108,7 @@ class base_item(object):
         while os.path.basename(rel_url):
             rv.insert(0, link(os.path.join(config.url_prefix or '/', rel_url), os.path.basename(rel_url)))
             rel_url = os.path.dirname(rel_url)
-        if 'q' in self._request_args:
-            rv.insert(0, link(config.url_prefix + prefix_search + strargs(self._request_args), 'Suche: %s' % (self._request_args['q'])))
         return rv
-
-    def nxt(self, excluded_types=[]):
-        if self._nxt is None:
-            parent = self.parent()
-            index = parent.index_by_rel_path(self._rel_path)
-            if index >= 0:
-                while True:
-                    index += 1
-                    if index >= len(parent._itemlist):
-                        index = 0
-                    if type(parent._itemlist[index]) not in excluded_types:
-                        self._nxt = parent._itemlist[index]
-                        break
-        return self._nxt
-
-    def prv(self, excluded_types=[]):
-        if self._prv is None:
-            parent = self.parent()
-            index = parent.index_by_rel_path(self._rel_path)
-            if index >= 0:
-                while True:
-                    index -= 1
-                    if index < 0:
-                        index = len(parent._itemlist) - 1
-                    if type(parent._itemlist[index]) not in excluded_types:
-                        self._prv = parent._itemlist[index]
-                        break
-        return self._prv
 
     def raw_ext(self):
         return os.path.splitext(self.raw_path())[1][1:].lower()
@@ -192,30 +158,31 @@ class base_item(object):
 
 class base_list(object):
     mime_types = {'': 'folder'}
+    exclude_keys_request_args = []
 
     def __init__(self, rel_path, request_args={}, parent=None):
         self._rel_path = rel_path
         self._parent = parent
         self._itemlist = None
         self._len = None
-        self._request_args = extend_args(request_args, {})
+        self._request_args = extend_args(request_args, {}, self.exclude_keys_request_args)
 
     def __init_itemlist__(self):
         self._itemlist = list()
         self._len = 0
 
+    def str_request_args(self):
+        return strargs(self._request_args)
+
     def download_url(self):
         du = config.url_prefix + prefix_download
         if self._rel_path:
             du += '/' + decode(self._rel_path)
+        du += self.str_request_args()
         return du
 
     def exists(self):
         return os.path.isdir(self.raw_path())
-
-    def fits_search(self):
-        q = self._request_args.get('q')
-        return q in self.name()
 
     def list_holding_rel_path(self, rel_path):
         for item in self._itemlist:
@@ -245,8 +212,6 @@ class base_list(object):
         while os.path.basename(rel_url):
             rv.insert(0, link(os.path.join(config.url_prefix or '/', rel_url), os.path.basename(rel_url)))
             rel_url = os.path.dirname(rel_url)
-        if 'q' in self._request_args:
-            rv.insert(0, link(config.url_prefix + prefix_search + strargs(self._request_args), 'Suche: %s' % (self._request_args['q'])))
         return rv
 
     def raw_path(self):

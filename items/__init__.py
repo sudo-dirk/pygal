@@ -2,14 +2,14 @@ from pylibs import caching
 import os
 from app import base_item
 from app import base_list
+from app import link
 from app import piclink
 from app import prefix_add_tag
 from app import prefix_delete
-from app import prefix_edit
 from app import prefix_info
-from app import prefix_search
 from app import strargs
 from auth import pygal_user
+import lang
 from pylibs import fstools
 import json
 import pygal_config as config
@@ -133,6 +133,9 @@ class base_item_props(base_item, tags):
     def __init__(self, rel_path, request_args={}, parent=None):
         base_item.__init__(self, rel_path, request_args=request_args, parent=parent)
         tags.__init__(self, self.tag_path())
+        self._parent = parent
+        self._prv = None
+        self._nxt = None
 
     def add_tag_url(self, ident=None):
         add_tag_url = config.url_prefix + prefix_add_tag
@@ -149,6 +152,41 @@ class base_item_props(base_item, tags):
     def delete_url(self):
         return config.url_prefix + prefix_delete + '/' + (self.url(True) or '') + strargs(self._request_args)
 
+    def parent(self):
+        if self._parent is None:
+            c = get_class_for_item(os.path.dirname(self._rel_path))
+            if c is not None:
+                self._parent = c(os.path.dirname(self._rel_path), request_args=self._request_args)
+        return self._parent
+
+    def nxt(self, excluded_types=[]):
+        if self._nxt is None:
+            parent = self.parent()
+            index = parent.index_by_rel_path(self._rel_path)
+            if index >= 0:
+                while True:
+                    index += 1
+                    if index >= len(parent._itemlist):
+                        index = 0
+                    if type(parent._itemlist[index]) not in excluded_types:
+                        self._nxt = parent._itemlist[index]
+                        break
+        return self._nxt
+
+    def prv(self, excluded_types=[]):
+        if self._prv is None:
+            parent = self.parent()
+            index = parent.index_by_rel_path(self._rel_path)
+            if index >= 0:
+                while True:
+                    index -= 1
+                    if index < 0:
+                        index = len(parent._itemlist) - 1
+                    if type(parent._itemlist[index]) not in excluded_types:
+                        self._prv = parent._itemlist[index]
+                        break
+        return self._prv
+
     def info_url(self):
         return config.url_prefix + prefix_info + '/' + self.url(True) or ''
 
@@ -159,11 +197,27 @@ class base_item_props(base_item, tags):
     def slideshow_url(self):
         return self.base_url() + strargs(self._request_args, additional_args={'slideshow': None}) + '#main'
 
+    def is_a_searchitem(self):
+        return 'q' in self._request_args
 
-def get_class_for_item(rel_path):
+    def search_url(self):
+        return self.url() + '&search_request='
+
+    def navigation_list(self):
+        rv = base_item.navigation_list(self)
+        if self.is_a_searchitem():
+            rv.insert(0, link(self.search_url(), lang.search_results % self._request_args.get('q')))
+            rv.insert(1, link(None, ''))
+        return rv
+
+
+def get_class_for_item(rel_path, force_uncached=False, force_list=False):
     bl = base_list(rel_path)
-    if bl.exists():
-        return cached_itemlist
+    if bl.exists() or force_list:
+        if force_uncached:
+            return itemlist
+        else:
+            return cached_itemlist
     from picture import picture
     from video import video
     possible_item_classes = [picture, video]
@@ -175,6 +229,7 @@ def get_class_for_item(rel_path):
 
 
 class itemlist(base_list):
+    exclude_keys_request_args = ['search_request']
     DATA_VERSION = 0
     PROP_LEN = 'len'
     PROP_TIME = 'time'
@@ -190,33 +245,67 @@ class itemlist(base_list):
 
     def __init__(self, rel_path, request_args={}, parent=None, create_cache=False):
         base_list.__init__(self, rel_path, request_args=request_args, parent=parent)
-        self._rel_path = rel_path
-        self._request_args = request_args
-        self._parent = parent
         self._create_cache = create_cache
 
     def tag_id_exists(self, tag_id):    # for compatibility with picture object
         return False
 
+    def is_a_searchresult(self):
+        return 'q' in self._request_args
+
+    def exists(self):
+        return base_list.exists(self) or self.is_a_searchresult()
+
+    def name(self, *args, **kwargs):
+        if self.is_a_searchresult():
+            return lang.search_results % self._request_args.get('q', '')
+        else:
+            return base_list.name(self, *args, **kwargs)
+
     def __init_itemlist__(self):
         base_list.__init_itemlist__(self)
-        if self.exists():
-            for entry in os.listdir(self.raw_path()):
-                c = get_class_for_item(os.path.join(self._rel_path, entry))
-                if c:
-                    item = c(os.path.join(self._rel_path, entry), request_args=self._request_args, parent=self, create_cache=self._create_cache)
-                    if item.exists():
-                        if type(item) not in [itemlist, cached_itemlist]:
-                            if self._create_cache or item.user_may_view():
-                                self._len += 1
-                                self._itemlist.append(item)
-                        else:
-                            if item.len() > 0:
-                                self._len += 1
-                                self._itemlist.append(item)
+        if self.is_a_searchresult():
+            search_query = self._request_args.get('q', '')
+            for f in fstools.filelist(config.database_folder, '*.json'):
+                t = tags(f)
+                if t.matches(search_query):
+                    c = get_class_for_item(t.get_rel_path())
+                    if c:
+                        item = c(t.get_rel_path(), self._request_args)
+                        if item.exists():
+                            if type(item) not in [itemlist, cached_itemlist]:
+                                if self._create_cache or item.user_may_view():
+                                    self._len += 1
+                                    self._itemlist.append(item)
+                            else:
+                                if item.len() > 0:
+                                    self._len += 1
+                                    self._itemlist.append(item)
+        else:
+            if self.exists():
+                for entry in os.listdir(self.raw_path()):
+                    c = get_class_for_item(os.path.join(self._rel_path, entry))
+                    if c:
+                        item = c(os.path.join(self._rel_path, entry), request_args=self._request_args, parent=self, create_cache=self._create_cache)
+                        if item.exists():
+                            if type(item) not in [itemlist, cached_itemlist]:
+                                if self._create_cache or item.user_may_view():
+                                    self._len += 1
+                                    self._itemlist.append(item)
+                            else:
+                                if item.len() > 0:
+                                    self._len += 1
+                                    self._itemlist.append(item)
             #
             self.sort()
             #
+
+    def navigation_list(self):
+        rv = base_list.navigation_list(self)
+        if self.is_a_searchresult():
+            rv.insert(0, link(self.search_url(), lang.search_results % self._request_args.get('q')))
+            rv.insert(1, link(None, ''))
+        return rv
 
     def user_may_view(self):
         return self.len() > 0
@@ -264,7 +353,7 @@ class itemlist(base_list):
                 v += entry.num_vid()
             return v
         elif key == self.PROP_NUM_GALS:
-            g = 1
+            g = 0
             for entry in self._itemlist:
                 g += entry.num_gal()
             return g
@@ -355,7 +444,11 @@ class itemlist(base_list):
         info_url = config.url_prefix + prefix_info
         if self.url(True):
             info_url += '/' + self.url(True) or ''
+        info_url += self.str_request_args()
         return info_url
+
+    def search_url(self):
+        return self.url() + '&search_request='
 
     def itemlist(self):
         if self._itemlist is None:
@@ -392,21 +485,6 @@ class itemlist(base_list):
     def create_webnail(self):
         for item in self.itemlist():
             item.create_webnail()
-
-
-class searchlist(itemlist):
-    def __init__(self, searchquery):
-        itemlist.__init__(self, '')
-        self._searchquery = searchquery
-
-    def __init_itemlist__(self):
-        self._itemlist = list()
-        for f in fstools.filelist(config.database_folder, '*.json'):
-            t = tags(f)
-            if t.matches(self._searchquery):
-                c = get_class_for_item(t.get_rel_path())
-                if c:
-                    self._itemlist.append(c(t.get_rel_path()))
 
 
 class cached_itemlist(itemlist):
