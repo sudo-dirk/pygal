@@ -303,6 +303,7 @@ class itemlist(base_list):
                                 if item.len() > 0:
                                     self._len += 1
                                     self._itemlist.append(item)
+            self._itemlist.sort()
         else:
             if self.exists():
                 for entry in os.listdir(self.raw_path()):
