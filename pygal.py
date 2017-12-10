@@ -4,19 +4,20 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Suche in Tag-Files verbessern (whoosh?) und nach Filenamen?
-#       - Umgang mit Suchergebnissen (z.B.: Download, info, ...)
+# TODO: - Rechte Management für Tageditierung (siehe TODOs)
+#       - Anzeige von Tags und deren Links zum Editieren bei Videos
+#       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
+#       - Benutzereinstellungen (Anmeldedaten + weitere Einstellungen (wie thumbnailssize, webnailsize, ...)
+#       - Config Klasse zum Handeln von Parametern (Session, cfg-Datei, ....); webnail-size als session-parameter und default in user-data?
+#       - Admingruppe implementieren (ggf. in pygal_config.py)
+#       - Festlegung der Benutzerrechte auf Weboberfläche
+#       - E-Mailbenachrichtigung bei neuem Benutzer und Passwortrücksetzung
 ###############################################################################################################
 #       - Berechtigungen im Auth File mit regex? statt Liste von Startwith...
-#       - Suche führt zu Elementen, die wiederum zu einer Exception führen.
-#       - Bei Suche die Actions Info, Download korrigieren (Info und Download der Suchergebnisse)
 #       - Session nur für die jeweilige Unterseite anlegen (Test ob tiefere Seiten okay)
-#       - Config Klasse zum Handeln von Parametern (Session, cfg-Datei, ....); webnail-size als session-parameter und default in user-data?
-#       - __user__ - Seite implementieren, um Änderungen vornehmen zu können
-#       - E-Mailbenachrichtigung bei neuem Benutzer
 #       - Kurze Namen (Anfa...nde) (laenge aus pygal_config), onMouseover: Voller Name anzeigen
 #       - Fehler abfangen (Zugriffsrechte items, cache, user.json)
-#       - Sonderfunktionen hinzu (z.B.: Kommentar, Gruppeninfo für Rechte)
+#       - Sonderfunktionen hinzu (z.B.: Gruppenberechtigungen)
 
 from datetime import timedelta
 import flask

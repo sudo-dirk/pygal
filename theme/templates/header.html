@@ -21,7 +21,7 @@
       function preview(img, selection) {}
         $(function () {
           $('#tag_img').imgAreaSelect({
-{% if input.has_attr('this') and input.this.tag_id_exists(input.tag_id) %}
+{% if input.has_attr('this') and input.this.tag_id_exists(input.tag_id) and input.this.tag_has_coordinates(input.tag_id) %}
             x1: {{input.this.get_tag_wn_x(input.tag_id)}}, 
             x2: {{input.this.get_tag_wn_x2(input.tag_id)}}, 
             y1: {{input.this.get_tag_wn_y(input.tag_id)}}, 
@@ -69,13 +69,8 @@
           </div>
 
           <div class="col-sm-3 hidden-xs">
-            {% if input.has_attr('this') %}
-            <form class="moin-navbar-form" action="{{input.this.url()}}" method="get" role="search">
-            {% else %}
             <form class="moin-navbar-form" action="{{input.url_prefix or '/'}}" method="get" role="search">
-            {% endif %}
               <div class="input-group">
-                <input name='search_request' type="hidden">
                 <input name='q' type="text" class="form-control" placeholder="{{ input.lang.search }}...">
                 <div class="input-group-btn">
                   <button class="btn btn-primary" type="submit">

@@ -1,6 +1,6 @@
 from pylibs import caching
 import os
-from app import base_item
+from app import base_item, prefix_slideshow
 from app import base_list
 from app import link
 from app import piclink
@@ -54,6 +54,7 @@ class tags(dict):
         rv = self.keys()
         if self.DATA_ID in rv:
             rv.remove(self.DATA_ID)
+        rv.sort()
         return rv
 
     def get_tag_wn_x(self, tag_id):
@@ -98,6 +99,19 @@ class tags(dict):
         except:
             return ''
 
+    def get_tag_icon(self, tag_id):
+        return config.url_prefix + '/static/common/img/%d.png' % (int(tag_id) % 10)
+
+    def add_tag_wn(self, tag, ident=None):
+        tag_dict = dict()
+        tag_dict['tag'] = tag
+        if ident is None:
+            self._id += 1
+            self[str(self._id)] = tag_dict
+        else:
+            self[str(ident)] = tag_dict
+        self._save_tags()
+        
     def add_tag_wn_xywh(self, x, y, w, h, tag, ident=None):
         tag_dict = dict()
         tag_dict['x'] = float(x) / self.webnail_x()
@@ -125,13 +139,24 @@ class tags(dict):
             with open(self.tag_path(), 'w') as fh:
                 fh.write(json.dumps(self, indent=3, sort_keys=True))
 
+    def tag_has_coordinates(self, tag_id):
+        if self.get_tag_wn_x(tag_id) == '':
+            return False
+        if self.get_tag_wn_y(tag_id) == '':
+            return False
+        if self.get_tag_wn_w(tag_id) == '':
+            return False
+        if self.get_tag_wn_h(tag_id) == '':
+            return False
+        return True
+
 
 class base_item_props(base_item, tags):
     required_prop_keys = []
     prop_vers = 0.0
 
-    def __init__(self, rel_path, request_args={}, parent=None):
-        base_item.__init__(self, rel_path, request_args=request_args, parent=parent)
+    def __init__(self, rel_path, request_args={}, slideshow=False, parent=None):
+        base_item.__init__(self, rel_path, request_args=request_args, slideshow=slideshow, parent=parent)
         tags.__init__(self, self.tag_path())
         self._parent = parent
         self._prv = None
@@ -195,18 +220,15 @@ class base_item_props(base_item, tags):
         return os.path.join(config.iprop_folder, propfile)
 
     def slideshow_url(self):
-        return self.base_url() + strargs(self._request_args, additional_args={'slideshow': None}) + '#main'
+        return self.base_url(prefix_slideshow) + strargs(self._request_args) + '#main'
 
     def is_a_searchitem(self):
         return 'q' in self._request_args
 
-    def search_url(self):
-        return self.url() + '&search_request='
-
     def navigation_list(self):
         rv = base_item.navigation_list(self)
         if self.is_a_searchitem():
-            rv.insert(0, link(self.search_url(), lang.search_results % self._request_args.get('q')))
+            rv.insert(0, link(config.url_prefix + '/' + strargs(self._request_args), lang.search_results % self._request_args.get('q')))
             rv.insert(1, link(None, ''))
         return rv
 
@@ -243,7 +265,7 @@ class itemlist(base_list):
     PROP_FILESIZE = 'filesize'
     PROPERTIES = [PROP_LEN, PROP_TIME, PROP_THUMB_XY_MAX, PROP_THUMB_X, PROP_THUMB_Y, PROP_THUMB_URL, PROP_NUM_PICS, PROP_NUM_VIDS, PROP_NUM_GALS, PROP_FILESIZE]
 
-    def __init__(self, rel_path, request_args={}, parent=None, create_cache=False):
+    def __init__(self, rel_path, request_args={}, parent=None, slideshow=False, create_cache=False):
         base_list.__init__(self, rel_path, request_args=request_args, parent=parent)
         self._create_cache = create_cache
 
@@ -303,7 +325,7 @@ class itemlist(base_list):
     def navigation_list(self):
         rv = base_list.navigation_list(self)
         if self.is_a_searchresult():
-            rv.insert(0, link(self.search_url(), lang.search_results % self._request_args.get('q')))
+            rv.insert(0, link(config.url_prefix + '/' + strargs(self._request_args), lang.search_results % self._request_args.get('q')))
             rv.insert(1, link(None, ''))
         return rv
 
@@ -446,9 +468,6 @@ class itemlist(base_list):
             info_url += '/' + self.url(True) or ''
         info_url += self.str_request_args()
         return info_url
-
-    def search_url(self):
-        return self.url() + '&search_request='
 
     def itemlist(self):
         if self._itemlist is None:

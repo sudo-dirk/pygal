@@ -14,24 +14,13 @@ prefix_logout = '/_logout_'                         # base_func
 prefix_lostpass = '/_lostpass_'                     # base_func
 prefix_raw = '/_raw_'                               # items
 prefix_register = '/_register_'                     # base_func
+prefix_slideshow = '/_slideshow_'                   # items
 prefix_thumbnail = '/_thumbnail_'                   # items
 prefix_userprofile = '/_userprofile_'               # base_func
 prefix_webnail = '/_webnail_'                       # items
 
 
-def extend_args(request_args, additional_args, exclude=[]):
-    args = dict()
-    for key in request_args:
-        if key not in exclude:
-            args[key] = request_args[key]
-    for key in additional_args:
-        if key not in exclude:
-            args[key] = additional_args[key]
-    return args
-
-
-def strargs(request_args, additional_args={}, exclude=[]):
-    args = extend_args(request_args, additional_args, exclude)
+def strargs(args):
     if len(args) == 0:
         return ''
     else:
@@ -55,9 +44,10 @@ class base_item(object):
     mime_types = {}
     default_mime_type = 'text/plain'
 
-    def __init__(self, rel_path, request_args={}, parent=None):
+    def __init__(self, rel_path, request_args={}, slideshow=False, parent=None):
         self._rel_path = rel_path
-        self._request_args = extend_args(request_args, {})
+        self._request_args = request_args
+        self._slideshow = slideshow
 
     def str_request_args(self):
         strargs(self._request_args)
@@ -65,8 +55,8 @@ class base_item(object):
     def rel_path(self):
         return self._rel_path
 
-    def base_url(self):
-        return config.url_prefix + '/' + decode(self._rel_path)
+    def base_url(self, flask_prefix = ''):
+        return config.url_prefix + flask_prefix + '/' + decode(self._rel_path)
 
     def delete(self):
         shutil.move(self.raw_path(), self.delete_path())
@@ -123,7 +113,7 @@ class base_item(object):
         return os.path.getsize(self.raw_path())
 
     def parent_url(self):
-        return config.url_prefix + '/' + decode(os.path.dirname(self._rel_path)) + strargs(self._request_args, exclude=['slideshow'])
+        return config.url_prefix + '/' + decode(os.path.dirname(self._rel_path)) + strargs(self._request_args)
 
     def strfilesize(self):
         unit = {0: 'Byte', 1: 'kB', 2: 'MB', 3: 'GB', 4: 'TB'}
@@ -135,7 +125,7 @@ class base_item(object):
         return '%.1f %s' % (size, unit[u])
 
     def slideshow(self):
-        return 'slideshow' in self._request_args
+        return self._slideshow
 
     def uid(self):
         return fstools.uid(self.raw_path())
@@ -144,7 +134,7 @@ class base_item(object):
         if relative:
             return decode(self._rel_path)
         else:
-            return self.base_url() + strargs(self._request_args, exclude=['slideshow'])
+            return self.base_url() + strargs(self._request_args)
 
     def user_may_view(self):
         return pygal_user.may_view(self)
@@ -158,14 +148,13 @@ class base_item(object):
 
 class base_list(object):
     mime_types = {'': 'folder'}
-    exclude_keys_request_args = []
 
     def __init__(self, rel_path, request_args={}, parent=None):
         self._rel_path = rel_path
         self._parent = parent
         self._itemlist = None
         self._len = None
-        self._request_args = extend_args(request_args, {}, self.exclude_keys_request_args)
+        self._request_args = request_args
 
     def __init_itemlist__(self):
         self._itemlist = list()
@@ -180,6 +169,9 @@ class base_list(object):
             du += '/' + decode(self._rel_path)
         du += self.str_request_args()
         return du
+
+    def base_url(self, flask_prefix = ''):
+        return config.url_prefix + flask_prefix + '/' + decode(self._rel_path)
 
     def exists(self):
         return os.path.isdir(self.raw_path())

@@ -23,8 +23,8 @@ class picture(base_item_props):
     required_prop_keys = ['raw_x', 'raw_y', 'time', 'orientation', 'manufactor', 'model']
     prop_vers = 0.1
 
-    def __init__(self, rel_path, request_args={}, parent=None, **kwargs):
-        base_item_props.__init__(self, rel_path, request_args=request_args, parent=parent)
+    def __init__(self, rel_path, request_args={}, parent=None, slideshow=False, **kwargs):
+        base_item_props.__init__(self, rel_path, request_args=request_args, slideshow=slideshow, parent=parent)
         logger.debug('Initialising %s', self.name(True))
         self._info = picture_info_cached(self.raw_path(), self.prop_item_path(), logger=logger)
         self._citem_info = None

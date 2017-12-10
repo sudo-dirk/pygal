@@ -4,6 +4,7 @@ from app import prefix_add_tag
 from app import prefix_delete
 from app import prefix_download
 from app import prefix_info
+from app import prefix_slideshow
 from app import prefix_thumbnail
 from app import prefix_webnail
 from app import prefix_raw
@@ -158,15 +159,20 @@ def delete(item_name):
     flask.abort(404)
 
 
+@item.route(prefix_slideshow + '/<itemname:item_name>', methods=['GET', 'POST'])
+def slideshow(item_name):
+    return item(item_name, slideshow=True)
+
+
 @item.route('/<itemname:item_name>', methods=['GET', 'POST'])
-def item(item_name):
+def item(item_name, slideshow=False):
     item_name = encode(item_name)
     if flask.request.args.get('search_request', None) is None:
         c = get_class_for_item(item_name)
     else:
         c = get_class_for_item(item_name, force_uncached=True, force_list=True)
     if c:
-        item = c(item_name, flask.request.args)
+        item = c(item_name, flask.request.args, slideshow=slideshow)
         #
         # Edit/ Add a tag if posted
         #
@@ -175,12 +181,16 @@ def item(item_name):
             tag_id = flask.request.form.get('tag_id', None)
             action = flask.request.form.get('action')
             if action == 'Submit Tag':       # EDIT/ ADD
-                x1 = int(flask.request.form.get('x1'))
-                x2 = int(flask.request.form.get('x2'))
-                y1 = int(flask.request.form.get('y1'))
-                y2 = int(flask.request.form.get('y2'))
                 tag_text = flask.request.form.get('tag_text')
-                item.add_tag_wn_x1y1x2y2(x1, y1, x2, y2, tag_text, tag_id)
+                try:
+                    x1 = int(flask.request.form.get('x1'))
+                    x2 = int(flask.request.form.get('x2'))
+                    y1 = int(flask.request.form.get('y1'))
+                    y2 = int(flask.request.form.get('y2'))
+                except ValueError:
+                    item.add_tag_wn(tag_text, tag_id)
+                else:
+                    item.add_tag_wn_x1y1x2y2(x1, y1, x2, y2, tag_text, tag_id)
             elif action == 'Delete Tag':     # DELETE
                 item.delete_tag(tag_id)
         #
