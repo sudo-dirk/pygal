@@ -112,7 +112,7 @@ class tags(dict):
         else:
             self[str(ident)] = tag_dict
         self._save_tags()
-        
+
     def add_tag_wn_xywh(self, x, y, w, h, tag, ident=None):
         tag_dict = dict()
         tag_dict['x'] = float(x) / self.webnail_x()
@@ -128,7 +128,7 @@ class tags(dict):
         self._save_tags()
 
     def add_tag_wn_x1y1x2y2(self, x1, y1, x2, y2, tag_text, tag_id=None):
-        self.add_tag_wn_xywh(min(x1, x2), min(y1, y2), abs(x2-x1), abs(y2-y1), tag_text, tag_id)
+        self.add_tag_wn_xywh(min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1), tag_text, tag_id)
 
     def delete_tag(self, tag_id):
         if self.tag_id_exists(tag_id):
@@ -303,7 +303,6 @@ class itemlist(base_list):
                                 if item.len() > 0:
                                     self._len += 1
                                     self._itemlist.append(item)
-            self._itemlist.sort(reverse=True)
         else:
             if self.exists():
                 for entry in os.listdir(self.raw_path()):
@@ -319,9 +318,9 @@ class itemlist(base_list):
                                 if item.len() > 0:
                                     self._len += 1
                                     self._itemlist.append(item)
-            #
-            self.sort()
-            #
+        #
+        self.sort()
+        #
 
     def navigation_list(self):
         rv = base_list.navigation_list(self)
