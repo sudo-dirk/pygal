@@ -26,7 +26,7 @@ class picture(base_item_props):
     def __init__(self, rel_path, request_args={}, parent=None, slideshow=False, **kwargs):
         base_item_props.__init__(self, rel_path, request_args=request_args, slideshow=slideshow, parent=parent)
         logger.debug('Initialising %s', self.name(True))
-        self._info = picture_info_cached(self.raw_path(), self.prop_item_path(), logger=logger)
+        self._info = picture_info_cached(self.raw_path(), self.prop_item_path())
         self._citem_info = None
 
         self._parent = None
@@ -65,7 +65,7 @@ class picture(base_item_props):
         return rv
 
     def aperture(self):
-        fn = self._info.get(self._info.FNUMBER, None)
+        fn = self._info.get(self._info.FNUMBER, None, logger=logger)
         if fn is None:
             return None
         else:
@@ -92,20 +92,20 @@ class picture(base_item_props):
         os.remove(self.prop_item_path())
 
     def exposure_program(self):
-        return self._info.get(self._info.EXPOSURE_PROGRAM, None)
+        return self._info.get(self._info.EXPOSURE_PROGRAM, None, logger=logger)
 
     def exposure_time(self):
-        et = self._info.get(self._info.EXPOSURE_TIME, None)
+        et = self._info.get(self._info.EXPOSURE_TIME, None, logger=logger)
         if et is None:
             return None
         else:
             return '%d/%d' % (et[0], et[1])
 
     def flash(self):
-        return self._info.get(self._info.FLASH, None)
+        return self._info.get(self._info.FLASH, None, logger=logger)
 
     def focal_length(self):
-        fl = self._info.get(self._info.FOCAL_LENGTH, None)
+        fl = self._info.get(self._info.FOCAL_LENGTH, None, logger=logger)
         if fl is None:
             return None
         else:
@@ -136,7 +136,7 @@ class picture(base_item_props):
 
     def gps(self):
         try:
-            gps_dict = self._info.get(self._info.GPS_INFO, None)
+            gps_dict = self._info.get(self._info.GPS_INFO, None, logger=logger)
         except AttributeError:
             return None
         if gps_dict is None:
@@ -151,23 +151,23 @@ class picture(base_item_props):
             return (osm.landmark_link(self.gps()), self.gps().__str__())
 
     def iso(self):
-        iso = self._info.get(self._info.ISO, None)
+        iso = self._info.get(self._info.ISO, None, logger=logger)
         if iso is None:
             return None
         else:
             return '%d' % iso
 
     def manufactor(self):
-        return self._info.get(self._info.MANUFACTOR, None)
+        return self._info.get(self._info.MANUFACTOR, None, logger=logger)
 
     def model(self):
-        return self._info.get(self._info.MODEL, None)
+        return self._info.get(self._info.MODEL, None, logger=logger)
 
     def nxt(self):
         return base_item_props.nxt(self, excluded_types=[itemlist, cached_itemlist])
 
     def orientation(self):
-        return self._info.get(self._info.ORIENTATION, None)
+        return self._info.get(self._info.ORIENTATION, None, logger=logger)
 
     def prop_citem_path(self):
         return os.path.join(config.citem_folder, self.uid() + '.prop')
@@ -176,10 +176,16 @@ class picture(base_item_props):
         return base_item_props.prv(self, excluded_types=[itemlist, cached_itemlist])
 
     def raw_x(self):
-        return self._info.get(self._info.WIDTH, config.webnail_size)
+        return self._info.get(self._info.WIDTH, logger=logger) or config.webnail_size
 
     def raw_y(self):
-        return self._info.get(self._info.HEIGHT, config.webnail_size)
+        return self._info.get(self._info.HEIGHT, logger=logger) or config.webnail_size
+
+    def ratio_x(self):
+        return float(self.raw_x()) / max(self.raw_x(), self.raw_y())
+
+    def ratio_y(self):
+        return float(self.raw_y()) / max(self.raw_x(), self.raw_y())
 
     def resolution(self):
         if self.raw_x() is None or self.raw_y() is None:
@@ -216,7 +222,7 @@ class picture(base_item_props):
         return self._thumbnail_y or config.thumbnail_size
 
     def time(self):
-        return self._info.get(self._info.TIME, 0)
+        return self._info.get(self._info.TIME, 0, logger=logger)
 
     def webnail_item_path(self):
         return self._cimage_item_path(config.webnail_size)

@@ -10,9 +10,10 @@ import logging
 import os
 from pylibs import fstools
 from PIL import Image
-from picture import picture_edit
+from pylibs.multimedia.picture import picture_edit
 import StringIO
 import subprocess
+from pylibs import report
 import time
 
 __version__ = '0.0.9'
@@ -52,17 +53,18 @@ class video_picture_edit(picture_edit):
             self._load_im()
         picture_edit.save(self, filename)
 
-    def _load_im(self, logger=None):
-        logit = logger or self.logger
+    def _load_im(self):
         ffmpeg = os.popen('ffmpeg -ss 0.5 -i "' + self._file + '" -vframes 1 -f image2pipe pipe:1 2> /dev/null')
         ffmpeg_handle = StringIO.StringIO(ffmpeg.read())
         if ffmpeg.close() is None:
             self._im = Image.open(ffmpeg_handle)
-        vi = video_info(self._file, logger=logit)
+        vi = video_info(self._file)
         self._im = self._im.resize((vi.get(vi.WIDTH), vi.get(vi.HEIGHT)), Image.NEAREST).rotate(0)
 
 
 class video_info(base_info):
+    LOG_PREFIX = 'VidInfo:'
+
     """Class to hold and handle information of a video. See also parent class :py:class:`multimedia.base_info`.
 
     :param str filename: Name of the picture
@@ -158,6 +160,8 @@ class video_info(base_info):
 
 
 class video_info_cached(video_info):
+    LOG_PREFIX = 'VidInfoCa:'
+
     """Class to hold and handle information of a video. See also parent class :py:class:`video_info`.
     This class caches the information to have a faster access.
 
@@ -184,9 +188,9 @@ class video_info_cached(video_info):
         time <type 'int'> 1414951903
     """
 
-    def __init__(self, filename, cache_filename, logger=None):
-        video_info.__init__(self, filename, logger)
-        self._cached_data = caching.property_cache_json(video_info(filename, logger), cache_filename, load_all_on_init=True, logger=logger)
+    def __init__(self, filename, cache_filename, load_all_on_init=True):
+        video_info.__init__(self, filename)
+        self._cached_data = caching.property_cache_json(video_info(filename), cache_filename, load_all_on_init)
 
     def get(self, key, default=None, logger=None):
         """
@@ -196,8 +200,7 @@ class video_info_cached(video_info):
         :param default: The default value to be returned, if no information with that key exists
         :returns: The information for the given key
         """
-        logger = logger or self.logger
-        logger.debug("Property request (%s) for %s", key, os.path.basename(self.filename))
+        self.logit(logger, report.logging.DEBUG, "Property request (%s) for %s", key, os.path.basename(self.filename))
         return self._cached_data.get(key, default)
 
 

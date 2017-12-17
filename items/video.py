@@ -21,7 +21,7 @@ class video(picture):
 
     def __init__(self, rel_path, request_args={}, parent=None, **kwargs):
         base_item_props.__init__(self, rel_path, request_args=request_args, parent=parent)
-        self._info = video_info_cached(self.raw_path(), self.prop_item_path(), logger=logger)
+        self._info = video_info_cached(self.raw_path(), self.prop_item_path())
         self._citem_info = None
 
         self._parent = None
@@ -42,7 +42,7 @@ class video(picture):
         return 0
 
     def duration(self):
-        duration = self._info.get(self._info.DURATION)
+        duration = self._info.get(self._info.DURATION, logger=logger)
         if duration is None:
             return None
         else:
@@ -65,7 +65,7 @@ class video(picture):
 
     def stay_time(self):
         if self.raw_ext() in self.internal_player:
-            return self._info.get(self._info.DURATION, 2) + 2
+            return self._info.get(self._info.DURATION, 2, logger=logger) + 2
         else:
             return picture.stay_time(self)
 
@@ -89,10 +89,10 @@ class video(picture):
         if force or not os.path.exists(self._cimage_item_path(size)) or self._citem_info.get(VERSION) != __version__ + this_method_version or self._citem_info.get(WATERMARK) != fstools.uid(watermark_path):
             logger.info('creating citem (%d) for %s', size, self.name())
             try:
-                p = video_picture_edit(self.raw_path(), logger=logger)
-                p.resize(size)
+                p = video_picture_edit(self.raw_path())
+                p.resize(size, logger=logger)
                 movie_icon = picture_edit(watermark_path)
-                p.join(movie_icon, p.JOIN_TOP_RIGHT, 0.75)
+                p.join(movie_icon, p.JOIN_TOP_RIGHT, 0.75, logger=logger)
             except IOError:
                 logger.error('error creating citem (%d) for %s', size, self.name())
             else:

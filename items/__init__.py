@@ -15,6 +15,7 @@ import json
 import pygal_config as config
 import time
 
+
 class tags(dict):
     DATA_ID = '_common_'
 
@@ -43,7 +44,7 @@ class tags(dict):
 
     def matches(self, query):
         for tag_id in self.get_tag_id_list():
-            if query in self.get_tag_text(tag_id):
+            if query.lower() in self.get_tag_text(tag_id).lower():
                 return True
         return False
 
@@ -252,18 +253,17 @@ def get_class_for_item(rel_path, force_uncached=False, force_list=False):
 
 class itemlist(base_list):
     exclude_keys_request_args = ['search_request']
-    DATA_VERSION = 0
+    DATA_VERSION = 1
     PROP_LEN = 'len'
     PROP_TIME = 'time'
-    PROP_THUMB_XY_MAX = 'thumb_xy_max'
-    PROP_THUMB_X = 'thumb_x'
-    PROP_THUMB_Y = 'thumb_y'
+    PROP_RATIO_X = 'ratio_x'
+    PROP_RATIO_Y = 'ratio_y'
     PROP_THUMB_URL = 'thumb_url'
     PROP_NUM_PICS = 'num_pics'
     PROP_NUM_VIDS = 'num_vids'
     PROP_NUM_GALS = 'num_gals'
     PROP_FILESIZE = 'filesize'
-    PROPERTIES = [PROP_LEN, PROP_TIME, PROP_THUMB_XY_MAX, PROP_THUMB_X, PROP_THUMB_Y, PROP_THUMB_URL, PROP_NUM_PICS, PROP_NUM_VIDS, PROP_NUM_GALS, PROP_FILESIZE]
+    PROPERTIES = [PROP_LEN, PROP_TIME, PROP_RATIO_X, PROP_RATIO_Y, PROP_THUMB_URL, PROP_NUM_PICS, PROP_NUM_VIDS, PROP_NUM_GALS, PROP_FILESIZE]
 
     def __init__(self, rel_path, request_args={}, parent=None, slideshow=False, create_cache=False):
         base_list.__init__(self, rel_path, request_args=request_args, parent=parent)
@@ -303,7 +303,7 @@ class itemlist(base_list):
                                 if item.len() > 0:
                                     self._len += 1
                                     self._itemlist.append(item)
-            self._itemlist.sort()
+            self._itemlist.sort(reverse=True)
         else:
             if self.exists():
                 for entry in os.listdir(self.raw_path()):
@@ -353,15 +353,12 @@ class itemlist(base_list):
         elif key == self.PROP_TIME:
             if len(self._itemlist) > 0:
                 return self._itemlist[0].time()
-        elif key == self.PROP_THUMB_XY_MAX:
+        elif key == self.PROP_RATIO_X:
             if len(self._itemlist) > 0:
-                return self._itemlist[0].thumbnail_xy_max()
-        elif key == self.PROP_THUMB_X:
+                return self._itemlist[0].ratio_x()
+        elif key == self.PROP_RATIO_Y:
             if len(self._itemlist) > 0:
-                return self._itemlist[0].thumbnail_x()
-        elif key == self.PROP_THUMB_Y:
-            if len(self._itemlist) > 0:
-                return self._itemlist[0].thumbnail_y()
+                return self._itemlist[0].ratio_y()
         elif key == self.PROP_THUMB_URL:
             if len(self._itemlist) > 0:
                 return self._itemlist[0].thumbnail_url()
@@ -418,14 +415,11 @@ class itemlist(base_list):
     def thumbnail_url(self):
         return self.get(self.PROP_THUMB_URL)
 
-    def thumbnail_x(self):
-        return self.get(self.PROP_THUMB_X, config.thumbnail_size)
+    def ratio_x(self):
+        return self.get(self.PROP_RATIO_X, 1.0)
 
-    def thumbnail_xy_max(self):
-        return self.get(self.PROP_THUMB_XY_MAX, config.thumbnail_size)
-
-    def thumbnail_y(self):
-        return self.get(self.PROP_THUMB_Y, config.thumbnail_size)
+    def ratio_y(self):
+        return self.get(self.PROP_RATIO_Y, 1.0)
 
     def time(self):
         return self.get(self.PROP_TIME, 0)
@@ -433,6 +427,15 @@ class itemlist(base_list):
     #
     # Further Methods
     #
+    def thumbnail_xy_max(self):
+        return config.thumbnail_size
+
+    def thumbnail_x(self):
+        return self.ratio_x() * self.thumbnail_xy_max()
+
+    def thumbnail_y(self):
+        return self.ratio_y() * self.thumbnail_xy_max()
+
     def actions(self):
         rv = list()
         rv.append(piclink(self.info_url(), 'Info', config.url_prefix + '/static/common/img/info.png'))
@@ -513,11 +516,11 @@ class cached_itemlist(itemlist):
         if not self._create_cache:
             from pygal import logger
             self.logger = logger
-            self._cached_data = caching.property_cache_json(itemlist(*args, **kwargs), self.prop_item_path(), load_all_on_init=True, logger=self.logger)
+            self._cached_data = caching.property_cache_json(itemlist(*args, **kwargs), self.prop_item_path(), load_all_on_init=True)
 
     def get(self, key, default=None):
         if not self._create_cache:
             self.logger.debug("Property request (%s) for %s", key, self.name())
-            return self._cached_data.get(key, default)
+            return self._cached_data.get(key, default, logger=self.logger)
         else:
             return itemlist.get(self, key, default)

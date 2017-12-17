@@ -4,8 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Die Resolution raw_x und raw_y wird nur aus den Exif-Daten bestimmt. Wenn Exif nicht existend, könnte eine andere Methode
-#         gezogen werden (notwendig für die richtige Darstellung von Bildern ohne Exif-Informationen - z.B.: Rahmenerstellung)
+# TODO: - Neue Reportingklasse und -system analog multimedia-klasse verwenden (items/...) und einsetzen (PREFIX, self.logit)
 #       - Rechte Management für Tageditierung (siehe TODOs)
 #       - Anzeige von Tags und deren Links zum Editieren bei Videos
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
@@ -20,6 +19,7 @@
 #       - Kurze Namen (Anfa...nde) (laenge aus pygal_config), onMouseover: Voller Name anzeigen
 #       - Fehler abfangen (Zugriffsrechte items, cache, user.json)
 #       - Sonderfunktionen hinzu (z.B.: Gruppenberechtigungen)
+
 
 from datetime import timedelta
 import flask

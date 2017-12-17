@@ -4,10 +4,10 @@
 from pylibs import caching
 import calendar
 from pylibs import fstools
-import logging
 import os
 from PIL import Image
 from PIL import ImageEnhance
+from pylibs import report
 import time
 
 __version__ = '0.0.9'
@@ -15,7 +15,9 @@ __version__ = '0.0.9'
 from __init__ import base_info
 
 
-class picture_edit:
+class picture_edit(report.logit):
+    LOG_PREFIX = 'PicEdit:'
+
     """
     Class to edit a picture. That means things like resize, rotate, join, ...
 
@@ -47,10 +49,15 @@ class picture_edit:
     JOIN_BOT_RIGHT = 4
     JOIN_CENTER = 5
 
-    def __init__(self, file_info, logger=None):
+    def __init__(self, file_info):
         self._file = file_info
         self._im = None
-        self.logger = logger
+
+    def _filename(self):
+        try:
+            return os.path.basename(self._file)
+        except AttributeError:  # seems to be a filehandle or so
+            return '-'
 
     def get(self):
         """
@@ -62,26 +69,27 @@ class picture_edit:
             self._load_im()
         return self._im
 
-    def resize(self, max_size):
+    def resize(self, max_size, logger=None):
         """
         This resizes the picture without changing the ratio.
 
         :param max_size: The maximum size of x, y.
         """
+        self.logit(logger, report.logging.DEBUG, 'Resizing picture %s to max %d pixel in whatever direction', self._filename(), max_size)
         if self._im is None:
             self._load_im()
         x, y = self._im.size
         xy_max = max(x, y)
         self._im = self._im.resize((int(x * float(max_size) / xy_max), int(y * float(max_size) / xy_max)), Image.NEAREST).rotate(0)
 
-    def rotate(self, orientation):
+    def rotate(self, orientation, logger=None):
         """
         This rotates the picture.
 
         :param orientation: Orientation Information. See also self.ORIENTATION_*
 
         .. note::
-          The orientation parameter can take the exif-orientation to create a picture in the correct orientation.
+          The orientation parameter can be taken from the exif-orientation to create a picture in the correct orientation.
         """
         angle = None
         if orientation == 3:
@@ -91,11 +99,12 @@ class picture_edit:
         elif orientation == 8:
             angle = 90
         if angle is not None:
+            self.logit(logger, report.logging.DEBUG, 'Rotating picture %s by %d°', self._filename(), angle)
             if self._im is None:
                 self._load_im()
             self._im = self._im.rotate(angle)
 
-    def save(self, filename):
+    def save(self, filename, logger=None):
         """
         This saves the picture.
 
@@ -104,11 +113,12 @@ class picture_edit:
         .. note::
           The fileformat is **always** *JPEG*.
         """
+        self.logit(logger, report.logging.DEBUG, 'Saving original file %s to %s', self._filename(), os.path.basename(filename))
         if self._im is not None:
             with open(filename, 'w') as fh:
                 self._im.save(fh, 'JPEG')
 
-    def join(self, picture, joint_pos=JOIN_TOP_RIGHT, opacity=0.7):
+    def join(self, picture, joint_pos=JOIN_TOP_RIGHT, opacity=0.7, logger=None):
         """
         This joins another picture to this one.
 
@@ -119,6 +129,7 @@ class picture_edit:
         .. note::
           joint_pos makes only sense if picture is smaller than this picture.
         """
+        self.logit(logger, report.logging.DEBUG, 'Joining %s to %s', picture._filename(), self._filename())
         im2 = picture.get()
         im2 = self._rgba_copy(im2)
         # change opacity of im2
@@ -212,6 +223,8 @@ def strip(txt):
 
 
 class picture_info(base_info):
+    LOG_PREFIX = 'PicInfo:'
+
     """Class to hold and handle information of a picture. See also parent class :py:class:`multimedia.base_info`.
 
     :param str filename: Name of the picture
@@ -448,6 +461,10 @@ class picture_info(base_info):
                 exif = dict(im._getexif().items())
             except:
                 exif = dict()
+            if not self.WIDTH in exif or exif[self.WIDTH] is None:
+                exif[self.WIDTH] = im.size[0]
+            if not self.HEIGHT in exif or exif[self.HEIGHT] is None:
+                exif[self.HEIGHT] = im.size[1]
             for key in exif:
                 key_name = self.EXIF_TAGS.get(key, [key])[0]
                 if key_name in self.TAG_TYPES:
@@ -474,6 +491,8 @@ class picture_info(base_info):
 
 
 class picture_info_cached(picture_info):
+    LOG_PREFIX = 'PicInfoCa:'
+
     """Class to hold and handle information of a picture. See also parent class :py:class:`picture_info`.
     This class caches the information to have a faster access.
 
@@ -502,9 +521,9 @@ class picture_info_cached(picture_info):
         gps <type 'dict'> {u'11': [12853, 10000], u'10': u'3', u'13': [2661, 1000], u'12': u'K', u'15': [34519, 100], u'14': u'T', u'17': [23725, 100], u'16': u'M', u'18': u'WGS-84', u'30': 0, u'29': u'2014:10:30', u'1': u'N', u'0': [2, 3, 0, 0], u'3': u'E', u'2': [[53, 1], [59, 1], [35037, 1000]], u'5': 1, u'4': [[11, 1], [22, 1], [30873, 1000]], u'7': [[15, 1], [29, 1], [7951, 1000]], u'6': [8320, 1000], u'9': u'A'}
     """
 
-    def __init__(self, filename, cache_filename, load_all_on_init=True, logger=None):
-        picture_info.__init__(self, filename, logger)
-        self._cached_data = caching.property_cache_json(picture_info(filename, logger), cache_filename, logger=logger)
+    def __init__(self, filename, cache_filename, load_all_on_init=True):
+        picture_info.__init__(self, filename)
+        self._cached_data = caching.property_cache_json(picture_info(filename), cache_filename, load_all_on_init)
 
     def get(self, key, default=None, logger=None):
         """
@@ -514,6 +533,5 @@ class picture_info_cached(picture_info):
         :param default: The default value to be returned, if no information with that key exists
         :returns: The information for the given key
         """
-        logger = logger or self.logger
-        logger.debug("Property request (%s) for %s", key, os.path.basename(self.filename))
+        self.logit(logger, report.logging.DEBUG, "Property request (%s) for %s", key, os.path.basename(self.filename))
         return self._cached_data.get(key, default)

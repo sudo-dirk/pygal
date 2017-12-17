@@ -9,11 +9,12 @@ Multimedia Module
 """
 
 import os
+from pylibs import report
 
 __all__ = ['multimedia.video', 'multimedia.picture']
 
 
-class base_info:
+class base_info(report.logit):
     """Base class to hold and handle information of a file
 
     :param str filename: Name of the source file
@@ -21,11 +22,11 @@ class base_info:
     .. note:: This is is not designed to be used directly.
     """
     TAG_TYPES = {}
+    LOG_PREFIX = 'MULTIMEDIA:'
 
-    def __init__(self, filename, logger=None):
+    def __init__(self, filename):
         self.filename = filename
         self._info = None
-        self.logger = logger
 
     def get(self, key, default=None, logger=None):
         """
@@ -35,8 +36,7 @@ class base_info:
         :param default: The default value to be returned, if no information with that key exists
         :returns: The information for the given key
         """
-        logger = logger or self.logger
-        logger.debug("Property request for %s", os.path.basename(self.filename))
+        self.logit(logger, report.logging.DEBUG, "Property request (%s) for %s", key, os.path.basename(self.filename))
         if self._info is None:
             self._get_info()
         return self._info.get(key, default)

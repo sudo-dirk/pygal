@@ -9,13 +9,14 @@ Caching Module
 import hashlib
 import hmac
 import json
-import logging
+from pylibs import report
 import os
 import pickle
-import time
 
 
-class property_cache_pickle(object):
+class property_cache_pickle(report.logit):
+    LOG_PREFIX = 'PickCache:'
+
     """
     Class to cache properties, which take longer on initialising than reading a file in pickle format.
 
@@ -24,7 +25,6 @@ class property_cache_pickle(object):
     :param cache_filename: File name, where the properties are stored as cache
     :type cache_filename: str
     :param load_all_on_init: Optionally init behaviour control parameter. True will load all available properties from source on init, False not.
-    :param logger: Optionally logger instance to use instead of creating one
     :raises: ?
 
     .. note:: This module uses logging. So logging should be initialised at least by executing logging.basicConfig(...)
@@ -111,7 +111,7 @@ class property_cache_pickle(object):
 
             def get(self, key, default=None):
                 return self._cached_data.get(key, default)
-        
+
 
         data = tsd_cache_pickle()
         print 'Testing property_cache (pickle):\\n--------------------------------'
@@ -166,14 +166,13 @@ class property_cache_pickle(object):
     DATA_VERSION_TAG = '_property_cache_data_version_'
     UID_TAG = '_property_cache_uid_'
 
-    def __init__(self, source_instance, cache_filename, load_all_on_init=False, logger=None):
-        self.logger = logger or logging.getLogger(self.__class__.__name__)
+    def __init__(self, source_instance, cache_filename, load_all_on_init=False):
         self._source_instance = source_instance
         self._cache_filename = cache_filename
         self._load_all_on_init = load_all_on_init
         self._cached_props = None
 
-    def get(self, key, default=None):
+    def get(self, key, default=None, logger=None):
         """
         Method to get the cached property. If key does not exists in cache, the property will be loaded from source_instance and stored in cache (file).
 
@@ -182,14 +181,14 @@ class property_cache_pickle(object):
         :returns: value for a given key or default value.
         """
         if self._cached_props is None:
-            self.__init_cache()
+            self.__init_cache(logger=logger)
         if self._key_filter(key) not in self._cached_props:
             val = self._source_instance.get(key, None)
-            self.logger.debug('Loading property for "%s" from source instance (%s)', key, unicode(val))
+            self.logit(logger, report.logging.DEBUG, 'Loading property for "%s" from source instance (%s)', key, unicode(val))
             self._cached_props[self._key_filter(key)] = val
-            self._save_cache()
+            self._save_cache(logger)
         else:
-            self.logger.debug('Providing property for "%s" from cache (%s)', key, unicode(self._cached_props.get(self._key_filter(key), default)))
+            self.logit(logger, report.logging.DEBUG, 'Providing property for "%s" from cache (%s)', key, unicode(self._cached_props.get(self._key_filter(key), default)))
         return self._cached_props.get(self._key_filter(key), default)
 
     def keys(self):
@@ -212,32 +211,32 @@ class property_cache_pickle(object):
         else:
             return self._cached_props.get(self.DATA_VERSION_TAG, None)
 
-    def __init_cache(self):
-        if not self._load_cache() or self._source_instance.uid() != self._uid() or self._source_instance.data_version() > self._data_version():
-            if self._source_instance.uid() != self._uid():
-                self.logger.debug("Source File changed, ignoring previous cache data")
-            if self._source_instance.data_version() > self._data_version():
-                self.logger.debug("Data version increased, ignoring previous cache data")
+    def __init_cache(self, logger):
+        if not self._load_cache(logger=logger) or self._source_instance.uid() != self._uid() or self._source_instance.data_version() > self._data_version():
+            if self._uid() is not None and self._source_instance.uid() != self._uid():
+                self.logit(logger, report.logging.DEBUG, "Source File changed, ignoring previous cache data")
+            if self._data_version() is not None and self._source_instance.data_version() > self._data_version():
+                self.logit(logger, report.logging.DEBUG, "Data version increased, ignoring previous cache data")
             self._cached_props = dict()
             if self._load_all_on_init:
-                self.logger.debug("Loading all items from source...")
-                self._load_source()
+                self.logit(logger, report.logging.DEBUG, "Loading all items from source...")
+                self._load_source(logger)
             self._cached_props[self.UID_TAG] = self._source_instance.uid()
             self._cached_props[self.DATA_VERSION_TAG] = self._source_instance.data_version()
-            self._save_cache()
+            self._save_cache(logger)
 
-    def _load_cache(self):
+    def _load_cache(self, logger):
         if os.path.exists(self._cache_filename):
             try:
                 with open(self._cache_filename, 'r') as fh:
                     self._cached_props = pickle.loads(fh.read())
             except:
-                self.logger.warning('Error while reading cache file (%s)', self._cache_filename)
+                self.logit(logger, report.logging.WARNING, 'Error while reading cache file (%s)', self._cache_filename)
             else:
-                self.logger.info('Loading properties from cache (%s)', self._cache_filename)
+                self.logit(logger, report.logging.INFO, 'Loading properties from cache (%s)', self._cache_filename)
                 return True
         else:
-            self.logger.debug('Cache file does not exists (yet).')
+            self.logit(logger, report.logging.DEBUG, 'Cache file does not exists (yet).')
         return False
 
     def _key_filter(self, key):
@@ -246,19 +245,19 @@ class property_cache_pickle(object):
                 return '_' + key
         return key
 
-    def _load_source(self):
-        self.logger.debug('Loading all properties from source - %s', repr(self._source_instance.keys()))
+    def _load_source(self, logger):
+        self.logit(logger, report.logging.DEBUG, 'Loading all properties from source - %s', repr(self._source_instance.keys()))
         for key in self._source_instance.keys():
             val = self._source_instance.get(key)
             self._cached_props[self._key_filter(key)] = val
 
-    def _save_cache(self):
+    def _save_cache(self, logger):
         try:
             with open(self._cache_filename, 'w') as fh:
                 fh.write(pickle.dumps(self._cached_props))
-                self.logger.info('cache-file stored (%s)', self._cache_filename)
+                self.logit(logger, report.logging.INFO, 'cache-file stored (%s)', self._cache_filename)
         except IOError:
-            self.logger.warning('Error while writing cache file (%s)', self._cache_filename)
+            self.logit(logger, report.logging.WARNING, 'Error while writing cache file (%s)', self._cache_filename)
 
     def _uid(self):
         if self._cached_props is None:
@@ -268,6 +267,8 @@ class property_cache_pickle(object):
 
 
 class property_cache_json(property_cache_pickle):
+    LOG_PREFIX = 'JsonCache:'
+
     """
     Class to cache properties, which take longer on initialising than reading a file in json format. See also parent :py:class:`property_cache_pickle`
 
@@ -276,7 +277,6 @@ class property_cache_json(property_cache_pickle):
     :param cache_filename: File name, where the properties are stored as cache
     :type cache_filename: str
     :param load_all_on_init: Optionally init behaviour control parameter. True will load all available properties from source on init, False not.
-    :param logger: Optionally logger instance to use instead of creating one
     :raises: ?
 
     .. warning:: This class uses json. You should **only** use keys of type string!
@@ -417,121 +417,24 @@ class property_cache_json(property_cache_pickle):
         2015-01-11 17:35:56,713::DEBUG::__init__.py::75::Providing property for "__property_cache_uid_" from cache
         five
     """
-    def _load_cache(self):
+    def _load_cache(self, logger):
         if os.path.exists(self._cache_filename):
             try:
                 with open(self._cache_filename, 'r') as fh:
                     self._cached_props = json.loads(fh.read())
             except:
-                self.logger.warning('Error while reading cache file (%s)', self._cache_filename)
+                self.logit(logger, report.logging.WARNING, 'Error while reading cache file (%s)', self._cache_filename)
             else:
-                self.logger.info('Loading properties from cache (%s)', self._cache_filename)
+                self.logit(logger, report.logging.INFO, 'Loading properties from cache (%s)', self._cache_filename)
                 return True
         else:
-            self.logger.debug('Cache file does not exists (yet).')
+            self.logit(logger, report.logging.DEBUG, 'Cache file does not exists (yet).')
         return False
 
-    def _save_cache(self):
+    def _save_cache(self, logger):
         try:
             with open(self._cache_filename, 'w') as fh:
                 fh.write(json.dumps(self._cached_props, sort_keys=True, indent=4))
-                self.logger.info('cache-file stored (%s)', self._cache_filename)
+                self.logit(logger, report.logging.INFO, 'cache-file stored (%s)', self._cache_filename)
         except IOError:
-            self.logger.warning('Error while writing cache file (%s)', self._cache_filename)
-
-
-if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s::%(levelname)s::%(pathname)s::%(lineno)s::%(message)s', level=logging.DEBUG)
-
-    class test_slow_data(object):
-        _ONE = '1'
-        _TWO = '2'
-        _THREE = '_property_cache_data_version_'
-        _FOUR = '_property_cache_uid_'
-        _FIVE = '__property_cache_uid_'
-        KEYS = [_ONE, _TWO, _THREE, _FOUR, _FIVE]
-        VERS = 0.1
-
-        def data_version(self):
-            return self.VERS
-
-        def one(self):
-            return self.get(self._ONE)
-
-        def two(self):
-            return self.get(self._TWO)
-
-        def three(self):
-            return self.get(self._THREE)
-
-        def four(self):
-            return self.get(self._FOUR)
-
-        def five(self):
-            return self.get(self._FIVE)
-
-        def get(self, key, default=None):
-            def print_n_sleep(k):
-                logging.info('slow get executed for %s', k)
-                time.sleep(3)
-            if key == self._ONE:
-                print_n_sleep(key)
-                return 'one'
-            if key == self._TWO:
-                print_n_sleep(key)
-                return 'two'
-            if key == self._THREE:
-                print_n_sleep(key)
-                return 'three'
-            if key == self._FOUR:
-                print_n_sleep(key)
-                return 'four'
-            if key == self._FIVE:
-                print_n_sleep(key)
-                return 'five'
-            return default
-
-        def keys(self):
-            return self.KEYS
-
-        def uid(self):
-            return None
-
-    class tsd_cache_json(test_slow_data):
-        def __init__(self, *args, **kwargs):
-            test_slow_data.__init__(self, *args, **kwargs)
-            self._cached_data = property_cache_json(test_slow_data(*args, **kwargs), 'cache.json', load_all_on_init=False)
-
-        def one(self):
-            return test_slow_data.get(self, self._ONE)
-
-        def get(self, key, default=None):
-            return self._cached_data.get(key, default)
-
-    class tsd_cache_pickle(test_slow_data):
-        def __init__(self, *args, **kwargs):
-            test_slow_data.__init__(self, *args, **kwargs)
-            self._cached_data = property_cache_pickle(test_slow_data(*args, **kwargs), 'cache.pickle', load_all_on_init=False)
-
-        def two(self):
-            return test_slow_data.get(self, self._TWO)
-
-        def get(self, key, default=None):
-            return self._cached_data.get(key, default)
-        
-
-    data = tsd_cache_json()
-    print '\n\nTesting property_cache (json):\n------------------------------'
-    print data.one()
-    print data.two()
-    print data.three()
-    print data.four()
-    print data.five()
-
-    data = tsd_cache_pickle()
-    print '\n\nTesting property_cache (pickle):\n--------------------------------'
-    print data.one()
-    print data.two()
-    print data.three()
-    print data.four()
-    print data.five()
+            self.logit(logger, report.logging.WARNING, 'Error while writing cache file (%s)', self._cache_filename)
