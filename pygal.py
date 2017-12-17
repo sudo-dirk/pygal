@@ -4,7 +4,9 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Rechte Management für Tageditierung (siehe TODOs)
+# TODO: - Die Resolution raw_x und raw_y wird nur aus den Exif-Daten bestimmt. Wenn Exif nicht existend, könnte eine andere Methode
+#         gezogen werden (notwendig für die richtige Darstellung von Bildern ohne Exif-Informationen - z.B.: Rahmenerstellung)
+#       - Rechte Management für Tageditierung (siehe TODOs)
 #       - Anzeige von Tags und deren Links zum Editieren bei Videos
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
 #       - Benutzereinstellungen (Anmeldedaten + weitere Einstellungen (wie thumbnailssize, webnailsize, ...)
