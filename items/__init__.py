@@ -372,11 +372,9 @@ class itemlist(base_list):
                 v += entry.num_vid()
             return v
         elif key == self.PROP_NUM_GALS:
-            g = 0
+            g = 1
             for entry in self._itemlist:
                 g += entry.num_gal()
-                if type(entry) is itemlist or type(entry) is cached_itemlist:
-                    g += 1
             return g
         elif key == self.PROP_FILESIZE:
             fs = 0
