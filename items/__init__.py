@@ -375,6 +375,8 @@ class itemlist(base_list):
             g = 0
             for entry in self._itemlist:
                 g += entry.num_gal()
+                if type(entry) is itemlist or type(entry) is cached_itemlist:
+                    g += 1
             return g
         elif key == self.PROP_FILESIZE:
             fs = 0
