@@ -184,11 +184,11 @@ class property_cache_pickle(report.logit):
             self.__init_cache(logger=logger)
         if self._key_filter(key) not in self._cached_props:
             val = self._source_instance.get(key, None)
-            self.logit(logger, report.logging.DEBUG, 'Loading property for "%s" from source instance (%s)', key, unicode(val))
+            self.logit_debug(logger, 'Loading property for "%s" from source instance (%s)', key, unicode(val))
             self._cached_props[self._key_filter(key)] = val
             self._save_cache(logger)
         else:
-            self.logit(logger, report.logging.DEBUG, 'Providing property for "%s" from cache (%s)', key, unicode(self._cached_props.get(self._key_filter(key), default)))
+            self.logit_debug(logger, 'Providing property for "%s" from cache (%s)', key, unicode(self._cached_props.get(self._key_filter(key), default)))
         return self._cached_props.get(self._key_filter(key), default)
 
     def keys(self):
@@ -214,12 +214,12 @@ class property_cache_pickle(report.logit):
     def __init_cache(self, logger):
         if not self._load_cache(logger=logger) or self._source_instance.uid() != self._uid() or self._source_instance.data_version() > self._data_version():
             if self._uid() is not None and self._source_instance.uid() != self._uid():
-                self.logit(logger, report.logging.DEBUG, "Source File changed, ignoring previous cache data")
+                self.logit_debug(logger, "Source File changed, ignoring previous cache data")
             if self._data_version() is not None and self._source_instance.data_version() > self._data_version():
-                self.logit(logger, report.logging.DEBUG, "Data version increased, ignoring previous cache data")
+                self.logit_debug(logger, "Data version increased, ignoring previous cache data")
             self._cached_props = dict()
             if self._load_all_on_init:
-                self.logit(logger, report.logging.DEBUG, "Loading all items from source...")
+                self.logit_debug(logger, "Loading all items from source...")
                 self._load_source(logger)
             self._cached_props[self.UID_TAG] = self._source_instance.uid()
             self._cached_props[self.DATA_VERSION_TAG] = self._source_instance.data_version()
@@ -231,12 +231,12 @@ class property_cache_pickle(report.logit):
                 with open(self._cache_filename, 'r') as fh:
                     self._cached_props = pickle.loads(fh.read())
             except:
-                self.logit(logger, report.logging.WARNING, 'Error while reading cache file (%s)', self._cache_filename)
+                self.logit_warning(logger, 'Error while reading cache file (%s)', self._cache_filename)
             else:
-                self.logit(logger, report.logging.INFO, 'Loading properties from cache (%s)', self._cache_filename)
+                self.logit_info(logger, 'Loading properties from cache (%s)', self._cache_filename)
                 return True
         else:
-            self.logit(logger, report.logging.DEBUG, 'Cache file does not exists (yet).')
+            self.logit_debug(logger, 'Cache file does not exists (yet).')
         return False
 
     def _key_filter(self, key):
@@ -246,7 +246,7 @@ class property_cache_pickle(report.logit):
         return key
 
     def _load_source(self, logger):
-        self.logit(logger, report.logging.DEBUG, 'Loading all properties from source - %s', repr(self._source_instance.keys()))
+        self.logit_debug(logger, 'Loading all properties from source - %s', repr(self._source_instance.keys()))
         for key in self._source_instance.keys():
             val = self._source_instance.get(key)
             self._cached_props[self._key_filter(key)] = val
@@ -255,9 +255,9 @@ class property_cache_pickle(report.logit):
         try:
             with open(self._cache_filename, 'w') as fh:
                 fh.write(pickle.dumps(self._cached_props))
-                self.logit(logger, report.logging.INFO, 'cache-file stored (%s)', self._cache_filename)
+                self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
         except IOError:
-            self.logit(logger, report.logging.WARNING, 'Error while writing cache file (%s)', self._cache_filename)
+            self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)
 
     def _uid(self):
         if self._cached_props is None:
@@ -423,18 +423,18 @@ class property_cache_json(property_cache_pickle):
                 with open(self._cache_filename, 'r') as fh:
                     self._cached_props = json.loads(fh.read())
             except:
-                self.logit(logger, report.logging.WARNING, 'Error while reading cache file (%s)', self._cache_filename)
+                self.logit_warning(logger, 'Error while reading cache file (%s)', self._cache_filename)
             else:
-                self.logit(logger, report.logging.INFO, 'Loading properties from cache (%s)', self._cache_filename)
+                self.logit_info(logger, 'Loading properties from cache (%s)', self._cache_filename)
                 return True
         else:
-            self.logit(logger, report.logging.DEBUG, 'Cache file does not exists (yet).')
+            self.logit_debug(logger, 'Cache file does not exists (yet).')
         return False
 
     def _save_cache(self, logger):
         try:
             with open(self._cache_filename, 'w') as fh:
                 fh.write(json.dumps(self._cached_props, sort_keys=True, indent=4))
-                self.logit(logger, report.logging.INFO, 'cache-file stored (%s)', self._cache_filename)
+                self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
         except IOError:
-            self.logit(logger, report.logging.WARNING, 'Error while writing cache file (%s)', self._cache_filename)
+            self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)

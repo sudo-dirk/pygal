@@ -14,18 +14,20 @@ from pylibs import fstools
 import json
 import os
 from pygal import logger
+from pylibs import report
 import pygal_config as config
 import time
 
 
-class picture(base_item_props):
+class picture(base_item_props, report.logit):
+    LOG_PREFIX = 'picture:'
     mime_types = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'jpe': 'image/jpeg', 'png': 'image/png', 'tif': 'image/tiff', 'tiff': 'image/tiff', 'gif': 'image/gif'}
     required_prop_keys = ['raw_x', 'raw_y', 'time', 'orientation', 'manufactor', 'model']
     prop_vers = 0.1
 
     def __init__(self, rel_path, request_args={}, parent=None, slideshow=False, **kwargs):
         base_item_props.__init__(self, rel_path, request_args=request_args, slideshow=slideshow, parent=parent)
-        logger.debug('Initialising %s', self.name(True))
+        self.logit_debug(logger, 'Initialising %s', self.name(True))
         self._info = picture_info_cached(self.raw_path(), self.prop_item_path())
         self._citem_info = None
 
@@ -263,25 +265,25 @@ class picture(base_item_props):
                 self._citem_info = dict()
         VERSION = '__module_version_citem_creation_%d__' % size
         if force or not os.path.exists(self._cimage_item_path(size)) or self._citem_info.get(VERSION) != __version__ + this_method_version:
-            logger.info('creating citem (%d) for %s', size, self.name())
+            self.logit_info(logger, 'creating citem (%d) for %s', size, self.name())
             try:
                 p = picture_edit(self.raw_path())
                 p.resize(size)
                 p.rotate(self.orientation())
             except IOError:
-                logger.error('error creating citem (%d) for %s', size, self.name())
+                self.logit_error(logger, 'error creating citem (%d) for %s', size, self.name())
             else:
                 try:
                     p.save(self._cimage_item_path(size))
                 except IOError:
-                    logger.error('error creating citem (%d) for %s', size, self.name())
+                    self.logit_error(logger, 'error creating citem (%d) for %s', size, self.name())
                 else:
                     self._citem_info[VERSION] = __version__ + this_method_version
                     try:
                         with open(self.prop_citem_path(), 'w') as fh:
                             fh.write(json.dumps(self._citem_info, sort_keys=True, indent=4))
                     except IOError:
-                        logger.warning('Error while writing cache file (%s)', self._cache_filename)
+                        self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)
 
     def _get_jpg_size(self, filename):
         import struct

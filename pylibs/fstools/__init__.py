@@ -11,11 +11,14 @@ Filesystem Tools
 import glob
 import hashlib
 import hmac
-import logging
 import os
 import sys
 import time
+from pylibs import report
 
+
+class fstools_logit(report.logit):
+    LOG_PREFIX = 'fstools:'
 
 def uid(pathname, max_staleness=3600):
     """
@@ -109,10 +112,10 @@ def filelist(path='.', expression='*', rekursive=True, logger=None):
     ./__init__.py
     ./__init__.pyc
     """
-    logger = logger or logging.getLogger(filelist.__name__)
+    logit = fstools_logit()
     l = list()
     if os.path.exists(path):
-        logger.debug('path (%s) exists - looking for files to append', path)
+        logit.logit_debug(logger, 'path (%s) exists - looking for files to append', path)
         for filename in glob.glob(os.path.join(path, expression)):
             if os.path.isfile(filename):
                 l.append(filename)
@@ -121,9 +124,8 @@ def filelist(path='.', expression='*', rekursive=True, logger=None):
             if os.path.isdir(directory) and rekursive:
                 l.extend(filelist(directory, expression))
     else:
-        logger.info('path (%s) does not exist - empty filelist will be returned', path)
+        logit.logit_info(logger, 'path (%s) does not exist - empty filelist will be returned', path)
     return l
-
 
 def dirlist(path='.', rekursive=True, logger=None):
     """
@@ -142,10 +144,10 @@ def dirlist(path='.', rekursive=True, logger=None):
     ../caching
     ../fstools
     """
-    logger = logger or logging.getLogger(filelist.__name__)
+    logit = fstools_logit()
     l = list()
     if os.path.exists(path):
-        logger.debug('path (%s) exists - looking for directories to append', path)
+        logit.logit_debug(logger, 'path (%s) exists - looking for directories to append', path)
         for dirname in os.listdir(path):
             fulldir = os.path.join(path, dirname)
             if os.path.isdir(fulldir):
@@ -153,9 +155,8 @@ def dirlist(path='.', rekursive=True, logger=None):
                 if rekursive:
                     l.extend(dirlist(fulldir))
     else:
-        logger.info('path (%s) does not exist - empty filelist will be returned', path)
+        logit.logit_info(logger, 'path (%s) does not exist - empty filelist will be returned', path)
     return l
-
 
 def is_writeable(path):
     """.. warning:: Needs to be documented
@@ -163,25 +164,9 @@ def is_writeable(path):
     if os.access(path, os.W_OK):
         # path is writeable whatever it is, file or directory
         return True
-    elif os.path.isfile(path):
-        # path wasn't writeable and is a file, so it couldn't be written
-        return False
-    elif os.access(os.path.dirname(path), os.W_OK):
-        # path is not writeable, but is no file, parentfolder is writeable so this folder can be changed, seems to make no sense...
-        return True
     else:
+        # path is not writeable whatever it is, file or directory
         return False
-
-#def split(path):
-#    """.. warning:: Needs to be documented
-#    """
-#    rv=[]
-#    lastpath=None
-#    while os.path.basename(path)!='':
-#        rv.insert(0, os.path.basename(path))
-#        lastpath=path
-#        path=os.path.dirname(path)
-#    return rv
 
 def mkdir(path):
     """.. warning:: Needs to be documented
@@ -191,39 +176,4 @@ def mkdir(path):
         mkdir(os.path.dirname(path))
     if not os.path.exists(path):
         os.mkdir(path)
-
-#def filenamereplace(path, old, new):
-#    """.. warning:: Needs to be documented
-#    """
-#    stop=False
-#    lst=dirlist(path)
-#    lst.extend(filelist(path))
-#    for file in lst:
-#        pathlst=split(file)
-#        base=''
-#        while len(pathlst)>0:
-#            base=os.path.join(base, pathlst.pop(0))
-#            if base!=base.replace(old, new):
-#                os.rename(base, base.replace(old, new))
-#                stop=True
-#            if stop:
-#                break
-#        if stop:
-#            break
-#    if stop:
-#        if len(base)<=len(path):
-#            path=base.replace(old, new)+path[len(base):]
-#        filenamereplace(path, old, new)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(format='%(asctime)s::%(levelname)s::%(pathname)s::%(lineno)s::%(message)s', level=logging.INFO)
-    #print __file__
-    #print 'UID:     ', uid(__file__)
-    #print
-    print os.path.dirname(os.path.abspath(__file__))
-    print 'UID:', uid(os.path.dirname(os.path.abspath(__file__)))
-    #for filename in filelist(path='..', expression='*.py*', rekursive=True):
-    #    print filename
-    #for dirname in dirlist(path='..', rekursive=True):
-    #    print dirname
+    return os.path.isdir(path)

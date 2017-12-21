@@ -36,7 +36,7 @@ class base_info(report.logit):
         :param default: The default value to be returned, if no information with that key exists
         :returns: The information for the given key
         """
-        self.logit(logger, report.logging.DEBUG, "Property request (%s) for %s", key, os.path.basename(self.filename))
+        self.logit_debug(logger, "Property request (%s) for %s", key, os.path.basename(self.filename))
         if self._info is None:
             self._get_info()
         return self._info.get(key, default)

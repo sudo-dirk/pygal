@@ -14,6 +14,7 @@ from pygal import logger
 
 
 class video(picture):
+    LOG_PREFIX = 'video:'
     mime_types = {'avi': 'video/x-msvideo', 'mpg': 'video/mpeg', 'mpeg': 'video/mpeg', 'mpe': 'video/mpeg', 'mov': 'video/quicktime', 'qt': 'video/quicktime', 'mp4': 'video/mp4', 'webm': 'video/webm', 'ogv': 'video/ogg', 'flv': 'video/x-flv', '3gp': 'video/3gpp'}
     required_prop_keys = ['raw_x', 'raw_y', 'time', 'duration']
     internal_player = ['mp4', 'webm', 'ogv', 'flv', '3gp']
@@ -87,19 +88,19 @@ class video(picture):
         WATERMARK = '__watermark_uid_citem_creation_%d__' % size
         watermark_path = os.path.join(os.path.join(os.path.dirname(__file__), '..'), 'theme', 'static', 'common', 'img', 'thumbnail_movie.png')
         if force or not os.path.exists(self._cimage_item_path(size)) or self._citem_info.get(VERSION) != __version__ + this_method_version or self._citem_info.get(WATERMARK) != fstools.uid(watermark_path):
-            logger.info('creating citem (%d) for %s', size, self.name())
+            self.logit_info(logger, 'creating citem (%d) for %s', size, self.name())
             try:
                 p = video_picture_edit(self.raw_path())
                 p.resize(size, logger=logger)
                 movie_icon = picture_edit(watermark_path)
                 p.join(movie_icon, p.JOIN_TOP_RIGHT, 0.75, logger=logger)
             except IOError:
-                logger.error('error creating citem (%d) for %s', size, self.name())
+                self.logit_error(logger, 'error creating citem (%d) for %s', size, self.name())
             else:
                 try:
                     p.save(self._cimage_item_path(size))
                 except IOError:
-                    logger.error('error creating citem (%d) for %s', size, self.name())
+                    self.logit_error(logger, 'error creating citem (%d) for %s', size, self.name())
                 else:
                     self._citem_info[VERSION] = __version__ + this_method_version
                     self._citem_info[WATERMARK] = fstools.uid(watermark_path)
@@ -107,4 +108,4 @@ class video(picture):
                         with open(self.prop_citem_path(), 'w') as fh:
                             fh.write(json.dumps(self._citem_info, sort_keys=True, indent=4))
                     except IOError:
-                        logger.warning('Error while writing cache file (%s)', self._cache_filename)
+                        self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)

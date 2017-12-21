@@ -14,6 +14,8 @@ from pylibs import fstools
 import json
 import pygal_config as config
 import time
+from pygal import logger
+from pylibs import report
 
 
 class tags(dict):
@@ -509,17 +511,17 @@ class itemlist(base_list):
             item.create_webnail()
 
 
-class cached_itemlist(itemlist):
+class cached_itemlist(itemlist, report.logit):
+    LOG_PREFIX = 'cached_il:'
+
     def __init__(self, *args, **kwargs):
         itemlist.__init__(self, *args, **kwargs)
         if not self._create_cache:
-            from pygal import logger
-            self.logger = logger
             self._cached_data = caching.property_cache_json(itemlist(*args, **kwargs), self.prop_item_path(), load_all_on_init=True)
 
     def get(self, key, default=None):
         if not self._create_cache:
-            self.logger.debug("Property request (%s) for %s", key, self.name())
-            return self._cached_data.get(key, default, logger=self.logger)
+            self.logit_debug(logger, "Property request (%s) for %s", key, self.name())
+            return self._cached_data.get(key, default, logger=logger)
         else:
             return itemlist.get(self, key, default)

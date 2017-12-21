@@ -6,7 +6,6 @@
 
 from pylibs import caching
 import calendar
-import logging
 import os
 from pylibs import fstools
 from PIL import Image
@@ -200,21 +199,5 @@ class video_info_cached(video_info):
         :param default: The default value to be returned, if no information with that key exists
         :returns: The information for the given key
         """
-        self.logit(logger, report.logging.DEBUG, "Property request (%s) for %s", key, os.path.basename(self.filename))
-        return self._cached_data.get(key, default)
-
-
-if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s::%(levelname)s::%(pathname)s::%(lineno)s::%(message)s', level=logging.DEBUG)
-
-    basepath = os.path.abspath(os.path.dirname(__file__))
-    v = video_info(os.path.join(basepath, 'example', 'video.3gp'))
-    for key in v.keys():
-        print key, type(v.get(key)), v.get(key)
-    v = video_info_cached(os.path.join(basepath, 'example', 'video.3gp'), os.path.join(basepath, 'video.json'))
-    for key in v.keys():
-        print key, type(v.get(key)), v.get(key)
-
-    vpe = video_picture_edit(os.path.join(basepath, 'example', 'video.3gp'))
-    vpe.rotate(vpe.ORIENTATION_LEFT)
-    vpe.save(os.path.join(basepath, 'video.jpg'))
+        self.logit_debug(logger, "Property request (%s) for %s", key, os.path.basename(self.filename))
+        return self._cached_data.get(key, default, logger=logger)

@@ -75,7 +75,7 @@ class picture_edit(report.logit):
 
         :param max_size: The maximum size of x, y.
         """
-        self.logit(logger, report.logging.DEBUG, 'Resizing picture %s to max %d pixel in whatever direction', self._filename(), max_size)
+        self.logit_debug(logger, 'Resizing picture %s to max %d pixel in whatever direction', self._filename(), max_size)
         if self._im is None:
             self._load_im()
         x, y = self._im.size
@@ -99,7 +99,7 @@ class picture_edit(report.logit):
         elif orientation == 8:
             angle = 90
         if angle is not None:
-            self.logit(logger, report.logging.DEBUG, 'Rotating picture %s by %d°', self._filename(), angle)
+            self.logit_debug(logger, 'Rotating picture %s by %d°', self._filename(), angle)
             if self._im is None:
                 self._load_im()
             self._im = self._im.rotate(angle)
@@ -113,7 +113,7 @@ class picture_edit(report.logit):
         .. note::
           The fileformat is **always** *JPEG*.
         """
-        self.logit(logger, report.logging.DEBUG, 'Saving original file %s to %s', self._filename(), os.path.basename(filename))
+        self.logit_debug(logger, 'Saving original file %s to %s', self._filename(), os.path.basename(filename))
         if self._im is not None:
             with open(filename, 'w') as fh:
                 self._im.save(fh, 'JPEG')
@@ -129,7 +129,7 @@ class picture_edit(report.logit):
         .. note::
           joint_pos makes only sense if picture is smaller than this picture.
         """
-        self.logit(logger, report.logging.DEBUG, 'Joining %s to %s', picture._filename(), self._filename())
+        self.logit_debug(logger, 'Joining %s to %s', picture._filename(), self._filename())
         im2 = picture.get()
         im2 = self._rgba_copy(im2)
         # change opacity of im2
@@ -533,5 +533,5 @@ class picture_info_cached(picture_info):
         :param default: The default value to be returned, if no information with that key exists
         :returns: The information for the given key
         """
-        self.logit(logger, report.logging.DEBUG, "Property request (%s) for %s", key, os.path.basename(self.filename))
-        return self._cached_data.get(key, default)
+        self.logit_debug(logger, "Property request (%s) for %s", key, os.path.basename(self.filename))
+        return self._cached_data.get(key, default, logger=logger)

@@ -4,8 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Neue Reportingklasse und -system analog multimedia-klasse verwenden (items/...) und einsetzen (PREFIX, self.logit)
-#       - Rechte Management für Tageditierung (siehe TODOs)
+# TODO: - Rechte Management für Tageditierung (siehe TODOs)
 #       - Anzeige von Tags und deren Links zum Editieren bei Videos
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
 #       - Benutzereinstellungen (Anmeldedaten + weitere Einstellungen (wie thumbnailssize, webnailsize, ...)
