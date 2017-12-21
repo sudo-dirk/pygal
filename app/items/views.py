@@ -126,10 +126,12 @@ def add_tag(item_name):
         tag_id = flask.request.args.get('tag_id')
         item = c(item_name)
         if item.exists() and type(item) is not itemlist:
-            # TODO: Right management for tagging
             inp = collector(title='Add Tag: %s' % (item.name()), url_prefix=url_prefix, url_extention=url_extention(item_name), this=item, pygal_user=pygal_user, lang=lang, tag_id=tag_id)
             rv = flask.render_template('header.html', input=inp)
-            rv += flask.render_template('add_tag.html', input=inp)
+            if item.user_may_edit():
+                rv += flask.render_template('add_tag.html', input=inp)
+            else:
+                rv += lang.permission_denied
             rv += flask.render_template('footer.html', input=inp)
             return rv
     flask.abort(404)
@@ -176,8 +178,7 @@ def item(item_name, slideshow=False):
         #
         # Edit/ Add a tag if posted
         #
-        if flask.request.method == 'POST' and flask.request.form.get('tag_submit') == '1':
-            # TODO: Right management for tagging
+        if flask.request.method == 'POST' and flask.request.form.get('tag_submit') == '1' and item.user_may_edit():
             tag_id = flask.request.form.get('tag_id', None)
             action = flask.request.form.get('action')
             if action == 'Submit Tag':       # EDIT/ ADD

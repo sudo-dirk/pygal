@@ -4,12 +4,10 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Rechte Management für Tageditierung (siehe TODOs)
-#       - Anzeige von Tags und deren Links zum Editieren bei Videos
+# TODO: - Anzeige von Tags und deren Links zum Editieren bei Videos
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
 #       - Benutzereinstellungen (Anmeldedaten + weitere Einstellungen (wie thumbnailssize, webnailsize, ...)
 #       - Config Klasse zum Handeln von Parametern (Session, cfg-Datei, ....); webnail-size als session-parameter und default in user-data?
-#       - Admingruppe implementieren (ggf. in pygal_config.py)
 #       - Festlegung der Benutzerrechte auf Weboberfläche
 #       - E-Mailbenachrichtigung bei neuem Benutzer und Passwortrücksetzung
 ###############################################################################################################

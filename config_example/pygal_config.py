@@ -6,6 +6,7 @@ secret_key = 'This should be a real secret string including all kinds of charact
 admin_group = []
 thumbnail_size = 150
 webnail_size = 1300
+admin_group = []
 # e.g.
 # url_prefix = '/test'
 url_prefix = ''

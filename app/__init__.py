@@ -145,6 +145,9 @@ class base_item(object):
     def user_may_download(self):
         return pygal_user.may_download(self)
 
+    def user_may_edit(self):
+        return pygal_user.may_edit(self)
+
 
 class base_list(object):
     mime_types = {'': 'folder'}

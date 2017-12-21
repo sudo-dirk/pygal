@@ -1,5 +1,6 @@
 {
     "view": [""],
     "download": true,
-    "delete": [""]
+    "delete": [""],
+    "edit": [""]
 }

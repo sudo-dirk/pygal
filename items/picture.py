@@ -50,14 +50,13 @@ class picture(base_item_props, report.logit):
 
     def actions(self):
         rv = list()
-        # rv.append(piclink(self.edit_url(), 'Edit', config.url_prefix + '/static/pygal_theme/img/edit.png'))
         rv.append(piclink(self.info_url(), 'Info', config.url_prefix + '/static/common/img/info.png'))
-        rv.append(piclink(self.add_tag_url(), 'Add Tag', config.url_prefix + '/static/common/img/edit.png'))
+        if self.user_may_edit():
+            rv.append(piclink(self.add_tag_url(), 'Add Tag', config.url_prefix + '/static/common/img/edit.png'))
         if self.user_may_download():
             rv.append(piclink(self.download_url(), 'Download', config.url_prefix + '/static/common/img/download.png'))
         if self.gps() is not None:
             rv.append(piclink(self.gps_link()[0], 'GPS', config.url_prefix + '/static/common/img/earth.png'))
-        # rv.append(piclink(self.info_url(), 'Lock', config.url_prefix + '/static/pygal_theme/img/lock.png'))
         if self.slideshow():
             rv.append(piclink(self.url(), 'Stop Slideshow', config.url_prefix + '/static/common/img/stop_slideshow.png'))
         else:

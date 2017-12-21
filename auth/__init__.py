@@ -83,6 +83,11 @@ class pygal_auth(object):
             return True
         return self.get_perms_dict().get('download', False) and item.user_may_view()
 
+    def may_edit(self, item):
+        if self.may_admin():
+            return True
+        return self.chk_perms('edit', item)
+
     def may_admin(self):
         return self.chk_login() and self.get_session_user() in config.admin_group
 
