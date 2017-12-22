@@ -20,6 +20,16 @@
               <p class="vjs-no-js">To view {{input.this.name()}} please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
             </video>
           </div>
+          <ul class="moin-nav nav-tabs moin-shadow">
+            {% for tag_id in input.this.get_tag_id_list() %}
+              <li>
+                <a  href="{{input.this.add_tag_url(tag_id)}}" title="{{input.this.get_tag_text(tag_id)}}" rel="nofollow">
+                  <span><img src="{{input.this.get_tag_icon(tag_id)}}"></span>
+                  <span class="hidden-sm hidden-xs">{{input.this.get_tag_text(tag_id)}}</span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
         </div>
 
         <div class="thumb_border" style="width: {{input.this.nxt().thumbnail_xy_max() + 12}}px; height: {{input.this.nxt().thumbnail_xy_max() + 12}}px;">
