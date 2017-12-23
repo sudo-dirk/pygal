@@ -15,7 +15,7 @@
 
         <div id="main" class="thumb_border" style="width: {{input.this.webnail_x() + 12}}px; height: {{input.this.webnail_y() + 12}}px;">
           <div class="thumb_image_bg" style="width: {{input.this.webnail_x() + 12}}px; height: {{input.this.webnail_y() + 12}}px;">
-            <video id="MY_VIDEO_1" class="video-js vjs-default-skin" controls poster="{{input.this.webnail_url()}}" preload="auto" width="{{ input.this.webnail_x() }}" height="{{ input.this.webnail_y() }}" {% if input.this and input.this.slideshow() %}autoplay="true"{% endif %} data-setup="{}">
+            <video id="MY_VIDEO_1" class="video-js vjs-default-skin" controls poster="{{input.this.webnail_url()}}" preload="auto" width="{{ input.this.webnail_x() }}" height="{{ input.this.webnail_y() }}" {% if input.this.slideshow() %}autoplay="true"{% endif %} data-setup="{}">
               <source src="{{ input.this.raw_url() }}" type='{{ input.this.mime_type() }}'>
               <p class="vjs-no-js">To view {{input.this.name()}} please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
             </video>
