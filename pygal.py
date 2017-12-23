@@ -4,7 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Anzeige von Tags und deren Links zum Editieren bei Videos
+# TODO: - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
 #       - Benutzereinstellungen (Anmeldedaten + weitere Einstellungen (wie thumbnailssize, webnailsize, ...)
 #       - Config Klasse zum Handeln von Parametern (Session, cfg-Datei, ....); webnail-size als session-parameter und default in user-data?

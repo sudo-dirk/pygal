@@ -20,8 +20,8 @@ class video(picture):
     internal_player = ['mp4', 'webm', 'ogv', 'flv', '3gp']
     prop_vers = 0.100
 
-    def __init__(self, rel_path, request_args={}, parent=None, **kwargs):
-        base_item_props.__init__(self, rel_path, request_args=request_args, parent=parent)
+    def __init__(self, rel_path, request_args={}, parent=None, slideshow=False, **kwargs):
+        base_item_props.__init__(self, rel_path, request_args=request_args, slideshow=slideshow, parent=parent)
         self._info = video_info_cached(self.raw_path(), self.prop_item_path())
         self._citem_info = None
 

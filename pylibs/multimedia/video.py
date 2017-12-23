@@ -86,7 +86,7 @@ class video_info(base_info):
         ratio <type 'str'> 5:3
         time <type 'int'> 1414951903
     """
-    DATA_VERSION_NUMBER = 0.1
+    DATA_VERSION_NUMBER = 0.2
 
     TIME = 'time'
     DURATION = 'duration'
@@ -141,8 +141,14 @@ class video_info(base_info):
                         pass
         # rework some information...
         if self.TIME in self._info:
+            try:
+                self._info[self.TIME] = self._info[self.TIME][:self._info[self.TIME].index('.')]
+            except ValueError:
+                pass # time string seems to have no '.' 
             if '/' in self._info[self.TIME]:
                 format_string = '%Y-%m-%d/ %H:%M'
+            elif 'T' in self._info[self.TIME]:
+                format_string = '%Y-%m-%dT%H:%M:%S'
             else:
                 format_string = '%Y-%m-%d %H:%M:%S'
             try:
