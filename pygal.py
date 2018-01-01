@@ -5,7 +5,7 @@
 
 
 # TODO: - User None mit einem sinnvollen Namen benennen
-#       - Login, Admin Leiste auch reduzieren, wenn schmal, search nicht ausblenden
+#       - Der Modal-Dialog für die Bildinfos ist unschön auf dem Mobiltelefon
 #       - Administration Dialog aufhübschen und verbessern, weiter Administrative Felder hinzu? Switch User, ...
 #       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
 #       - Zusätzlich Infos auf modalDialog-info für itemlist (Datum, uid, ) siehe Bilder

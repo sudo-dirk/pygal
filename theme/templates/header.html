@@ -47,27 +47,42 @@
     <div class="col-md-12 col-sm-12 col-xs-12">
       <nav class="navbar moin-navbar-inverse">
         <div class="row">
-          <div class="col-md-1 col-sm-1 col-xs-1">
+          <div class="col-md-1 col-sm-1 col-xs-2">
             <!div class="moin-logo">
               <a href="{{ input.url_prefix }}/"><img src="{{ input.url_prefix }}/static/common/logos/pygal_logo.png" id="moin-img-logo" alt="Logo"></a>
             <!/div>
           </div>
 
-          <div class="col-md-4 col-sm-4 col-xs-6">
+          <div class="col-md-3 col-sm-3 col-xs-10">
             <div class="moin-navbar-header">
-              <a class="navbar-brand">{{ input.title }}</a>
+              <div class="navbar-brand">{{ input.title }}</div>
             </div>
           </div>
 
-          <div class="col-md-4 col-sm-4 col-xs-5 moin-loginsettings">
+          <div class="col-md-5 col-sm-5 col-xs-6">
             <div class="moin-navbar-collapse navbar-collapse collapse in">
               <ul class="nav navbar-nav moin-pull-right">
                 {% if input.pygal_user.may_admin() %}
-                  <li><a href="{{ input.url_prefix }}/_admin_{{ input.url_extention }}" rel="nofollow">{{ input.lang.admin }}</a></li>
+                  <li>
+                    <a href="{{ input.url_prefix }}/_admin_{{ input.url_extention }}" title="{{ input.lang.admin }}" rel="nofollow">
+                      <span><img src="{{input.url_prefix}}/static/common/img/admin.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ input.lang.admin }}</span>
+                    </a>
+                  </li>
                 {% endif %}
                 {% if input.pygal_user.session_data.chk_login() %}
-                  <li><a href="{{ input.pygal_user.user_url(input.url_extention) }}" rel="nofollow"><img src="{{input.url_prefix}}/static/common/img/user.png">{{ input.pygal_user.session_data.get_user() }}</a></li>
-                  <li><a href="{{ input.url_prefix }}/_logout_{{ input.url_extention }}" rel="nofollow"><img src="{{input.url_prefix}}/static/common/img/logout.png">{{ input.lang.logout }}</a></li>
+                  <li>
+                    <a href="{{ input.pygal_user.user_url(input.url_extention) }}" title="{{ input.lang.userprofile }}" rel="nofollow">
+                      <span><img src="{{input.url_prefix}}/static/common/img/user.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ input.pygal_user.session_data.get_user() }}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{{ input.url_prefix }}/_logout_{{ input.url_extention }}" title="{{ input.lang.logout }}" rel="nofollow">
+                      <span><img src="{{input.url_prefix}}/static/common/img/logout.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ input.lang.logout }}</span>
+                    </a>
+                  </li>
                 {% else %}
                   <li><a href="{{ input.url_prefix }}/_login_{{ input.url_extention }}" rel="nofollow">{{ input.lang.login }}</a></li>
                 {% endif %}
@@ -75,7 +90,7 @@
             </div>
           </div>
 
-          <div class="col-sm-3 hidden-xs">
+          <div class="col-md-3 col-sm-3 col-xs-6">
             <form class="moin-navbar-form" action="{{input.url_prefix or '/'}}" method="get" role="search">
               <div class="input-group">
                 <input name='q' type="text" class="form-control" placeholder="{{ input.lang.search }}...">

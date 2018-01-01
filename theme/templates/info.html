@@ -13,7 +13,7 @@
   {% endif %}
           </tr>
 {% endfor %}
-{% if input.this.get_tag_id_list()|length > 0 %}
+{% if not input.this.is_itemlist() and input.this.get_tag_id_list()|length > 0 %}
           <tr><td>Tags:</td><td></td></tr>
   {% for tag_id in input.this.get_tag_id_list() %}
           <tr>
