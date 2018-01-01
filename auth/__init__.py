@@ -261,7 +261,7 @@ class pygal_auth(object):
 
         al = admin_folder_list()
         for i in range(0, len(folder_list)):
-            rel_path = folder_list[i][len(config.item_folder) + 1:]
+            rel_path = decode(folder_list[i][len(config.item_folder) + 1:])
             try:
                 selected = rel_path in self.user_data.get_rights(user).get(perm_name)
             except (AttributeError, TypeError):
