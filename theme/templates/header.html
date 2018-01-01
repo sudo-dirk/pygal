@@ -14,9 +14,13 @@
     <link href="{{ input.url_prefix }}/static/video-js/video-js.css" rel="stylesheet">
     <script src="{{ input.url_prefix }}/static/video-js/video.js"></script>
 
+    <script type="text/javascript" src="{{input.url_prefix}}/static/jquery.min.js"></script>
+
     <link rel="stylesheet" type="text/css" href="{{input.url_prefix}}/static/common/css/imgareaselect-default.css" />
-    <script type="text/javascript" src="{{input.url_prefix}}/static/imgareaselect-js/jquery.min.js"></script>
     <script type="text/javascript" src="{{input.url_prefix}}/static/imgareaselect-js/jquery.imgareaselect.pack.js"></script>
+
+    <link rel="stylesheet" href="{{input.url_prefix}}/static/tree-js/themes/default/style.min.css" />
+    <script type="text/javascript" src="{{input.url_prefix}}/static/tree-js/jstree.js"></script>
     <script type="text/javascript">
       function preview(img, selection) {}
         $(function () {
@@ -58,8 +62,11 @@
           <div class="col-md-4 col-sm-4 col-xs-5 moin-loginsettings">
             <div class="moin-navbar-collapse navbar-collapse collapse in">
               <ul class="nav navbar-nav moin-pull-right">
-                {% if input.pygal_user.is_a_user_logged_in() %}
-                  <li><a href="{{ input.pygal_user.user_url(input.url_extention) }}" rel="nofollow"><img src="{{input.url_prefix}}/static/common/img/user.png">{{ input.pygal_user.get_session_user() }}</a></li>
+                {% if input.pygal_user.may_admin() %}
+                  <li><a href="{{ input.url_prefix }}/_admin_{{ input.url_extention }}" rel="nofollow">{{ input.lang.admin }}</a></li>
+                {% endif %}
+                {% if input.pygal_user.session_data.chk_login() %}
+                  <li><a href="{{ input.pygal_user.user_url(input.url_extention) }}" rel="nofollow"><img src="{{input.url_prefix}}/static/common/img/user.png">{{ input.pygal_user.session_data.get_user() }}</a></li>
                   <li><a href="{{ input.url_prefix }}/_logout_{{ input.url_extention }}" rel="nofollow"><img src="{{input.url_prefix}}/static/common/img/logout.png">{{ input.lang.logout }}</a></li>
                 {% else %}
                   <li><a href="{{ input.url_prefix }}/_login_{{ input.url_extention }}" rel="nofollow">{{ input.lang.login }}</a></li>
@@ -114,3 +121,11 @@
           {% endfor %}
         {% endif %}
         </ul>
+
+{% if input.error or input.info or input.hint %}
+    <div id="moin-flash">  
+      {% if input.error %}<p class="moin-flash moin-flash-error">{{ input.error|safe }}</p>{% endif %}
+      {% if input.info %}<p class="moin-flash moin-flash-info">{{ input.info|safe }}</p>{% endif %}
+      {% if input.hint %}<p class="moin-flash moin-flash-hint">{{ input.hint|safe }}</p>{% endif %}
+    </div>
+{% endif %}

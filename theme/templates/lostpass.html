@@ -2,9 +2,8 @@
   <div id="moin-content">
     <div id="moin-flash">  
     </div>
-    <h1>Lost Password</h1>
+    <h1>{{ input.lang.lostpass }}</h1>
     <div class="moin-form">
-      Please note that you only need to fill out one form field.
       <form name="lostpass" action="{{ input.url_prefix }}/_lostpass_{{ input.url_extention }}" method="post">
         <dl>
           <dt>

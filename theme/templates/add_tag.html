@@ -4,7 +4,7 @@
 
     <div class="moin-form">
       <h2>Add Tag to '{{ input.this.name() }}</h2>
-      <form name="add_tag" action="{{ input.this.url() }}" method="post">
+      <form name="add_tag" action="{{ input.this.add_tag_url() }}" method="post">
 {% if input.this.tag_id_exists(input.tag_id) %}        <input type="hidden" name="tag_id" value="{{input.tag_id}}" />{% endif %}
         <input type="hidden" name="x1" value="{{input.this.get_tag_wn_x(input.tag_id)}}" />
         <input type="hidden" name="y1" value="{{input.this.get_tag_wn_y(input.tag_id)}}" />

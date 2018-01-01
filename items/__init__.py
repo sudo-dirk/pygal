@@ -5,9 +5,11 @@ from app import base_list
 from app import link
 from app import piclink
 from app import prefix_add_tag
+from app import prefix_admin
 from app import prefix_delete
-from app import prefix_info
-from app import strargs
+from app import postfix_info
+from helpers import strargs
+from auth import rights_uid
 from auth import pygal_user
 import lang
 from pylibs import fstools
@@ -165,6 +167,9 @@ class base_item_props(base_item, tags):
         self._prv = None
         self._nxt = None
 
+    def is_itemlist(self):
+        return False
+
     def add_tag_url(self, ident=None):
         add_tag_url = config.url_prefix + prefix_add_tag
         if self.url(True):
@@ -215,8 +220,14 @@ class base_item_props(base_item, tags):
                         break
         return self._prv
 
+    def admin_url(self):
+        admin_url = config.url_prefix + prefix_admin
+        if self.url(True):
+            admin_url += '/' + self.url(True)
+        return admin_url + self.str_request_args()
+
     def info_url(self):
-        return config.url_prefix + prefix_info + '/' + self.url(True) or ''
+        return self.url() + postfix_info
 
     def prop_item_path(self):
         propfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '.prop'
@@ -243,6 +254,7 @@ def get_class_for_item(rel_path, force_uncached=False, force_list=False):
             return itemlist
         else:
             return cached_itemlist
+    # TODO: reduce late impoerts
     from picture import picture
     from video import video
     possible_item_classes = [picture, video]
@@ -389,11 +401,11 @@ class itemlist(base_list):
         return self.PROPERTIES
 
     def prop_item_path(self):
-        propfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '_' + (pygal_user.get_session_user() or 'None').encode('utf-8') + '.prop'
+        propfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '_' + (pygal_user.session_data.get_user() or 'None').encode('utf-8') + '.prop'
         return os.path.join(config.iprop_folder, propfile)
 
     def uid(self):
-        return fstools.uid(self.raw_path()) + '_' + pygal_user.get_rights_uid()
+        return fstools.uid(self.raw_path()) + '_' + rights_uid(pygal_user.session_data.get_user())
 
     #
     # Cached Properties
@@ -429,7 +441,7 @@ class itemlist(base_list):
     # Further Methods
     #
     def thumbnail_xy_max(self):
-        return config.thumbnail_size
+        return pygal_user.session_data.get_thumbnail_size()
 
     def thumbnail_x(self):
         return self.ratio_x() * self.thumbnail_xy_max()
@@ -467,12 +479,14 @@ class itemlist(base_list):
         add_info('Videos:', '%d' % self.num_vid())
         return infos
 
-    def info_url(self):
-        info_url = config.url_prefix + prefix_info
+    def admin_url(self):
+        admin_url = config.url_prefix + prefix_admin
         if self.url(True):
-            info_url += '/' + self.url(True) or ''
-        info_url += self.str_request_args()
-        return info_url
+            admin_url += '/' + self.url(True)
+        return admin_url + self.str_request_args()
+
+    def info_url(self):
+        return self.url() + postfix_info
 
     def itemlist(self):
         if self._itemlist is None:
@@ -483,6 +497,9 @@ class itemlist(base_list):
         return 'overview.html'
 
     def strtime(self):
+        tm = self.time()
+        if tm is None:
+            return ''
         return time.strftime("%d.%m.%Y - %H:%M:%S", time.gmtime(self.time()))
 
     def sort(self):

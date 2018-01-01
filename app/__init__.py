@@ -1,14 +1,16 @@
 from auth import pygal_user
 import flask
-from pylibs import fstools
+from helpers import decode, strargs
 import os
-import shutil
 import pygal_config as config
+from pylibs import fstools
+import shutil
 
+postfix_info = '#info'
 prefix_add_tag = '/_add_tag_'                       # items
+prefix_admin = '/_admin_'                           # items
 prefix_delete = '/_delete_'                         # items
 prefix_download = '/_download_'                     # items
-prefix_info = '/_info_'                             # items
 prefix_login = '/_login_'                           # base_func
 prefix_logout = '/_logout_'                         # base_func
 prefix_lostpass = '/_lostpass_'                     # base_func
@@ -18,26 +20,6 @@ prefix_slideshow = '/_slideshow_'                   # items
 prefix_thumbnail = '/_thumbnail_'                   # items
 prefix_userprofile = '/_userprofile_'               # base_func
 prefix_webnail = '/_webnail_'                       # items
-
-
-def strargs(args):
-    if len(args) == 0:
-        return ''
-    else:
-        rv = '?'
-        for key in args:
-            rv += key
-            if args.get(key):
-                rv += '=' + args[key]
-            rv += '&'
-        return decode(rv[:-1])
-
-
-def url_extention(item_name):
-    if item_name:
-        return '/' + decode(item_name)
-    else:
-        return ''
 
 
 class base_item(object):
@@ -50,12 +32,12 @@ class base_item(object):
         self._slideshow = slideshow
 
     def str_request_args(self):
-        strargs(self._request_args)
+        return strargs(self._request_args)
 
     def rel_path(self):
         return self._rel_path
 
-    def base_url(self, flask_prefix = ''):
+    def base_url(self, flask_prefix=''):
         return config.url_prefix + flask_prefix + '/' + decode(self._rel_path)
 
     def delete(self):
@@ -163,6 +145,9 @@ class base_list(object):
         self._itemlist = list()
         self._len = 0
 
+    def is_itemlist(self):
+        return True
+
     def str_request_args(self):
         return strargs(self._request_args)
 
@@ -220,32 +205,6 @@ class base_list(object):
             return decode(self._rel_path)
         else:
             return config.url_prefix + '/' + decode(self._rel_path) + strargs(self._request_args)
-
-
-class collector(object):
-    def __init__(self, **kwds):
-        for key in kwds:
-            setattr(self, key, kwds[key])
-
-    def has_attr(self, name):
-        return hasattr(self, name)
-
-def decode(string):
-    for i in ['utf-8', 'cp1252']:
-        try:
-            return string.decode(i)
-        except UnicodeEncodeError:
-            pass
-    return string
-
-
-def encode(string):
-    for i in ['utf-8', 'cp1252']:
-        try:
-            return string.encode(i)
-        except UnicodeEncodeError:
-            pass
-    return string
 
 
 class link(object):

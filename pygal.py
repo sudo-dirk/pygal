@@ -4,9 +4,18 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
+# TODO: - Action Leiste taucht auch bei Admin-Dialog auf. Action- und Navigationleiste auf Konsistenz prüfen
+#       - User None mit einem sinnvollen Namen benennen
+#       - Login, Admin Leiste auch reduzieren, wenn schmal, search nicht ausblenden
+#       - Administration Dialog aufhübschen und verbessern, weiter Administrative Felder hinzu? Switch User, ...
+#       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
+#       - Zusätzlich Infos auf modalDialog-info für itemlist (Datum, uid, ) siehe Bilder
+#       - Select all Button bei der Administration der Rechte hinzufügen
+#       - Restrukturierung (ggf. Auflösen der Unterscheidung base und item) + imports trennen from ... import a, b, c + imports nach alphabet sortieren
+#       - Beispieldaten einfügen (Notwendigkeit auf Produktivsystem eine Liste von Quellen zu verarbeiten)
+#       - Admin-User darf zu einem anderen Benutzer wechseln. Logout führt zu ursprünglichem Nutzer.
+#       - Nach texten auf der Oberfläche suchen, die in das Modul lang gehören (z.B.: Button- und Labeltexte)
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
-#       - Benutzereinstellungen (Anmeldedaten + weitere Einstellungen (wie thumbnailssize, webnailsize, ...)
 #       - Config Klasse zum Handeln von Parametern (Session, cfg-Datei, ....); webnail-size als session-parameter und default in user-data?
 #       - Festlegung der Benutzerrechte auf Weboberfläche
 #       - E-Mailbenachrichtigung bei neuem Benutzer und Passwortrücksetzung

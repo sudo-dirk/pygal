@@ -11,12 +11,14 @@ from pylibs.multimedia.picture import picture_info_cached
 from pylibs.multimedia.picture import picture_edit
 from pylibs.multimedia.picture import __version__
 from pylibs import fstools
+import struct
 import json
 import os
 from pygal import logger
 from pylibs import report
 import pygal_config as config
 import time
+from auth import pygal_user
 
 
 class picture(base_item_props, report.logit):
@@ -80,10 +82,18 @@ class picture(base_item_props, report.logit):
             return '%s - %s' % (self.manufactor(), self.model())
 
     def create_thumbnail(self, force=False):
-        self._create_citem(config.thumbnail_size, force)
+        try:
+            self._create_citem(pygal_user.session_data.get_thumbnail_size(), force)
+        except RuntimeError:
+            for thumbnail_size in config.thumbnail_size_list:
+                self._create_citem(thumbnail_size, force)
 
     def create_webnail(self, force=False):
-        self._create_citem(config.webnail_size, force)
+        try:
+            self._create_citem(pygal_user.session_data.get_webnail_size(), force)
+        except RuntimeError:
+            for webnail_size in config.webnail_size_list:
+                self._create_citem(webnail_size, force)
 
     def delete(self):
         base_item_props.delete(self)
@@ -198,13 +208,16 @@ class picture(base_item_props, report.logit):
         return 4
 
     def strtime(self):
+        tm = self.time()
+        if tm is None:
+            return ''
         return time.strftime("%d.%m.%Y - %H:%M:%S", time.gmtime(self.time()))
 
     def template(self):
         return 'picture.html'
 
     def thumbnail_item_path(self):
-        return self._cimage_item_path(config.thumbnail_size)
+        return self._cimage_item_path(pygal_user.session_data.get_thumbnail_size())
 
     def thumbnail_url(self):
         return config.url_prefix + prefix_thumbnail + '/' + self.url(True) or ''
@@ -212,7 +225,7 @@ class picture(base_item_props, report.logit):
     def thumbnail_x(self):
         if not self._thumbnail_x:
             self._calc_thumbnail_res()
-        return self._thumbnail_x or config.thumbnail_size
+        return self._thumbnail_x or pygal_user.session_data.get_thumbnail_size()
 
     def thumbnail_xy_max(self):
         return max(self.thumbnail_x(), self.thumbnail_y())
@@ -220,13 +233,13 @@ class picture(base_item_props, report.logit):
     def thumbnail_y(self):
         if not self._thumbnail_y:
             self._calc_thumbnail_res()
-        return self._thumbnail_y or config.thumbnail_size
+        return self._thumbnail_y or pygal_user.session_data.get_thumbnail_size()
 
     def time(self):
         return self._info.get(self._info.TIME, 0, logger=logger)
 
     def webnail_item_path(self):
-        return self._cimage_item_path(config.webnail_size)
+        return self._cimage_item_path(pygal_user.session_data.get_webnail_size())
 
     def webnail_url(self):
         return config.url_prefix + prefix_webnail + '/' + self.url(True) or ''
@@ -234,12 +247,12 @@ class picture(base_item_props, report.logit):
     def webnail_x(self):
         if not self._webnail_x:
             self._calc_webnail_res()
-        return self._webnail_x or config.webnail_size
+        return self._webnail_x or pygal_user.session_data.get_webnail_size()
 
     def webnail_y(self):
         if not self._webnail_y:
             self._calc_webnail_res()
-        return self._webnail_y or config.webnail_size
+        return self._webnail_y or pygal_user.session_data.get_webnail_size()
 
     def _calc_thumbnail_res(self):
         if not os.path.exists(self.thumbnail_item_path()):
@@ -285,7 +298,6 @@ class picture(base_item_props, report.logit):
                         self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)
 
     def _get_jpg_size(self, filename):
-        import struct
         try:
             fhandle = open(filename, 'rb')
             fhandle.seek(0)     # Read 0xff next
