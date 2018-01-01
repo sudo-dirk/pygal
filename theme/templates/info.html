@@ -6,12 +6,21 @@
 {% for desc, info in input.this.get_infos() %}
           <tr>
           <td>{{ desc }}</td>
-{% if info is string %}
+  {% if info is string %}
           <td style="text-align:right;">{{ info }}</td>
-{% else %}
+  {% else %}
           <td style="text-align:right;"><a href="{{ info[0] }}">{{ info[1] }}</a></td>
-{% endif %}
+  {% endif %}
           </tr>
 {% endfor %}
+{% if input.this.get_tag_id_list()|length > 0 %}
+          <tr><td>Tags:</td><td></td></tr>
+  {% for tag_id in input.this.get_tag_id_list() %}
+          <tr>
+            <td><img src="{{input.this.get_tag_icon(tag_id)}}"></td>
+            <td><a  href="{{input.this.add_tag_url(tag_id)}}" title="{{input.this.get_tag_text(tag_id)}}" rel="nofollow">{{input.this.get_tag_text(tag_id)}}</a></td>
+          </tr>
+  {% endfor %}
+{% endif %}
         </tbody>
       </table>
