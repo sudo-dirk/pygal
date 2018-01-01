@@ -4,7 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Action Leiste taucht auch bei Admin-Dialog auf. Action- und Navigationleiste auf Konsistenz prüfen
+# TODO: - Action Leiste taucht auch bei Admin-Dialog auf. Actionleiste auf Konsistenz prüfen
 #       - User None mit einem sinnvollen Namen benennen
 #       - Login, Admin Leiste auch reduzieren, wenn schmal, search nicht ausblenden
 #       - Administration Dialog aufhübschen und verbessern, weiter Administrative Felder hinzu? Switch User, ...
@@ -16,11 +16,8 @@
 #       - Admin-User darf zu einem anderen Benutzer wechseln. Logout führt zu ursprünglichem Nutzer.
 #       - Nach texten auf der Oberfläche suchen, die in das Modul lang gehören (z.B.: Button- und Labeltexte)
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
-#       - Config Klasse zum Handeln von Parametern (Session, cfg-Datei, ....); webnail-size als session-parameter und default in user-data?
-#       - Festlegung der Benutzerrechte auf Weboberfläche
 #       - E-Mailbenachrichtigung bei neuem Benutzer und Passwortrücksetzung
 ###############################################################################################################
-#       - Berechtigungen im Auth File mit regex? statt Liste von Startwith...
 #       - Session nur für die jeweilige Unterseite anlegen (Test ob tiefere Seiten okay)
 #       - Kurze Namen (Anfa...nde) (laenge aus pygal_config), onMouseover: Voller Name anzeigen
 #       - Fehler abfangen (Zugriffsrechte items, cache, user.json)

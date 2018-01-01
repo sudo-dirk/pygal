@@ -34,3 +34,15 @@ def url_extention(item_name):
         return '/' + decode(item_name)
     else:
         return ''
+
+
+class link(object):
+    def __init__(self, url, name):
+        self.url = url
+        self.name = name
+
+
+class piclink(link):
+    def __init__(self, url, name, pic):
+        link.__init__(self, url, name)
+        self.pic = pic

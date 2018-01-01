@@ -93,16 +93,14 @@
       </nav> 
 
       <ul class="moin-breadcrumb">
-      {% if input.has_attr('this') %}
-        {% for navi in input.this.navigation_list() %}
-          <li>
-            <h4 class="moin-location-breadcrumb">
-              <small> / </small>
-              <a href="{{navi.url}}">{{navi.name}}</a>
-            </h4>
-          </li>
-        {% endfor %}
-      {% endif %}
+      {% for navi in input.navigation_list %}
+        <li>
+          <h4 class="moin-location-breadcrumb">
+            <small> / </small>
+            <a href="{{navi.url}}">{{navi.name}}</a>
+          </h4>
+        </li>
+      {% endfor %}
       </ul> 
     
       <div class="moin-content">
@@ -110,7 +108,7 @@
         </div>
         
         <ul class="moin-nav nav-tabs moin-shadow">
-        {% if input.has_attr('this') %}
+        {% if input.has_attr('this')  and input.action_bar %}
           {% for action in input.this.actions() %}
           <li>
             <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">

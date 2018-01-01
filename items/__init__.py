@@ -2,12 +2,12 @@ from pylibs import caching
 import os
 from app import base_item, prefix_slideshow
 from app import base_list
-from app import link
-from app import piclink
 from app import prefix_add_tag
 from app import prefix_admin
 from app import prefix_delete
 from app import postfix_info
+from helpers import link
+from helpers import piclink
 from helpers import strargs
 from auth import rights_uid
 from auth import pygal_user
@@ -239,13 +239,6 @@ class base_item_props(base_item, tags):
     def is_a_searchitem(self):
         return 'q' in self._request_args
 
-    def navigation_list(self):
-        rv = base_item.navigation_list(self)
-        if self.is_a_searchitem():
-            rv.insert(0, link(config.url_prefix + '/' + strargs(self._request_args), lang.search_results % self._request_args.get('q')))
-            rv.insert(1, link(None, ''))
-        return rv
-
 
 def get_class_for_item(rel_path, force_uncached=False, force_list=False):
     bl = base_list(rel_path)
@@ -254,7 +247,7 @@ def get_class_for_item(rel_path, force_uncached=False, force_list=False):
             return itemlist
         else:
             return cached_itemlist
-    # TODO: reduce late impoerts
+    # TODO: reduce late imports
     from picture import picture
     from video import video
     possible_item_classes = [picture, video]
@@ -335,13 +328,6 @@ class itemlist(base_list):
         #
         self.sort()
         #
-
-    def navigation_list(self):
-        rv = base_list.navigation_list(self)
-        if self.is_a_searchresult():
-            rv.insert(0, link(config.url_prefix + '/' + strargs(self._request_args), lang.search_results % self._request_args.get('q')))
-            rv.insert(1, link(None, ''))
-        return rv
 
     def user_may_view(self):
         return self.len() > 0

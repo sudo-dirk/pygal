@@ -74,14 +74,6 @@ class base_item(object):
         else:
             return os.path.splitext(name)[0]
 
-    def navigation_list(self):
-        rv = list()
-        rel_url = self.url(True)
-        while os.path.basename(rel_url):
-            rv.insert(0, link(os.path.join(config.url_prefix or '/', rel_url), os.path.basename(rel_url)))
-            rel_url = os.path.dirname(rel_url)
-        return rv
-
     def raw_ext(self):
         return os.path.splitext(self.raw_path())[1][1:].lower()
 
@@ -186,14 +178,6 @@ class base_list(object):
         else:
             return os.path.splitext(name)[0]
 
-    def navigation_list(self):
-        rv = list()
-        rel_url = self.url(True)
-        while os.path.basename(rel_url):
-            rv.insert(0, link(os.path.join(config.url_prefix or '/', rel_url), os.path.basename(rel_url)))
-            rel_url = os.path.dirname(rel_url)
-        return rv
-
     def raw_path(self):
         return os.path.join(config.basepath, config.item_folder, self._rel_path)
 
@@ -205,15 +189,3 @@ class base_list(object):
             return decode(self._rel_path)
         else:
             return config.url_prefix + '/' + decode(self._rel_path) + strargs(self._request_args)
-
-
-class link(object):
-    def __init__(self, url, name):
-        self.url = url
-        self.name = name
-
-
-class piclink(link):
-    def __init__(self, url, name, pic):
-        link.__init__(self, url, name)
-        self.pic = pic

@@ -4,7 +4,7 @@
 from items import base_item_props, cached_itemlist
 from items import itemlist
 from pylibs import osm
-from app import piclink
+from helpers import piclink
 from app import prefix_thumbnail
 from app import prefix_webnail
 from pylibs.multimedia.picture import picture_info_cached
