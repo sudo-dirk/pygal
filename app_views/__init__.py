@@ -23,7 +23,7 @@ def get_header_input(title, item_name, error, info, hint, this=None, tag_id=None
     elif tag_id is None:
         return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_extention=url_extention(item_name), this=this, error=error, info=info, hint=hint)
     else:
-        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_extention=url_extention(item_name), error=error, info=info, hint=hint)
+        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_extention=url_extention(item_name), this=this, tag_id=tag_id, error=error, info=info, hint=hint)
 
 
 def get_footer_input():
