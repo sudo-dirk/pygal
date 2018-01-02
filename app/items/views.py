@@ -28,30 +28,34 @@ def admin(item_name):
     c = get_class_for_item(item_name)
     if c:
         i = c(item_name, flask.request.args)
-        if auth.pygal_user.may_admin():
-            if 'user' in flask.request.args:
-                user = flask.request.args.get('user')
-                info = None
-                if 'action' in flask.request.form:
-                    delete_rights = flask.request.form.get('delete-rights').split(',')
-                    download_right = flask.request.form.get('download-right') == 'true'
-                    edit_rights = flask.request.form.get('edit-rights').split(',')
-                    view_rights = flask.request.form.get('view-rights').split(',')
-                    udh = auth.user_data_handler(user)
-                    udh.set_rights_delete(delete_rights)
-                    udh.set_rights_download(download_right)
-                    udh.set_rights_edit(edit_rights)
-                    udh.set_rights_view(view_rights)
-                    udh.store_user()
-                    info = "Rights for %s changed. Check rights for safety reasons." % user
-                if user in auth.pygal_user.user_data.users():
-                    return app_views.make_response(app_views.RESP_TYPE_ADMIN_RIGHTS, item_name, item=i, info=info)
-                else:
-                    return app_views.make_response(app_views.RESP_TYPE_ITEM, item_name, item=i, error=lang.error_permission_denied)
+        if flask.request.method == 'GET':
+            if auth.pygal_user.may_admin():
+                return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i)
             else:
-                return app_views.make_response(app_views.RESP_TYPE_ADMIN_USER_CHOOSE, item_name, info=lang.info_choose_user)
+                return app_views.make_response(app_views.RESP_TYPE_EMPTY, item_name, error=lang.error_permission_denied)
         else:
-            return app_views.make_response(app_views.RESP_TYPE_EMPTY, item_name, error=lang.error_permission_denied)
+            user = app_views.get_form_user()
+            delete_rights = flask.request.form.get('delete-rights').split(',')
+            download_right = flask.request.form.get('download-right') == 'true'
+            edit_rights = flask.request.form.get('edit-rights').split(',')
+            view_rights = flask.request.form.get('view-rights').split(',')
+            if user in [None, '']:
+                pdh = auth.public_data_handler()
+                pdh.set_rights_delete(delete_rights)
+                pdh.set_rights_download(download_right)
+                pdh.set_rights_edit(edit_rights)
+                pdh.set_rights_view(view_rights)
+                pdh.store_user()
+                info = "Public rights were changed. Check rights for safety reasons."
+            else:
+                udh = auth.user_data_handler(user)
+                udh.set_rights_delete(delete_rights)
+                udh.set_rights_download(download_right)
+                udh.set_rights_edit(edit_rights)
+                udh.set_rights_view(view_rights)
+                udh.store_user()
+                info = "Rights for User '%s' changed. Check rights for safety reasons." % user
+            return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i, info=info)
     flask.abort(404)
 
 
@@ -75,7 +79,6 @@ def userprofile(item_name):
     if flask.request.method == 'GET':
         return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, item_name, hint=lang.hint_resolution)
     else:
-        user = auth.pygal_user.session_data.get_user()
         thumbnail_size_index = int(flask.request.form.get('select_thumbnail_size'))
         webnail_size_index = int(flask.request.form.get('select_webnail_size'))
         password_current = auth.password_salt_and_hash(flask.request.form.get('userprofile_password_current'))
@@ -88,7 +91,7 @@ def userprofile(item_name):
         sdh.set_webnail_size_index(webnail_size_index)
         udh.set_email(email)
         if flask.request.form.get('userprofile_password_current') != u'':
-            if not auth.pygal_user.user_data.chk_password(password_current, user) or not password_current == auth.pygal_user.session_data.get_password():
+            if not udh.chk_password(password_current) or not password_current == sdh.get_password():
                 return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, item_name, error=lang.error_password_wrong_userprofile)
             elif password1 != password2:
                 return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, item_name, error=lang.error_passwords_not_equal_userprofile)
@@ -96,7 +99,7 @@ def userprofile(item_name):
                 return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, item_name, error=lang.error_password_empty_userprofile)
             else:
                 sdh.set_password(auth.password_salt_and_hash(password1))
-                udh.set_password(auth.password_salt_and_hash(password1), user)
+                udh.set_password(auth.password_salt_and_hash(password1))
         udh.store_user()
         return flask.redirect(config.url_prefix + url_extention(item_name))
 

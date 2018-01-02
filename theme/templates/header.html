@@ -70,11 +70,11 @@
                     </a>
                   </li>
                 {% endif %}
-                {% if input.pygal_user.session_data.chk_login() %}
+                {% if input.pygal_user.chk_login() %}
                   <li>
                     <a href="{{ input.pygal_user.user_url(input.url_extention) }}" title="{{ input.lang.userprofile }}" rel="nofollow">
                       <span><img src="{{input.url_prefix}}/static/common/img/user.png"></span>
-                      <span class="hidden-sm hidden-xs">{{ input.pygal_user.session_data.get_user() }}</span>
+                      <span class="hidden-sm hidden-xs">{{ input.pygal_user.get_session_user() }}</span>
                     </a>
                   </li>
                   <li>

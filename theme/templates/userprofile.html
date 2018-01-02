@@ -5,7 +5,7 @@
         <dl>
         <input type="submit" value="Update Userprofile" class="button" />
         </dl>
-        <h1>Picture Size</h1>
+        <h2>Picture Size</h2>
         <dl>
           <dt>
             <label class="required" for="f_select_thumbnail_size">Thumbnail size</label>
@@ -13,22 +13,22 @@
           <dd>
             <select name="select_thumbnail_size" form="userprofile" />
               {% for thumbnail_size in input.config.thumbnail_size_list %}
-              <option value="{{ loop.index-1 }}"{% if input.pygal_user.session_data.get_thumbnail_size() == thumbnail_size %} selected{% endif %}>{{ thumbnail_size }}</option>
+              <option value="{{ loop.index-1 }}"{% if input.pygal_user.get_thumbnail_size() == thumbnail_size %} selected{% endif %}>{{ thumbnail_size }}</option>
               {% endfor %}
             </select>
           </dd>
           <dt>
-            <label class="required" for="f_select_thumbnail_size">Webnail size</label>
+            <label class="required" for="f_select_webnail_size">Webnail size</label>
           </dt>
           <dd>
             <select name="select_webnail_size" form="userprofile" />
               {% for webnail_size in input.config.webnail_size_list %}
-              <option value="{{ loop.index-1 }}"{% if input.pygal_user.session_data.get_webnail_size() == webnail_size %} selected{% endif %}>{{ webnail_size }}</option>
+              <option value="{{ loop.index-1 }}"{% if input.pygal_user.get_webnail_size() == webnail_size %} selected{% endif %}>{{ webnail_size }}</option>
               {% endfor %}
             </select>
           </dd>
         </dl>
-        <h1>User Profile data</h1>
+        <h2>User Profile data</h2>
         <dt>
           <label for="f_userprofile_password_current">Current Password</label>
         </dt>

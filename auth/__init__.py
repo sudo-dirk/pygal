@@ -7,9 +7,6 @@ import pygal_config as config
 from pylibs import fstools
 
 basepath = os.path.abspath(os.path.dirname(__file__))
-user_file_prefix = 'users_'
-user_file_extention = 'json'
-user_permission_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), user_file_prefix + '%s.json')
 
 
 def password_salt_and_hash(password):
@@ -17,13 +14,18 @@ def password_salt_and_hash(password):
 
 
 def rights_uid(user):
-    filename = user_permission_file % user
+    if user is None:
+        filename = public_data_handler().data_filename(user)
+    else:
+        filename = user_data_handler().data_filename(user)
     if os.path.isfile(filename):
         return fstools.uid(filename)
     return 'no_user_rights_uid'
 
 
 class user_data_handler(dict):
+    USER_FILE_PREFIX = 'user_'
+    USER_FILE_EXTENTION = 'json'
     KEY_EMAIL = 'email'
     KEY_PASSWORD = 'password'
     KEY_RIGHTS = 'rights'
@@ -63,6 +65,9 @@ class user_data_handler(dict):
         except TypeError:
             pass
         return False
+
+    def data_filename(self, user):
+        return os.path.join(basepath, self.USER_FILE_PREFIX + user + '.' + self.USER_FILE_EXTENTION)
 
     def get_email(self, user=None):
         self.load_user(user)
@@ -109,11 +114,14 @@ class user_data_handler(dict):
         except (TypeError, KeyError):
             return None
 
+    def load_store_condition(self, user):
+        return user is not None
+
     def load_user(self, user, force=False):
-        if (user is not self._user and user is not None) or force:
+        if (user is not self._user or force) and self.load_store_condition(user):
             self._user = user
             try:
-                with open(user_permission_file % str(user), 'r') as fh:
+                with open(self.data_filename(user), 'r') as fh:
                     dict.__init__(self, json.loads(fh.read()))
             except IOError:
                 self.clear()
@@ -151,21 +159,28 @@ class user_data_handler(dict):
         self[self.KEY_RIGHTS][self.KEY_RIGHTS_VIEW] = right_list
 
     def store_user(self):
-        with open(user_permission_file % str(self._user), 'w') as fh:
-            fh.write(json.dumps(self, indent=4, sort_keys=True))
+        if self.load_store_condition(self._user):
+            with open(self.data_filename(self._user), 'w') as fh:
+                fh.write(json.dumps(self, indent=4, sort_keys=True))
 
     def users(self):
-        rv = fstools.filelist(basepath, user_file_prefix + '*.' + user_file_extention, False)
+        rv = fstools.filelist(basepath, self.data_filename('*'), False)
         for i in range(0, len(rv)):
             entry = os.path.basename(rv[i])
-            if entry.startswith(user_file_prefix) and entry.endswith(user_file_extention):
-                rv[i] = entry[len(user_file_prefix):-len(user_file_extention) - 1]
-        if 'None' not in rv:
-            rv.append('None')
+            if entry.startswith(self.USER_FILE_PREFIX) and entry.endswith(self.USER_FILE_EXTENTION):
+                rv[i] = entry[len(self.USER_FILE_PREFIX):-len(self.USER_FILE_EXTENTION) - 1]
         return rv
 
     def user_exists(self, username):
         return username in self.users()
+
+
+class public_data_handler(user_data_handler):
+    def data_filename(self, user):
+        return os.path.join(basepath, 'public.json')
+
+    def load_store_condition(self, user):
+        return True
 
 
 class session_data_handler(object):
@@ -177,17 +192,11 @@ class session_data_handler(object):
     def get_password(self):
         return flask.session.get(self.KEY_PASSWORD)
 
-    def get_thumbnail_size(self):
-        thumbnail_size_index = flask.session.get(self.KEY_THUMBNAIL_SIZE_INDEX)
-        if thumbnail_size_index is None:
-            thumbnail_size_index = config.thumbnail_size_default
-        return config.thumbnail_size_list[thumbnail_size_index]
+    def get_thumbnail_index(self):
+        return flask.session.get(self.KEY_THUMBNAIL_SIZE_INDEX)
 
-    def get_webnail_size(self):
-        webnail_size_index = flask.session.get(self.KEY_WEBNAIL_SIZE_INDEX)
-        if webnail_size_index is None:
-            webnail_size_index = config.webnail_size_default
-        return config.webnail_size_list[webnail_size_index]
+    def get_webnail_index(self):
+        return flask.session.get(self.KEY_WEBNAIL_SIZE_INDEX)
 
     def get_user(self):
         return flask.session.get(self.KEY_USERNAME)
@@ -228,9 +237,6 @@ class session_data_handler(object):
 
 
 class pygal_auth(object):
-    user_data = user_data_handler()
-    session_data = session_data_handler()
-
     def _admin_right_list_(self, user, perm_name):
         class admin_folder_list(list):
             def __init__(self):
@@ -259,11 +265,15 @@ class pygal_auth(object):
         folder_list = fstools.dirlist(config.item_folder, True)
         folder_list.sort()
 
+        if user is None:
+            udh = public_data_handler()
+        else:
+            udh = user_data_handler(user)
         al = admin_folder_list()
         for i in range(0, len(folder_list)):
             rel_path = decode(folder_list[i][len(config.item_folder) + 1:])
             try:
-                selected = rel_path in self.user_data.get_rights(user).get(perm_name)
+                selected = rel_path in udh.get_rights().get(perm_name)
             except (AttributeError, TypeError):
                 selected = False
             al.append(rel_path, selected)
@@ -280,12 +290,37 @@ class pygal_auth(object):
 
     def admin_download_right(self, user):
         try:
-            return self.user_data.get_rights(user).get(self.user_data.KEY_RIGHTS_DOWNLOAD)
+            if user is None:
+                udh = public_data_handler()
+            else:
+                udh = user_data_handler(user)
+            return udh.get_rights().get(udh.KEY_RIGHTS_DOWNLOAD)
         except (AttributeError, TypeError):
             return False
 
+    def chk_login(self):
+        return session_data_handler().chk_login()
+
     def get_my_email(self):
-        return self.user_data.get_email(self.session_data.get_user())
+        return user_data_handler(self.get_session_user()).get_email()
+
+    def get_session_user(self):
+        return session_data_handler().get_user()
+
+    def get_thumbnail_size(self):
+        thumbnail_size_index = session_data_handler().get_thumbnail_index()
+        if thumbnail_size_index is None:
+            thumbnail_size_index = config.thumbnail_size_default
+        return config.thumbnail_size_list[thumbnail_size_index]
+
+    def get_webnail_size(self):
+        webnail_size_index = session_data_handler().get_webnail_index()
+        if webnail_size_index is None:
+            webnail_size_index = config.webnail_size_default
+        return config.webnail_size_list[webnail_size_index]
+
+    def users(self):
+        return user_data_handler().users()
 
     def user_url(self, url_extention=''):  # TODO: move this method to a more sensefull place
         # TODO: reduce late impoerts
@@ -299,31 +334,48 @@ class pygal_auth(object):
             path = decode(os.path.dirname(item._rel_path))
         else:
             path = decode(item._rel_path)
-        return user_data_handler(self.session_data.get_user()).chk_rights_view(path)
+        user = self.get_session_user()
+        if user is None:
+            return public_data_handler().chk_rights_view(path)
+        else:
+            return user_data_handler(user).chk_rights_view(path)
 
     def may_delete(self, item):
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
             path = decode(item._rel_path)
-        return user_data_handler(self.session_data.get_user()).chk_rights_delete(path)
+        user = self.get_session_user()
+        if user is None:
+            return public_data_handler().chk_rights_delete(path)
+        else:
+            return user_data_handler(user).chk_rights_delete(path)
 
     def may_download(self, item):
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
             path = decode(item._rel_path)
-        return user_data_handler(self.session_data.get_user()).chk_rights_download(path)
+        user = self.get_session_user()
+        if user is None:
+            return public_data_handler().chk_rights_download(path)
+        else:
+            return user_data_handler(user).chk_rights_download(path)
 
     def may_edit(self, item):
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
             path = decode(item._rel_path)
-        return user_data_handler(self.session_data.get_user()).chk_rights_edit(path)
+        user = self.get_session_user()
+        if user is None:
+            return public_data_handler().chk_rights_edit(path)
+        else:
+            return user_data_handler(user).chk_rights_edit(path)
 
     def may_admin(self):
-        return self.session_data.chk_login() and self.session_data.get_user() in config.admin_group
+        sdh = session_data_handler()
+        return sdh.chk_login() and sdh.get_user() in config.admin_group
 
 
 pygal_user = pygal_auth()

@@ -11,20 +11,18 @@ import pygal_config as config
 
 
 RESP_TYPE_ADD_TAG = 0
-RESP_TYPE_ADMIN_RIGHTS = 1
-RESP_TYPE_ADMIN_USER_CHOOSE = 2
-RESP_TYPE_DELETE = 3
-RESP_TYPE_EMPTY = 4
-RESP_TYPE_FORM_DATA = 5
-RESP_TYPE_ITEM = 6
-RESP_TYPE_LOGIN = 7
-RESP_TYPE_LOSTPASS = 8
-RESP_TYPE_REGISTER = 9
-RESP_TYPE_USERPROFILE = 10
+RESP_TYPE_ADMIN = 1
+RESP_TYPE_DELETE = 2
+RESP_TYPE_EMPTY = 3
+RESP_TYPE_FORM_DATA = 4
+RESP_TYPE_ITEM = 5
+RESP_TYPE_LOGIN = 6
+RESP_TYPE_LOSTPASS = 7
+RESP_TYPE_REGISTER = 8
+RESP_TYPE_USERPROFILE = 9
 
 show_action_bar = {RESP_TYPE_ADD_TAG: True,
-                   RESP_TYPE_ADMIN_RIGHTS: False,
-                   RESP_TYPE_ADMIN_USER_CHOOSE: False,
+                   RESP_TYPE_ADMIN: False,
                    RESP_TYPE_DELETE: True,
                    RESP_TYPE_EMPTY: False,
                    RESP_TYPE_FORM_DATA: False,
@@ -71,6 +69,13 @@ def get_footer_input():
     return collector()
 
 
+def get_form_user():
+    user = flask.request.args.get('user')
+    if user == '':
+        return None
+    return user
+
+
 def make_response(resp_type, item_name, item=None, error=None, info=None, hint=None):
     if resp_type is RESP_TYPE_ADD_TAG and item is not None:
         tag_id = flask.request.args.get('tag_id')
@@ -79,17 +84,10 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
         rv += flask.render_template('add_tag.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv
-    elif resp_type is RESP_TYPE_ADMIN_RIGHTS and item is not None:
+    elif resp_type is RESP_TYPE_ADMIN:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.admin, item_name, error, info, hint, item))
-        content_input = collector(pygal_user=auth.pygal_user, this=item, user_to_admin=flask.request.args.get('user'))
-        rv += flask.render_template('admin_right_dialog.html', input=content_input)
-        rv += flask.render_template('footer.html', input=get_footer_input())
-        return rv
-    elif resp_type is RESP_TYPE_ADMIN_USER_CHOOSE:
-        rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.admin, item_name, error, info, hint, item))
-        # TODO: create a template for this content
-        for user in auth.user_data_handler().users():
-            rv += '<form method="get" action=""> <input type="submit" value="%s" class="button" name="user"/></form><br>' % user
+        content_input = collector(pygal_user=auth.pygal_user, this=item, user_to_admin=get_form_user(), lang=lang)
+        rv += flask.render_template('admin_dialog.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv
     elif resp_type is RESP_TYPE_DELETE and item is not None:

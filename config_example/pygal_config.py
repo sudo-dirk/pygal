@@ -1,11 +1,11 @@
 import os
 
-DEBUG = True
+DEBUG = False
 ip_to_serve_from = '127.0.0.1'
 secret_key = 'This should be a real secret string including all kinds of characters'
 admin_group = []
 #
-thumbnail_size_list = [140, 175, 225]
+thumbnail_size_list = [137, 175, 225]
 thumbnail_size_default = 1
 webnail_size_list = [450, 1100, 1750]
 webnail_size_default = 1

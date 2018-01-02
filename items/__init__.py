@@ -387,11 +387,11 @@ class itemlist(base_list):
         return self.PROPERTIES
 
     def prop_item_path(self):
-        propfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '_' + (pygal_user.session_data.get_user() or 'None').encode('utf-8') + '.prop'
+        propfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '_' + (pygal_user.get_session_user() or 'None').encode('utf-8') + '.prop'
         return os.path.join(config.iprop_folder, propfile)
 
     def uid(self):
-        return fstools.uid(self.raw_path()) + '_' + rights_uid(pygal_user.session_data.get_user())
+        return fstools.uid(self.raw_path()) + '_' + rights_uid(pygal_user.get_session_user())
 
     #
     # Cached Properties
@@ -427,7 +427,7 @@ class itemlist(base_list):
     # Further Methods
     #
     def thumbnail_xy_max(self):
-        return pygal_user.session_data.get_thumbnail_size()
+        return pygal_user.get_thumbnail_size()
 
     def thumbnail_x(self):
         return self.ratio_x() * self.thumbnail_xy_max()

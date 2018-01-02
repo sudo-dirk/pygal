@@ -80,15 +80,34 @@
   }
 </script>
 
+
 <div id="moin-page" lang="en" dir="ltr">
   <div id="moin-content">
-    <h2>{{ input.user_to_admin }}</h2>
     <div class="moin-form">
-      <form name="change_user_view-rights" action="{{ input.this.admin_url() }}" method="post" onsubmit="submitRightTree()">
+      <form method="get" action="{{ input.this.admin_url() }}">
+        <dl>
+          <div>
+            <dt>
+              <label class="required" for="user">{{ input.lang.user }}:</label>
+            </dt>
+            <dd>
+              <select name="user" onchange="this.form.submit()"/>
+                <option value {% if not input.user_to_admin %}selected {%endif %}>public-permissions</option>
+                {% for user in input.pygal_user.users() %}
+                <option value="{{ user }}" {% if user == input.user_to_admin %}selected{% endif %}>{{ user }}</option>
+                {% endfor %}
+              </select>
+            </dd>
+          </div>
+        </dl>
+      </form>
+    </div>
+    <div class="moin-form">
+      <form name="change_user_rights" action="{{ input.this.admin_url() }}" method="post" onsubmit="submitRightTree()">
          <input type="hidden" name="view-rights" id="view-rights" value="" />
          <input type="hidden" name="edit-rights" id="edit-rights" value="" />
          <input type="hidden" name="delete-rights" id="delete-rights" value="" />
-         <input type="submit" value="Submit view-rights" class="button" name="action"/>
+         <input type="submit" value="Set permissions" class="button" name="action"/>
          <dl>
            <div>
              <dt>
@@ -124,12 +143,8 @@
            </div>
          </dl>
          <br style="clear:both" />
-         <input type="submit" value="Submit view-rights" class="button" name="action"/>
-
+         <input type="submit" value="Set permissions" class="button" name="action"/>
       </form>
     </div>
-
-
   </div>
-
 </div>
