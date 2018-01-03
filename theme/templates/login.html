@@ -2,7 +2,7 @@
   <div id="moin-content">
     <div class="moin-form">
       <h2>{{ input.lang.login }}</h2>
-      <form name="login" action="{{ input.url_prefix }}/_login_{{ input.url_extention }}" method="post">
+      <form name="login" action="{{ input.url_prefix + input.app.prefix_login + input.url_extention }}" method="post">
         <dl>
           <dt>
             <label class="required" for="f_login_username">Name</label>

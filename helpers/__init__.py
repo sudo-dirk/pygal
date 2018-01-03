@@ -1,3 +1,6 @@
+import urllib
+
+
 def decode(string):
     for i in ['utf-8', 'cp1252']:
         try:
@@ -26,12 +29,12 @@ def strargs(args):
             if args.get(key):
                 rv += '=' + args[key]
             rv += '&'
-        return decode(rv[:-1])
+        return urllib.quote(rv[:-1])
 
 
 def url_extention(item_name):
     if item_name:
-        return '/' + decode(item_name)
+        return '/' + urllib.quote(item_name)
     else:
         return ''
 

@@ -1,7 +1,7 @@
 <div id="moin-page" lang="en" dir="ltr">
   <div id="moin-content">
     <div class="moin-form">
-      <form name="userprofile" id="userprofile" action="{{ input.url_prefix }}/_userprofile_{{ input.url_extention }}" method="post">
+      <form name="userprofile" id="userprofile" action="{{ input.config.url_prefix + input.app.prefix_userprofile + input.url_extention }}" method="post">
         <dl>
         <input type="submit" value="Update Userprofile" class="button" />
         </dl>

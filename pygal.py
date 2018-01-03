@@ -4,8 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Der Modal-Dialog für die Bildinfos ist unschön auf dem Mobiltelefon
-#       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
+# TODO: - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
 #       - Zusätzlich Infos auf Info-Seite für itemlist (Datum, uid, ) siehe Bilder
 #       - Select all Button bei der Administration der Rechte hinzufügen
 #       - Restrukturierung (ggf. Auflösen der Unterscheidung base und item) + imports trennen from ... import a, b, c + imports nach alphabet sortieren

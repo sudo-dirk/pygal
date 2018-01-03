@@ -1,16 +1,5 @@
-  <div id="info" class="modalDialog">
-	<div>
-      <a href="#close" title="Close" class="close">X</a>
-{% include 'info.html' %}
-    </div>
-  </div>
-
-
   <div id="moin-page" lang="en" dir="ltr">
-
     <div id="thumb_overview">
-
-
       {% for item in input.this.itemlist() %}
         <div id="{{ item.name() }}" class="thumb_border" style="width: {{item.thumbnail_xy_max() + 12}}px; height: {{item.thumbnail_xy_max() + 12 + 65 }}px;">
           <b>{{ item.name() }}</b><br>

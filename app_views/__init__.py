@@ -1,3 +1,4 @@
+import app
 import auth
 import flask
 from helpers import decode
@@ -15,17 +16,19 @@ RESP_TYPE_ADMIN = 1
 RESP_TYPE_DELETE = 2
 RESP_TYPE_EMPTY = 3
 RESP_TYPE_FORM_DATA = 4
-RESP_TYPE_ITEM = 5
-RESP_TYPE_LOGIN = 6
-RESP_TYPE_LOSTPASS = 7
-RESP_TYPE_REGISTER = 8
-RESP_TYPE_USERPROFILE = 9
+RESP_TYPE_INFO = 5
+RESP_TYPE_ITEM = 6
+RESP_TYPE_LOGIN = 7
+RESP_TYPE_LOSTPASS = 8
+RESP_TYPE_REGISTER = 9
+RESP_TYPE_USERPROFILE = 10
 
 show_action_bar = {RESP_TYPE_ADD_TAG: True,
                    RESP_TYPE_ADMIN: False,
                    RESP_TYPE_DELETE: True,
                    RESP_TYPE_EMPTY: False,
                    RESP_TYPE_FORM_DATA: False,
+                   RESP_TYPE_INFO: True,
                    RESP_TYPE_ITEM: True,
                    RESP_TYPE_LOGIN: False,
                    RESP_TYPE_LOSTPASS: False,
@@ -56,13 +59,13 @@ def navigation_list(item_name):
 
 def get_header_input(resp_type, title, item_name, error, info, hint, this=None, tag_id=None):
     if this is None and tag_id is None:
-        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_extention=url_extention(item_name), navigation_list=navigation_list(item_name), action_bar=show_action_bar[resp_type], error=error, info=info, hint=hint)
+        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_prefix=config.url_prefix, url_extention=url_extention(item_name), app=app, navigation_list=navigation_list(item_name), action_bar=show_action_bar[resp_type], error=error, info=info, hint=hint)
     elif this is None:
-        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_extention=url_extention(item_name), navigation_list=navigation_list(item_name), action_bar=show_action_bar[resp_type], tag_id=tag_id, error=error, info=info, hint=hint)
+        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_prefix=config.url_prefix, url_extention=url_extention(item_name), app=app, navigation_list=navigation_list(item_name), action_bar=show_action_bar[resp_type], tag_id=tag_id, error=error, info=info, hint=hint)
     elif tag_id is None:
-        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_extention=url_extention(item_name), navigation_list=navigation_list(item_name), action_bar=show_action_bar[resp_type], this=this, error=error, info=info, hint=hint)
+        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_prefix=config.url_prefix, url_extention=url_extention(item_name), app=app, navigation_list=navigation_list(item_name), action_bar=show_action_bar[resp_type], this=this, error=error, info=info, hint=hint)
     else:
-        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_extention=url_extention(item_name), navigation_list=navigation_list(item_name), action_bar=show_action_bar[resp_type], this=this, tag_id=tag_id, error=error, info=info, hint=hint)
+        return collector(title=title, pygal_user=auth.pygal_user, lang=lang, url_prefix=config.url_prefix, url_extention=url_extention(item_name), app=app, navigation_list=navigation_list(item_name), action_bar=show_action_bar[resp_type], this=this, tag_id=tag_id, error=error, info=info, hint=hint)
 
 
 def get_footer_input():
@@ -105,6 +108,12 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
         hint = hint.replace('\n', '<br>').replace(' ', '&nbsp')
         rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.title_info, item_name, error, info, hint))
         return rv
+    elif resp_type is RESP_TYPE_INFO and item is not None:
+        rv = flask.render_template('header.html', input=get_header_input(resp_type, item.name(), item_name, error, info, hint, item))
+        content_input = collector(this=item)
+        rv += flask.render_template('info.html', input=content_input)
+        rv += flask.render_template('footer.html', input=get_footer_input())
+        return rv
     elif resp_type is RESP_TYPE_ITEM and item is not None:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, item.name(), item_name, error, info, hint, item))
         content_input = collector(this=item)
@@ -113,25 +122,25 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
         return rv
     elif resp_type is RESP_TYPE_LOGIN:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.login, item_name, error, info, hint))
-        content_input = collector(lang=lang, url_extention=url_extention(item_name))
+        content_input = collector(lang=lang, url_prefix=config.url_prefix, url_extention=url_extention(item_name), app=app)
         rv += flask.render_template('login.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv
     elif resp_type is RESP_TYPE_LOSTPASS:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.lostpass, item_name, error, info, hint))
-        content_input = collector(lang=lang)
+        content_input = collector(lang=lang, url_prefix=config.url_prefix, app=app)
         rv += flask.render_template('lostpass.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv
     elif resp_type is RESP_TYPE_REGISTER:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.register, item_name, error, info, hint))
-        content_input = collector(lang=lang)
+        content_input = collector(lang=lang, url_prefix=config.url_prefix, app=app)
         rv += flask.render_template('register.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv
     elif resp_type is RESP_TYPE_USERPROFILE:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.userprofile, item_name, error, info, hint))
-        content_input = collector(config=config, pygal_user=auth.pygal_user, lang=lang, url_extention=url_extention(item_name))
+        content_input = collector(config=config, pygal_user=auth.pygal_user, lang=lang, url_extention=url_extention(item_name), app=app)
         rv += flask.render_template('userprofile.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv

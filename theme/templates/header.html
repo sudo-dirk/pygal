@@ -64,7 +64,7 @@
               <ul class="nav navbar-nav moin-pull-right">
                 {% if input.pygal_user.may_admin() %}
                   <li>
-                    <a href="{{ input.url_prefix }}/_admin_{{ input.url_extention }}" title="{{ input.lang.admin }}" rel="nofollow">
+                    <a href="{{ input.url_prefix + input.app.prefix_admin + input.url_extention }}" title="{{ input.lang.admin }}" rel="nofollow">
                       <span><img src="{{input.url_prefix}}/static/common/img/admin.png"></span>
                       <span class="hidden-sm hidden-xs">{{ input.lang.admin }}</span>
                     </a>
@@ -78,13 +78,13 @@
                     </a>
                   </li>
                   <li>
-                    <a href="{{ input.url_prefix }}/_logout_{{ input.url_extention }}" title="{{ input.lang.logout }}" rel="nofollow">
+                    <a href="{{ input.url_prefix + input.app.prefix_logout + input.url_extention }}" title="{{ input.lang.logout }}" rel="nofollow">
                       <span><img src="{{input.url_prefix}}/static/common/img/logout.png"></span>
                       <span class="hidden-sm hidden-xs">{{ input.lang.logout }}</span>
                     </a>
                   </li>
                 {% else %}
-                  <li><a href="{{ input.url_prefix }}/_login_{{ input.url_extention }}" rel="nofollow">{{ input.lang.login }}</a></li>
+                  <li><a href="{{ input.url_prefix + input.app.prefix_login + input.url_extention }}" rel="nofollow">{{ input.lang.login }}</a></li>
                 {% endif %}
               </ul>
             </div>

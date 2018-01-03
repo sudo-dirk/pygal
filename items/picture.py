@@ -187,10 +187,10 @@ class picture(base_item_props, report.logit):
         return base_item_props.prv(self, excluded_types=[itemlist, cached_itemlist])
 
     def raw_x(self):
-        return self._info.get(self._info.WIDTH, logger=logger) or config.webnail_size
+        return self._info.get(self._info.WIDTH, logger=logger) or pygal_user.get_webnail_size()
 
     def raw_y(self):
-        return self._info.get(self._info.HEIGHT, logger=logger) or config.webnail_size
+        return self._info.get(self._info.HEIGHT, logger=logger) or pygal_user.get_webnail_size()
 
     def ratio_x(self):
         return float(self.raw_x()) / max(self.raw_x(), self.raw_y())

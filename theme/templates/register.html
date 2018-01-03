@@ -5,7 +5,7 @@
     
     <h1>{{ input.lang.register }}</h1>
     <div class="moin-form">
-      <form name="register" action="{{ input.url_prefix }}/_register_{{ input.url_extention }}" method="post">
+      <form name="register" action="{{ input.url_prefix + input.app.prefix_register + input.url_extention }}" method="post">
         <dl>
           <dt>
             <label class="required" for="f_register_username">Name</label>

@@ -5,21 +5,22 @@ import os
 import pygal_config as config
 from pylibs import fstools
 import shutil
+import urllib
 
-postfix_info = '#info'
-prefix_add_tag = '/_add_tag_'                       # items
-prefix_admin = '/_admin_'                           # items
-prefix_delete = '/_delete_'                         # items
-prefix_download = '/_download_'                     # items
-prefix_login = '/_login_'                           # base_func
-prefix_logout = '/_logout_'                         # base_func
-prefix_lostpass = '/_lostpass_'                     # base_func
-prefix_raw = '/_raw_'                               # items
-prefix_register = '/_register_'                     # base_func
-prefix_slideshow = '/_slideshow_'                   # items
-prefix_thumbnail = '/_thumbnail_'                   # items
-prefix_userprofile = '/_userprofile_'               # base_func
-prefix_webnail = '/_webnail_'                       # items
+prefix_add_tag = '/+add_tag'                        # items
+prefix_admin = '/+admin'                            # items
+prefix_delete = '/+delete'                          # items
+prefix_download = '/+download'                      # items
+prefix_info = '/+info'                              # items
+prefix_login = '/+login'                            # base_func
+prefix_logout = '/+logout'                          # base_func
+prefix_lostpass = '/+lostpass'                      # base_func
+prefix_raw = '/+raw'                                # items
+prefix_register = '/+register'                      # base_func
+prefix_slideshow = '/+slideshow'                    # items
+prefix_thumbnail = '/+thumbnail'                    # items
+prefix_userprofile = '/+userprofile'                # base_func
+prefix_webnail = '/+webnail'                        # items
 
 
 class base_item(object):
@@ -38,7 +39,7 @@ class base_item(object):
         return self._rel_path
 
     def base_url(self, flask_prefix=''):
-        return config.url_prefix + flask_prefix + '/' + decode(self._rel_path)
+        return config.url_prefix + flask_prefix + '/' + urllib.quote(self._rel_path)
 
     def delete(self):
         shutil.move(self.raw_path(), self.delete_path())
@@ -49,7 +50,7 @@ class base_item(object):
     def download_url(self):
         du = config.url_prefix + prefix_download
         if self._rel_path:
-            du += '/' + decode(self._rel_path)
+            du += '/' + urllib.quote(self._rel_path)
         return du
 
     def exists(self):
@@ -81,13 +82,13 @@ class base_item(object):
         return os.path.join(config.basepath, config.item_folder, self._rel_path)
 
     def raw_url(self):
-        return config.url_prefix + prefix_raw + '/' + decode(self._rel_path) or ''
+        return config.url_prefix + prefix_raw + '/' + urllib.quote(self._rel_path) or ''
 
     def filesize(self):
         return os.path.getsize(self.raw_path())
 
     def parent_url(self):
-        return config.url_prefix + '/' + decode(os.path.dirname(self._rel_path)) + strargs(self._request_args)
+        return config.url_prefix + '/' + urllib.quote(os.path.dirname(self._rel_path)) + strargs(self._request_args)
 
     def strfilesize(self):
         unit = {0: 'Byte', 1: 'kB', 2: 'MB', 3: 'GB', 4: 'TB'}
@@ -106,7 +107,7 @@ class base_item(object):
 
     def url(self, relative=False):
         if relative:
-            return decode(self._rel_path)
+            return urllib.quote(self._rel_path)
         else:
             return self.base_url() + strargs(self._request_args)
 
@@ -146,12 +147,12 @@ class base_list(object):
     def download_url(self):
         du = config.url_prefix + prefix_download
         if self._rel_path:
-            du += '/' + decode(self._rel_path)
+            du += '/' + urllib.quote(self._rel_path)
         du += self.str_request_args()
         return du
 
-    def base_url(self, flask_prefix = ''):
-        return config.url_prefix + flask_prefix + '/' + decode(self._rel_path)
+    def base_url(self, flask_prefix=''):
+        return config.url_prefix + flask_prefix + '/' + urllib.quote(self._rel_path)
 
     def exists(self):
         return os.path.isdir(self.raw_path())
@@ -186,6 +187,6 @@ class base_list(object):
 
     def url(self, relative=False):
         if relative:
-            return decode(self._rel_path)
+            return urllib.quote(self._rel_path)
         else:
-            return config.url_prefix + '/' + decode(self._rel_path) + strargs(self._request_args)
+            return config.url_prefix + '/' + urllib.quote(self._rel_path) + strargs(self._request_args)

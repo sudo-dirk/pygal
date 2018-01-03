@@ -1,4 +1,5 @@
 import os
+import urllib
 
 DEBUG = False
 ip_to_serve_from = '127.0.0.1'
@@ -10,8 +11,8 @@ thumbnail_size_default = 1
 webnail_size_list = [450, 1100, 1750]
 webnail_size_default = 1
 # e.g.
-# url_prefix = '/test'
-url_prefix = ''
+# url_prefix = urllib.quote('/test')
+url_prefix = urllib.quote('')
 basepath = os.path.abspath(os.path.dirname(__file__))
 trash_path = 'data/trash'
 item_folder = 'data/items'

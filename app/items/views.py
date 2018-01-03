@@ -3,6 +3,7 @@ from app import prefix_add_tag
 from app import prefix_admin
 from app import prefix_delete
 from app import prefix_download
+from app import prefix_info
 from app import prefix_slideshow
 from app import prefix_thumbnail
 from app import prefix_userprofile
@@ -56,6 +57,17 @@ def admin(item_name):
                 udh.store_user()
                 info = "Rights for User '%s' changed. Check rights for safety reasons." % user
             return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i, info=info)
+    flask.abort(404)
+
+
+@item.route(prefix_info + '/<itemname:item_name>')
+@item.route(prefix_info, defaults=dict(item_name=u''))
+def info(item_name):
+    item_name = encode(item_name)
+    c = get_class_for_item(item_name)
+    if c:
+        i = c(item_name, flask.request.args)
+        return app_views.make_response(app_views.RESP_TYPE_INFO, item_name, item=i)
     flask.abort(404)
 
 

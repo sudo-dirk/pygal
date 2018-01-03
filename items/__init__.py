@@ -5,7 +5,7 @@ from app import base_list
 from app import prefix_add_tag
 from app import prefix_admin
 from app import prefix_delete
-from app import postfix_info
+from app import prefix_info
 from helpers import link
 from helpers import piclink
 from helpers import strargs
@@ -227,7 +227,10 @@ class base_item_props(base_item, tags):
         return admin_url + self.str_request_args()
 
     def info_url(self):
-        return self.url() + postfix_info
+        info_url = config.url_prefix + prefix_info
+        if self.url(True):
+            info_url += '/' + self.url(True)
+        return info_url + self.str_request_args()
 
     def prop_item_path(self):
         propfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '.prop'
@@ -266,11 +269,13 @@ class itemlist(base_list):
     PROP_RATIO_X = 'ratio_x'
     PROP_RATIO_Y = 'ratio_y'
     PROP_THUMB_URL = 'thumb_url'
+    PROP_WEB_URL = 'web_url'
+    PROP_WEB_Y = 'web_y'
     PROP_NUM_PICS = 'num_pics'
     PROP_NUM_VIDS = 'num_vids'
     PROP_NUM_GALS = 'num_gals'
     PROP_FILESIZE = 'filesize'
-    PROPERTIES = [PROP_LEN, PROP_TIME, PROP_RATIO_X, PROP_RATIO_Y, PROP_THUMB_URL, PROP_NUM_PICS, PROP_NUM_VIDS, PROP_NUM_GALS, PROP_FILESIZE]
+    PROPERTIES = [PROP_LEN, PROP_TIME, PROP_RATIO_X, PROP_RATIO_Y, PROP_THUMB_URL, PROP_WEB_URL, PROP_WEB_Y, PROP_NUM_PICS, PROP_NUM_VIDS, PROP_NUM_GALS, PROP_FILESIZE]
 
     def __init__(self, rel_path, request_args={}, parent=None, slideshow=False, create_cache=False):
         base_list.__init__(self, rel_path, request_args=request_args, parent=parent)
@@ -361,6 +366,12 @@ class itemlist(base_list):
         elif key == self.PROP_THUMB_URL:
             if len(self._itemlist) > 0:
                 return self._itemlist[0].thumbnail_url()
+        elif key == self.PROP_WEB_URL:
+            if len(self._itemlist) > 0:
+                return self._itemlist[0].webnail_url()
+        elif key == self.PROP_WEB_Y:
+            if len(self._itemlist) > 0:
+                return self._itemlist[0].webnail_y()
         elif key == self.PROP_NUM_PICS:
             p = 0
             for entry in self._itemlist:
@@ -413,6 +424,12 @@ class itemlist(base_list):
 
     def thumbnail_url(self):
         return self.get(self.PROP_THUMB_URL)
+
+    def webnail_url(self):
+        return self.get(self.PROP_WEB_URL)
+
+    def webnail_y(self):
+        return self.get(self.PROP_WEB_Y)
 
     def ratio_x(self):
         return self.get(self.PROP_RATIO_X, 1.0)
@@ -472,7 +489,10 @@ class itemlist(base_list):
         return admin_url + self.str_request_args()
 
     def info_url(self):
-        return self.url() + postfix_info
+        info_url = config.url_prefix + prefix_info
+        if self.url(True):
+            info_url += '/' + self.url(True)
+        return info_url + self.str_request_args()
 
     def itemlist(self):
         if self._itemlist is None:
