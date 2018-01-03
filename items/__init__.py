@@ -179,7 +179,7 @@ class base_item_props(base_item, tags):
         return add_tag_url
 
     def tag_path(self):
-        tagfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '.json'
+        tagfile = self._rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json'
         return os.path.join(config.database_folder, tagfile)
 
     def delete_url(self):
@@ -233,7 +233,7 @@ class base_item_props(base_item, tags):
         return info_url + self.str_request_args()
 
     def prop_item_path(self):
-        propfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '.prop'
+        propfile = self._rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json'
         return os.path.join(config.iprop_folder, propfile)
 
     def slideshow_url(self):
@@ -398,7 +398,7 @@ class itemlist(base_list):
         return self.PROPERTIES
 
     def prop_item_path(self):
-        propfile = os.path.splitext(self._rel_path)[0].replace(os.path.sep, '_') + '_' + (pygal_user.get_session_user() or 'None').encode('utf-8') + '.prop'
+        propfile = self._rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '_' + (pygal_user.get_session_user() or 'None').encode('utf-8') + '.json'
         return os.path.join(config.iprop_folder, propfile)
 
     def uid(self):
