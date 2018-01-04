@@ -1,6 +1,6 @@
 <div id="moin-page" lang="en" dir="ltr">
   <div id="moin-content" style="background-image:url({{ input.this.webnail_url() }}); background-repeat: no-repeat; min-height: {{ input.this.webnail_y() }}px; background-color: rgba(255,255,255,0.75); background-blend-mode: lighten;">
-      <h2>{{ input.this.name() or 'Root' }}</h2>
+      <h2>{% if input.this.is_itemlist() %}Galery: {% else %}Item: {% endif %}{{ input.this.name() or 'Root' }}</h2>
       <table>
         <tbody>
 {% for desc, info in input.this.get_infos() %}
