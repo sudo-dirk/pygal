@@ -9,6 +9,7 @@ import urllib
 
 prefix_add_tag = '/+add_tag'                        # items
 prefix_admin = '/+admin'                            # items
+prefix_cachedataview = '/+cachedataview'            # items
 prefix_delete = '/+delete'                          # items
 prefix_download = '/+download'                      # items
 prefix_info = '/+info'                              # items

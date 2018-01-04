@@ -1,6 +1,7 @@
 from app.items import item
 from app import prefix_add_tag
 from app import prefix_admin
+from app import prefix_cachedataview
 from app import prefix_delete
 from app import prefix_download
 from app import prefix_info
@@ -60,6 +61,18 @@ def admin(item_name):
     flask.abort(404)
 
 
+@item.route(prefix_cachedataview + '/<itemname:item_name>')
+@item.route(prefix_cachedataview, defaults=dict(item_name=u''))
+def cachedataview(item_name):
+    item_name = encode(item_name)
+    c = get_class_for_item(item_name)
+    if c:
+        i = c(item_name, flask.request.args)
+        if auth.pygal_user.may_admin():
+            return app_views.make_response(app_views.RESP_TYPE_CACHEDATAVIEW, item_name, item=i)
+    flask.abort(404)
+
+
 @item.route(prefix_info + '/<itemname:item_name>')
 @item.route(prefix_info, defaults=dict(item_name=u''))
 def info(item_name):
@@ -67,7 +80,8 @@ def info(item_name):
     c = get_class_for_item(item_name)
     if c:
         i = c(item_name, flask.request.args)
-        return app_views.make_response(app_views.RESP_TYPE_INFO, item_name, item=i)
+        if i.user_may_view():
+            return app_views.make_response(app_views.RESP_TYPE_INFO, item_name, item=i)
     flask.abort(404)
 
 
@@ -76,10 +90,13 @@ def thumbnail(item_name):
     item_name = encode(item_name)
     c = get_class_for_item(item_name)
     if c:
+        index = flask.request.args.get('index', None)
+        if index is not None:
+            index = int(index)
         item = c(item_name, flask.request.args)
         if item.user_may_view():
-            item.create_thumbnail()
-            thumbnail_item_path = item.thumbnail_item_path()
+            item.create_thumbnail(index=index)
+            thumbnail_item_path = item.thumbnail_item_path(index=index)
             if os.path.exists(thumbnail_item_path):
                 return flask.send_file(thumbnail_item_path)
     flask.abort(404)
@@ -121,10 +138,13 @@ def webnail(item_name):
     item_name = encode(item_name)
     c = get_class_for_item(item_name)
     if c:
+        index = flask.request.args.get('index', None)
+        if index is not None:
+            index = int(index)
         item = c(item_name, flask.request.args)
         if item.user_may_view():
-            item.create_webnail()
-            webnail_item_path = item.webnail_item_path()
+            item.create_webnail(index=index)
+            webnail_item_path = item.webnail_item_path(index=index)
             if os.path.exists(webnail_item_path):
                 return flask.send_file(webnail_item_path)
     flask.abort(404)

@@ -4,12 +4,15 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Problem mit png und mit Bild in Linde/orig (Ausrichtung)
+# TODO: - delete cache auf Seitenebene für Administratoren einführen
+#       - tar statt zip in download + stream statt memory element
 #       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
+#       - Problem mit png und mit Bild in Linde/orig (Ausrichtung) - Test mit originaldaten erforderlich
 #       - Zusätzlich Infos auf Info-Seite für itemlist (Datum, uid, ) siehe Bilder
 #       - Select all Button bei der Administration der Rechte hinzufügen
 #       - Restrukturierung (ggf. Auflösen der Unterscheidung base und item) + imports trennen from ... import a, b, c + imports nach alphabet sortieren
 #       - Beispieldaten einfügen (Notwendigkeit auf Produktivsystem eine Liste von Quellen zu verarbeiten)
+#       - Erweiterte Suche einbauen. Zugang über flash-Bereich analog login.
 #       - Admin-User darf zu einem anderen Benutzer wechseln. Logout führt zu ursprünglichem Nutzer.
 #       - Nach texten auf der Oberfläche suchen, die in das Modul lang gehören (z.B.: Button- und Labeltexte)
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?

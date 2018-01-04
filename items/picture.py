@@ -5,6 +5,9 @@ from items import base_item_props, cached_itemlist
 from items import itemlist
 from pylibs import osm
 from helpers import piclink
+from helpers import strargs
+from helpers import decode
+from app import prefix_cachedataview
 from app import prefix_thumbnail
 from app import prefix_webnail
 from pylibs.multimedia.picture import picture_info_cached
@@ -40,6 +43,41 @@ class picture(base_item_props, report.logit):
         self._thumbnail_y = None
         self._webnail_x = None
         self._webnail_y = None
+
+    def cache_data_url(self, i):
+        cu = config.url_prefix + prefix_cachedataview
+        if self._rel_path:
+            cu += '/' + urllib.quote(self._rel_path)
+        return cu + strargs({'index': str(i)})
+
+    def cache_data(self):
+        rv = list()
+        for i in range(0, len(config.thumbnail_size_list)):
+            entry = list()
+            entry.append('Thumbnail (%d)' % i)
+            entry.append(decode(self._cimage_item_path(config.thumbnail_size_list[i])))
+            rv.append(entry)
+        for i in range(0, len(config.webnail_size_list)):
+            entry = list()
+            entry.append('Webnail (%d)' % i)
+            entry.append(decode(self._cimage_item_path(config.webnail_size_list[i])))
+            rv.append(entry)
+        entry = list()
+        entry.append(decode('Xnail creation version'))
+        entry.append(decode(self.prop_citem_path()))
+        rv.append(entry)
+        entry = list()
+        entry.append('Item data')
+        entry.append(decode(self.prop_item_path()))
+        rv.append(entry)
+        entry = list()
+        entry.append('User data')
+        entry.append(decode(self.tag_path()))
+        rv.append(entry)
+        # Add Link
+        for i in range(0, len(rv)):
+            rv[i].append(self.cache_data_url(i))
+        return rv
 
     def num_pic(self):
         return 1
@@ -81,16 +119,22 @@ class picture(base_item_props, report.logit):
         else:
             return '%s - %s' % (self.manufactor(), self.model())
 
-    def create_thumbnail(self, force=False):
+    def create_thumbnail(self, force=False, index=None):
         try:
-            self._create_citem(pygal_user.get_thumbnail_size(), force)
+            if index is None:
+                self._create_citem(pygal_user.get_thumbnail_size(), force)
+            else:
+                self._create_citem(config.thumbnail_size_list[index], force)
         except RuntimeError:
             for thumbnail_size in config.thumbnail_size_list:
                 self._create_citem(thumbnail_size, force)
 
-    def create_webnail(self, force=False):
+    def create_webnail(self, force=False, index=None):
         try:
-            self._create_citem(pygal_user.get_webnail_size(), force)
+            if index is None:
+                self._create_citem(pygal_user.get_webnail_size(), force)
+            else:
+                self._create_citem(config.webnail_size_list[index], force)
         except RuntimeError:
             for webnail_size in config.webnail_size_list:
                 self._create_citem(webnail_size, force)
@@ -181,7 +225,7 @@ class picture(base_item_props, report.logit):
         return self._info.get(self._info.ORIENTATION, None, logger=logger)
 
     def prop_citem_path(self):
-        return os.path.join(config.citem_folder, self.uid() + '.prop')
+        return os.path.join(config.citem_folder, self.uid() + '.json')
 
     def prv(self):
         return base_item_props.prv(self, excluded_types=[itemlist, cached_itemlist])
@@ -219,11 +263,18 @@ class picture(base_item_props, report.logit):
     def template(self):
         return 'picture.html'
 
-    def thumbnail_item_path(self):
-        return self._cimage_item_path(pygal_user.get_thumbnail_size())
+    def thumbnail_item_path(self, index=None):
+        if index is None:
+            return self._cimage_item_path(pygal_user.get_thumbnail_size())
+        else:
+            return self._cimage_item_path(config.thumbnail_size_list[index])
 
-    def thumbnail_url(self):
-        return config.url_prefix + prefix_thumbnail + '/' + self.url(True) or ''
+    def thumbnail_url(self, i=None):
+        if i is None:
+            args = ''
+        else:
+            args = strargs({'index': str(i)})
+        return config.url_prefix + prefix_thumbnail + ('/' + self.url(True) or '') + args
 
     def thumbnail_x(self):
         if not self._thumbnail_x:
@@ -241,11 +292,18 @@ class picture(base_item_props, report.logit):
     def time(self):
         return self._info.get(self._info.TIME, 0, logger=logger)
 
-    def webnail_item_path(self):
-        return self._cimage_item_path(pygal_user.get_webnail_size())
+    def webnail_item_path(self, index=None):
+        if index is None:
+            return self._cimage_item_path(pygal_user.get_webnail_size())
+        else:
+            return self._cimage_item_path(config.webnail_size_list[index])
 
-    def webnail_url(self):
-        return config.url_prefix + prefix_webnail + '/' + self.url(True) or ''
+    def webnail_url(self, i=None):
+        if i is None:
+            args = ''
+        else:
+            args = strargs({'index': str(i)})
+        return config.url_prefix + prefix_webnail + ('/' + self.url(True) or '') +args
 
     def webnail_x(self):
         if not self._webnail_x:
@@ -291,7 +349,7 @@ class picture(base_item_props, report.logit):
                 try:
                     p.save(self._cimage_item_path(size))
                 except IOError:
-                    self.logit_error(logger, 'error creating citem (%d) for %s', size, self.name())
+                    self.logit_error(logger, 'Error creating citem (%d) for %s', size, self.name())
                 else:
                     self._citem_info[VERSION] = __version__ + this_method_version
                     try:

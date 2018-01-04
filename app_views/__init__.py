@@ -13,18 +13,20 @@ import pygal_config as config
 
 RESP_TYPE_ADD_TAG = 0
 RESP_TYPE_ADMIN = 1
-RESP_TYPE_DELETE = 2
-RESP_TYPE_EMPTY = 3
-RESP_TYPE_FORM_DATA = 4
-RESP_TYPE_INFO = 5
-RESP_TYPE_ITEM = 6
-RESP_TYPE_LOGIN = 7
-RESP_TYPE_LOSTPASS = 8
-RESP_TYPE_REGISTER = 9
-RESP_TYPE_USERPROFILE = 10
+RESP_TYPE_CACHEDATAVIEW = 2
+RESP_TYPE_DELETE = 3
+RESP_TYPE_EMPTY = 4
+RESP_TYPE_FORM_DATA = 5
+RESP_TYPE_INFO = 6
+RESP_TYPE_ITEM = 7
+RESP_TYPE_LOGIN = 8
+RESP_TYPE_LOSTPASS = 9
+RESP_TYPE_REGISTER = 10
+RESP_TYPE_USERPROFILE = 11
 
 show_action_bar = {RESP_TYPE_ADD_TAG: True,
                    RESP_TYPE_ADMIN: False,
+                   RESP_TYPE_CACHEDATAVIEW: True,
                    RESP_TYPE_DELETE: True,
                    RESP_TYPE_EMPTY: False,
                    RESP_TYPE_FORM_DATA: False,
@@ -93,6 +95,40 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
         rv += flask.render_template('admin_dialog.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv
+    elif resp_type is RESP_TYPE_CACHEDATAVIEW and item is not None:
+        index = int(flask.request.args.get('index', '0'))
+        data = item.cache_data()
+        cache_filename = decode(os.path.basename(data[index][1]))
+        rv = flask.render_template('header.html', input=get_header_input(resp_type, cache_filename, item_name, error, info, hint, item))
+        if item.is_itemlist():
+            try:
+                with open(data[index][1], 'r') as fh:
+                    json_str = fh.read()
+            except IOError:
+                json_str = ''
+            # TODO: cachedataview - JSON view aufhuebschen
+            content_input = collector(datatemplate='single_json.html', this=item, json_str=json_str, filename=cache_filename)
+            rv += flask.render_template('cachedataview.html', input=content_input)
+        else:
+            if index in [0, 1, 2, 3, 4, 5]:
+                if index in [0, 1, 2]:
+                    url = item.thumbnail_url(index)
+                    xy_max = config.thumbnail_size_list[index]
+                else:
+                    url = item.webnail_url(index - 3)
+                    xy_max = config.webnail_size_list[index - 3]
+                content_input = collector(datatemplate='single_picture.html', this=item, x=int(xy_max * item.ratio_x()), y=int(xy_max * item.ratio_y()), xy_max=xy_max, url=url, filename=cache_filename)
+                rv += flask.render_template('cachedataview.html', input=content_input)
+            if index in [6, 7, 8]:
+                try:
+                    with open(data[index][1], 'r') as fh:
+                        json_str = fh.read()
+                except IOError:
+                    json_str = ''
+                content_input = collector(datatemplate='single_json.html', this=item, json_str=json_str, filename=cache_filename)
+                rv += flask.render_template('cachedataview.html', input=content_input)
+        rv += flask.render_template('footer.html', input=get_footer_input())
+        return rv
     elif resp_type is RESP_TYPE_DELETE and item is not None:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, 'Delete: %s' % (item.name()), item_name, error, info, hint, item))
         content_input = collector(this=item)
@@ -110,7 +146,7 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
         return rv
     elif resp_type is RESP_TYPE_INFO and item is not None:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, item.name(), item_name, error, info, hint, item))
-        content_input = collector(this=item)
+        content_input = collector(pygal_user=auth.pygal_user, this=item)
         rv += flask.render_template('info.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv

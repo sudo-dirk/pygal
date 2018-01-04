@@ -4,15 +4,19 @@ from app import base_item, prefix_slideshow
 from app import base_list
 from app import prefix_add_tag
 from app import prefix_admin
+from app import prefix_cachedataview
 from app import prefix_delete
 from app import prefix_info
+import auth
+from auth import pygal_user
+from auth import rights_uid
+from helpers import decode
 from helpers import link
 from helpers import piclink
 from helpers import strargs
-from auth import rights_uid
-from auth import pygal_user
 import lang
 from pylibs import fstools
+import urllib
 import json
 import pygal_config as config
 import time
@@ -281,6 +285,15 @@ class itemlist(base_list):
         base_list.__init__(self, rel_path, request_args=request_args, parent=parent)
         self._create_cache = create_cache
 
+    def cache_data_url(self, i):
+        cu = config.url_prefix + prefix_cachedataview
+        if self._rel_path:
+            cu += '/' + urllib.quote(self._rel_path)
+        return cu + strargs({'index': str(i)})
+
+    def cache_data(self):
+        return list()
+
     def tag_id_exists(self, tag_id):    # for compatibility with picture object
         return False
 
@@ -397,8 +410,11 @@ class itemlist(base_list):
     def keys(self):
         return self.PROPERTIES
 
-    def prop_item_path(self):
-        propfile = self._rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '_' + (pygal_user.get_session_user() or 'None').encode('utf-8') + '.json'
+    def prop_item_path(self, user=None):
+        if user is None:
+            propfile = self._rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '_' + (pygal_user.get_session_user() or '').encode('utf-8') + '.json'
+        else:
+            propfile = self._rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '_' + (user).encode('utf-8') + '.json'
         return os.path.join(config.iprop_folder, propfile)
 
     def uid(self):
@@ -548,3 +564,16 @@ class cached_itemlist(itemlist, report.logit):
             return self._cached_data.get(key, default, logger=logger)
         else:
             return itemlist.get(self, key, default)
+
+    def cache_data(self):
+        rv = list()
+        users = [''] + auth.user_data_handler().users()
+        for i in range(0, len(users)):
+            entry = list()
+            entry.append('Item data (%s)' % users[i])
+            entry.append(decode(self.prop_item_path(users[i])))
+            rv.append(entry)
+        # Add Link
+        for i in range(0, len(rv)):
+            rv[i].append(self.cache_data_url(i))
+        return rv

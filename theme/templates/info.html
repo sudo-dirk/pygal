@@ -14,15 +14,17 @@
           </tr>
 {% endfor %}
 {% if not input.this.is_itemlist() and input.this.get_tag_id_list()|length > 0 %}
-          <tr><td>Tags:</td><td></td></tr>
   {% for tag_id in input.this.get_tag_id_list() %}
           <tr>
-            <td><img src="{{input.this.get_tag_icon(tag_id)}}"></td>
-            <td><a  href="{{input.this.add_tag_url(tag_id)}}" title="{{input.this.get_tag_text(tag_id)}}" rel="nofollow">{{input.this.get_tag_text(tag_id)}}</a></td>
+          <td>{% if loop.index == 1 %}Tags:{% endif %}</td>
+          <td style="text-align:right;"><a  href="{{input.this.add_tag_url(tag_id)}}" title="{{input.this.get_tag_text(tag_id)}}" rel="nofollow">{{input.this.get_tag_text(tag_id)}}<img src="{{input.this.get_tag_icon(tag_id)}}"></a></td>
           </tr>
   {% endfor %}
 {% endif %}
         </tbody>
       </table>
+{% if input.pygal_user.may_admin() %}
+{% include 'cachedata.html' %}
+{% endif %}
   </div>
 </div>
