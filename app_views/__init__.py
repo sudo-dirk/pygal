@@ -128,13 +128,13 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
         return rv
     elif resp_type is RESP_TYPE_LOSTPASS:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.lostpass, item_name, error, info, hint))
-        content_input = collector(lang=lang, url_prefix=config.url_prefix, app=app)
+        content_input = collector(lang=lang, url_prefix=config.url_prefix, url_extention=url_extention(item_name), app=app)
         rv += flask.render_template('lostpass.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv
     elif resp_type is RESP_TYPE_REGISTER:
         rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.register, item_name, error, info, hint))
-        content_input = collector(lang=lang, url_prefix=config.url_prefix, app=app)
+        content_input = collector(lang=lang, url_prefix=config.url_prefix, url_extention=url_extention(item_name), app=app)
         rv += flask.render_template('register.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv

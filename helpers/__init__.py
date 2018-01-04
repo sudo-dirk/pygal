@@ -29,7 +29,7 @@ def strargs(args):
             if args.get(key):
                 rv += '=' + args[key]
             rv += '&'
-        return urllib.quote(rv[:-1])
+        return decode(rv[:-1])
 
 
 def url_extention(item_name):
