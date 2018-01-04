@@ -168,7 +168,7 @@ class user_data_handler(dict):
         for i in range(0, len(rv)):
             entry = os.path.basename(rv[i])
             if entry.startswith(self.USER_FILE_PREFIX) and entry.endswith(self.USER_FILE_EXTENTION):
-                rv[i] = entry[len(self.USER_FILE_PREFIX):-len(self.USER_FILE_EXTENTION) - 1]
+                rv[i] = decode(entry[len(self.USER_FILE_PREFIX):-len(self.USER_FILE_EXTENTION) - 1])
         return rv
 
     def user_exists(self, username):
