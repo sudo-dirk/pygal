@@ -189,6 +189,9 @@ class picture(base_item_props, report.logit):
     def raw_x(self):
         return self._info.get(self._info.WIDTH, logger=logger) or pygal_user.get_webnail_size()
 
+    def raw_xy_max(self):
+        return max(self.raw_x(), self.raw_y())
+
     def raw_y(self):
         return self._info.get(self._info.HEIGHT, logger=logger) or pygal_user.get_webnail_size()
 
@@ -280,7 +283,7 @@ class picture(base_item_props, report.logit):
             self.logit_info(logger, 'creating citem (%d) for %s', size, self.name())
             try:
                 p = picture_edit(self.raw_path())
-                p.resize(size)
+                p.resize(min(size, self.raw_xy_max()))
                 p.rotate(self.orientation())
             except IOError:
                 self.logit_error(logger, 'error creating citem (%d) for %s', size, self.name())
