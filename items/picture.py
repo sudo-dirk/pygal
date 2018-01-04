@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+from auth import pygal_user
 from items import base_item_props, cached_itemlist
 from items import itemlist
 from pylibs import osm
@@ -21,7 +22,7 @@ from pygal import logger
 from pylibs import report
 import pygal_config as config
 import time
-from auth import pygal_user
+import urllib
 
 
 class picture(base_item_props, report.logit):
