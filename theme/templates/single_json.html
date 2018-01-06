@@ -1,6 +1,15 @@
         <h2>{{ input.filename }}</h2>
-        <pre>
-          <code>
-{{ input.json_str }}
-          </code>
-        </pre>
+        <div id="dest"></div>
+        <script type="text/javascript" src="renderjson.js"></script>
+        <script>
+          document.getElementById("dest").appendChild
+          (
+            renderjson.set_show_to_level("all")
+                      .set_sort_objects(true)
+                      .set_icons('+', '-')
+                      //.set_max_string_length(50)
+            (
+              {{ input.json_str|safe }}
+            )
+          );
+        </script>
