@@ -18,7 +18,10 @@ class database_handler(dict):
     def __init__(self, tag_path):
         self._id = 0
         self._tag_path = tag_path
-        print self._tag_path
+        self._initialised = False
+
+    def _load_tags(self):
+        self._initialised = True
         try:
             dict.__init__(self, json.loads(open(self._tag_path, 'r').read()))
         except IOError:
@@ -40,18 +43,26 @@ class database_handler(dict):
                 self._save_tags()
 
     def get_rel_path(self):
+        if not self._initialised:
+            self._load_tags()
         return self.get(self.KEY_DATA_ID, {}).get(self.KEY_DATA_ID_REL_PATH, '')
 
     def matches(self, query):
+        if not self._initialised:
+            self._load_tags()
         for tag_id in self.get_tag_id_list():
             if query.lower() in self.get_tag_text(tag_id).lower():
                 return True
         return False
 
     def tag_id_exists(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         return tag_id in self and tag_id != self.KEY_DATA_ID
 
     def get_tag_id_list(self):
+        if not self._initialised:
+            self._load_tags()
         rv = self.keys()
         if self.KEY_DATA_ID in rv:
             rv.remove(self.KEY_DATA_ID)
@@ -59,73 +70,98 @@ class database_handler(dict):
         return rv
 
     def get_tag_wn_x(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         try:
             return int(self[tag_id]['x'] * self.webnail_x())
         except:
             return ''
 
     def get_tag_wn_y(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         try:
             return int(self[tag_id]['y'] * self.webnail_y())
         except:
             return ''
 
     def get_tag_wn_w(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         try:
             return int(self[tag_id]['w'] * self.webnail_x())
         except:
             return ''
 
     def get_tag_wn_h(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         try:
             return int(self[tag_id]['h'] * self.webnail_y())
         except:
             return ''
 
     def get_tag_wn_x2(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         try:
             return self.get_tag_wn_x(tag_id) + self.get_tag_wn_w(tag_id)
         except:
             return ''
 
     def get_tag_wn_y2(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         try:
             return self.get_tag_wn_y(tag_id) + self.get_tag_wn_h(tag_id)
         except:
             return ''
 
     def get_tag_text(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         try:
             return self[tag_id]['tag']
         except:
             return ''
 
     def get_tag_icon(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         return config.url_prefix + '/static/common/img/%d.png' % (int(tag_id) % 10)
 
     def get_upload_src_ip(self):
+        if not self._initialised:
+            self._load_tags()
         if self.KEY_DATA_ID_SRC_IP_UPLOAD in self[self.KEY_DATA_ID]:
             return self[self.KEY_DATA_ID][self.KEY_DATA_ID_SRC_IP_UPLOAD]
         else:
             return ''
 
     def get_upload_strtime(self):
+        if not self._initialised:
+            self._load_tags()
         if self.KEY_DATA_ID_TIMESTAMP_UPLOAD in self[self.KEY_DATA_ID]:
             return time.strftime("%d.%m.%Y - %H:%M:%S", time.gmtime(self[self.KEY_DATA_ID][self.KEY_DATA_ID_TIMESTAMP_UPLOAD]))
         else:
             return ''
 
     def get_upload_user(self):
+        if not self._initialised:
+            self._load_tags()
         if self.KEY_DATA_ID_USERNAME_UPLOAD in self[self.KEY_DATA_ID]:
             return self[self.KEY_DATA_ID][self.KEY_DATA_ID_USERNAME_UPLOAD]
         else:
             return ''
 
     def add_data(self, key, data):
+        if not self._initialised:
+            self._load_tags()
         self[self.KEY_DATA_ID][key] = data
-        print json.dumps(self, indent=4, sort_keys=True)
 
     def add_tag_wn(self, tag, ident=None):
+        if not self._initialised:
+            self._load_tags()
         tag_dict = dict()
         tag_dict['tag'] = tag
         if ident is None:
@@ -136,6 +172,8 @@ class database_handler(dict):
         self._save_tags()
 
     def add_tag_wn_xywh(self, x, y, w, h, tag, ident=None):
+        if not self._initialised:
+            self._load_tags()
         tag_dict = dict()
         tag_dict['x'] = float(x) / self.webnail_x()
         tag_dict['y'] = float(y) / self.webnail_y()
@@ -150,20 +188,27 @@ class database_handler(dict):
         self._save_tags()
 
     def add_tag_wn_x1y1x2y2(self, x1, y1, x2, y2, tag_text, tag_id=None):
+        if not self._initialised:
+            self._load_tags()
         self.add_tag_wn_xywh(min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1), tag_text, tag_id)
 
     def delete_tag(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         if self.tag_id_exists(tag_id):
             del self[tag_id]
             self._save_tags()
 
     def _save_tags(self):
-        print self._tag_path
+        if not self._initialised:
+            self._load_tags()
         if self._tag_path is not None:
             with open(self._tag_path, 'w') as fh:
                 fh.write(json.dumps(self, indent=4, sort_keys=True))
 
     def tag_has_coordinates(self, tag_id):
+        if not self._initialised:
+            self._load_tags()
         if self.get_tag_wn_x(tag_id) == '':
             return False
         if self.get_tag_wn_y(tag_id) == '':
