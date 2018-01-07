@@ -66,6 +66,8 @@ def admin(item_name):
                         fh.seek(0)
                         return flask.send_file(fh, mimetype='image/jpeg')
                     flask.abort(404)
+                elif admin_issue == 'folder structure':
+                    return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i, hint='Mark the folder you want to delete or where you want to create a subfolder.')
                 else:
                     return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i)
             else:
@@ -98,8 +100,8 @@ def admin(item_name):
                 elif admin_issue == 'staging':
                     container_uuid = flask.request.form.get('container_uuid', container_uuid)
                     action = flask.request.form.get('action', action)
+                    target_path = flask.request.form.get('target_path')
                     if action == 'commit':
-                        target_path = flask.request.form.get('target_path')
                         if target_path != '':
                             sc = staging_container(config.staging_path, None, None, None, None, None)
                             sc.load(sc.get_container_info_file_by_uuid(container_uuid))
@@ -115,6 +117,26 @@ def admin(item_name):
                         sc.load(sc.get_container_info_file_by_uuid(container_uuid))
                         sc.delete()
                         return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i)
+                elif admin_issue == 'folder structure':
+                    action = flask.request.form.get('action', action)
+                    target_path = flask.request.form.get('target_path')
+                    if target_path == '':
+                        return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i, error='You need to check a folder!', hint='Mark the folder you want to delete or where you want to create a subfolder.')
+                    target = os.path.join(config.item_folder, target_path)
+                    if action == 'create':
+                        folder_name = flask.request.form.get('folder_name')
+                        target = os.path.join(target, folder_name)
+                        try:
+                            os.mkdir(target)
+                        except OSError:
+                            return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i, error='Folder %s can not be created. The parent folder has possibly insufficient rights' % target, hint='Mark the folder you want to delete or where you want to create a subfolder.')
+                        return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i, info='Folder %s succesfully created.' % target, hint='Mark the folder you want to delete or where you want to create a subfolder.')
+                    elif action == 'delete':
+                        try:
+                            os.rmdir(target)
+                        except OSError:
+                            return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i, error='Folder %s can not be deleted. The folder is possibly not empty' % target, hint='Mark the folder you want to delete or where you want to create a subfolder.')
+                        return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i, info='Folder %s succesfully deleted.' % target, hint='Mark the folder you want to delete or where you want to create a subfolder.')
     flask.abort(404)
 
 

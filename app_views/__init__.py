@@ -94,7 +94,6 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
         return rv
     elif resp_type is RESP_TYPE_ADMIN:
         admin_issue = flask.request.args.get('admin_issue', 'permission')
-        action = flask.request.args.get('action', 'commit')
         if admin_issue == 'permission':
             rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.admin, item_name, error, info, hint, item))
             content_input = collector(pygal_user=auth.pygal_user, this=item, user_to_admin=get_form_user(), lang=lang, url_prefix=config.url_prefix, app=app, url_extention=url_extention(item_name), admin_issue=admin_issue)
@@ -102,6 +101,7 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
             rv += flask.render_template('footer.html', input=get_footer_input())
             return rv
         elif admin_issue == 'staging':
+            action = flask.request.args.get('action', 'commit')
             # read staging data
             staging_content = dict()
             for scif in fstools.filelist(config.staging_path, '*' + staging_container.CONTAINER_INFO_FILE_EXTENTION):
@@ -120,6 +120,13 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
             rv = flask.render_template('header.html', input=get_header_input(resp_type, 'Staging', item_name, error, info, hint))
             rv += content
             rv += flask.render_template('footer.html', input=get_footer_input(), info=info)
+            return rv
+        elif admin_issue == 'folder structure':
+            action = flask.request.args.get('action', 'create')
+            rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.admin, item_name, error, info, hint, item))
+            content_input = collector(pygal_user=auth.pygal_user, this=item, admin_issue=admin_issue, action=action)
+            rv += flask.render_template('admin.html', input=content_input)
+            rv += flask.render_template('footer.html', input=get_footer_input())
             return rv
         else:
             return make_response(RESP_TYPE_EMPTY, item_name, error='Unknown admin_issue="%s"' % admin_issue)

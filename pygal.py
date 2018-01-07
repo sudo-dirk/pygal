@@ -4,7 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Erstellen eines Unterordners
+# TODO: - Verschieben aus Staging funktioniert nicht immer (Es blieben mehrfach Reste des Stagings, die sich anschließend nicht löschen lassen. Verschieben hat aber einmal zumindest geklappt.
 #       - required attribut für js-tree in admin.staging
 #       - Staging Area aufhübschen und für delete und commit eine Auswahl ermöglichen
 #       - delete cache auf Seitenebene für Administratoren einführen

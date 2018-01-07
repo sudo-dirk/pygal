@@ -16,9 +16,9 @@
     });
     //
     // expand complete tree on init
-    //$('#target-tree').on('ready.jstree', function() {
-    //  $("#target-tree").jstree("open_all");          
-    //});
+    $('#target-tree').on('ready.jstree', function() {
+      $("#target-tree").jstree("open_all");          
+    });
     //
   });
   //
@@ -35,39 +35,11 @@
 </script>
 
 
-    <h2>Staging</h2>
+
+    <h2>Folders</h2>
     <div class="moin-form">
       <form action="{{ input.this.admin_url() }}" method="get">
-        <input type="hidden" name="admin_issue" value="staging" />
-        <input type="hidden" name="action" value="{{ input.action }}" />
-        <dl>
-          <div>
-            <dt>
-              <label class="required" for="container_uuid">Choose a Staging-Container:</label>
-            </dt>
-            <dd>
-              <select name="container_uuid" onchange="this.form.submit()"/>
-                {% for container in input.containers.values() %}
-                <option value="{{ container._uuid_ }}" {% if container._uuid_ == input.container_uuid %}selected{% endif %}>{{ container.container_name }}</option>
-                {% endfor %}
-              </select>
-            </dd>
-          </div>
-        </dl>
-      </form>
-    </div>
-
-    <h2>Content:</h2>
-    {% for file in input.containers[input.container_uuid].container_files %}
-    <img src="{{ input.url_prefix + input.app.prefix_admin }}?admin_issue=staging&action=thumb&container_uuid={{ input.container_uuid }}&filename={{ file }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ file }}"></a>
-    {% endfor %}
-
- 
-    <h2>Action:</h2>
-    <div class="moin-form">
-      <form action="{{ input.this.admin_url() }}" method="get">
-        <input type="hidden" name="admin_issue" value="staging" />
-        <input type="hidden" name="container_uuid" value="{{ input.container_uuid }}" />
+        <input type="hidden" name="admin_issue" value="folder structure" />
         <dl>
           <div>
             <dt>
@@ -75,7 +47,7 @@
             </dt>
             <dd>
               <select name="action" onchange="this.form.submit()"/>
-                {% for action in ['delete', 'commit'] %}
+                {% for action in ['delete', 'create'] %}
                 <option value="{{ action }}" {% if input.action == action %}selected{% endif %}>{{ action }}</option>
                 {% endfor %}
               </select>
@@ -87,13 +59,19 @@
   
     <div class="moin-form">
       <form name="choose_target" action="{{ input.this.admin_url() }}" method="post" onsubmit="submitRightTree()">
-         <input type="hidden" name="admin_issue" value="staging" />
-         <input type="hidden" name="container_uuid" value="{{ input.container_uuid }}" />
+         <input type="hidden" name="admin_issue" value="folder structure" />
          <input type="hidden" name="action" value="{{ input.action }}" />
-{% if input.action == 'commit' %}
          <input type="hidden" name="target_path" id="target_path" value="" />
          <input type="submit" value="Make it so" class="button" name="button"/><br>
            <div style="float: left;">
+{% if input.action == 'create' %}
+             <dt>
+               <label class="required" for="f_folder_name">Folder Name</label>
+             </dt>
+             <dd>
+               <input class="required" required="required" type="text" name="folder_name" id="f_folder_name" placeholder="Folder Name" />
+             </dd>
+{% endif %}
              <dt>
                <label class="required" for="target-tree">Choose Target:</label>
              </dt>
@@ -102,8 +80,6 @@
              </dd>
            </div>
          <br style="clear:both" />
-{% endif %}
          <input type="submit" value="Make it so" class="button" name="button"/>
       </form>
     </div>
-  

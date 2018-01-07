@@ -11,7 +11,7 @@
             </dt>
             <dd>
               <select name="admin_issue" onchange="this.form.submit()"/>
-                {% for issue in ['permission', 'staging'] %}
+                {% for issue in ['permission', 'staging', 'folder structure'] %}
                 <option value="{{ issue }}" {% if input.admin_issue == issue %}selected{% endif %}>{{ issue }}</option>
                 {% endfor %}
               </select>
@@ -23,6 +23,7 @@
 
   {% if input.admin_issue == 'permission' %}{% include 'admin_permission.html' %}
   {% elif input.admin_issue == 'staging' %}{% include 'admin_staging.html' %}
+  {% elif input.admin_issue == 'folder structure' %}{% include 'admin_folders.html' %}
   {% endif %}
   
 
