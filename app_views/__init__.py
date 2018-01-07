@@ -11,7 +11,6 @@ import lang
 import os
 import pygal_config as config
 from pylibs import fstools
-import staging
 
 RESP_TYPE_ADD_TAG = 0
 RESP_TYPE_ADMIN = 1
