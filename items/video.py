@@ -13,6 +13,10 @@ from picture import picture
 from pygal import logger
 
 
+def is_video(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in video.mime_types.keys()
+
+
 class video(picture):
     LOG_PREFIX = 'video:'
     mime_types = {'avi': 'video/x-msvideo', 'mpg': 'video/mpeg', 'mpeg': 'video/mpeg', 'mpe': 'video/mpeg', 'mov': 'video/quicktime', 'qt': 'video/quicktime', 'mp4': 'video/mp4', 'webm': 'video/webm', 'ogv': 'video/ogg', 'flv': 'video/x-flv', '3gp': 'video/3gpp'}

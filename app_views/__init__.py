@@ -3,13 +3,15 @@ import auth
 import flask
 from helpers import decode
 from helpers import link
+from helpers import staging_container
 from helpers import strargs
 from helpers import url_extention
 import json
 import lang
 import os
 import pygal_config as config
-
+from pylibs import fstools
+import staging
 
 RESP_TYPE_ADD_TAG = 0
 RESP_TYPE_ADMIN = 1
@@ -22,7 +24,8 @@ RESP_TYPE_ITEM = 7
 RESP_TYPE_LOGIN = 8
 RESP_TYPE_LOSTPASS = 9
 RESP_TYPE_REGISTER = 10
-RESP_TYPE_USERPROFILE = 11
+RESP_TYPE_UPLOAD = 11
+RESP_TYPE_USERPROFILE = 12
 
 show_action_bar = {RESP_TYPE_ADD_TAG: True,
                    RESP_TYPE_ADMIN: False,
@@ -35,6 +38,7 @@ show_action_bar = {RESP_TYPE_ADD_TAG: True,
                    RESP_TYPE_LOGIN: False,
                    RESP_TYPE_LOSTPASS: False,
                    RESP_TYPE_REGISTER: False,
+                   RESP_TYPE_UPLOAD: False,
                    RESP_TYPE_USERPROFILE: False}
 
 
@@ -90,11 +94,36 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv
     elif resp_type is RESP_TYPE_ADMIN:
-        rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.admin, item_name, error, info, hint, item))
-        content_input = collector(pygal_user=auth.pygal_user, this=item, user_to_admin=get_form_user(), lang=lang)
-        rv += flask.render_template('admin_dialog.html', input=content_input)
-        rv += flask.render_template('footer.html', input=get_footer_input())
-        return rv
+        admin_issue = flask.request.args.get('admin_issue', 'permission')
+        action = flask.request.args.get('action', 'commit')
+        if admin_issue == 'permission':
+            rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.admin, item_name, error, info, hint, item))
+            content_input = collector(pygal_user=auth.pygal_user, this=item, user_to_admin=get_form_user(), lang=lang, url_prefix=config.url_prefix, app=app, url_extention=url_extention(item_name), admin_issue=admin_issue)
+            rv += flask.render_template('admin.html', input=content_input)
+            rv += flask.render_template('footer.html', input=get_footer_input())
+            return rv
+        elif admin_issue == 'staging':
+            # read staging data
+            staging_content = dict()
+            for scif in fstools.filelist(config.staging_path, '*' + staging_container.CONTAINER_INFO_FILE_EXTENTION):
+                sc = staging_container(None, None, None, None, None, None)
+                sc.load(scif)
+                staging_content[sc.get(sc.KEY_UUID)] = sc
+            # create response
+            if len(staging_content) > 0:
+                container_uuid = flask.request.args.get('container_uuid', staging_content.values()[0].get(staging_container.KEY_UUID))
+                content_input = collector(pygal_user=auth.pygal_user, this=item, url_prefix=config.url_prefix, app=app, containers=staging_content, container_uuid=container_uuid, admin_issue=admin_issue, action=action)
+                content = flask.render_template('admin.html', input=content_input)
+                info = None
+            else:
+                content = ''
+                info = 'No data in Staging-Area'
+            rv = flask.render_template('header.html', input=get_header_input(resp_type, 'Staging', item_name, error, info, hint))
+            rv += content
+            rv += flask.render_template('footer.html', input=get_footer_input(), info=info)
+            return rv
+        else:
+            return make_response(RESP_TYPE_EMPTY, item_name, error='Unknown admin_issue="%s"' % admin_issue)
     elif resp_type is RESP_TYPE_CACHEDATAVIEW and item is not None:
         index = int(flask.request.args.get('index', '0'))
         data = item.cache_data()
@@ -106,7 +135,6 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
                     json_str = fh.read()
             except IOError:
                 json_str = ''
-            # TODO: cachedataview - JSON view aufhuebschen
             content_input = collector(datatemplate='single_json.html', this=item, json_str=json_str, filename=cache_filename)
             rv += flask.render_template('cachedataview.html', input=content_input)
         else:
@@ -172,6 +200,12 @@ def make_response(resp_type, item_name, item=None, error=None, info=None, hint=N
         rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.register, item_name, error, info, hint))
         content_input = collector(lang=lang, url_prefix=config.url_prefix, url_extention=url_extention(item_name), app=app)
         rv += flask.render_template('register.html', input=content_input)
+        rv += flask.render_template('footer.html', input=get_footer_input())
+        return rv
+    elif resp_type is RESP_TYPE_UPLOAD:
+        rv = flask.render_template('header.html', input=get_header_input(resp_type, lang.upload, item_name, error, info, hint))
+        content_input = collector(config=config, url_extention=url_extention(item_name), app=app)
+        rv += flask.render_template('upload.html', input=content_input)
         rv += flask.render_template('footer.html', input=get_footer_input())
         return rv
     elif resp_type is RESP_TYPE_USERPROFILE:

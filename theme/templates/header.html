@@ -55,13 +55,13 @@
             <!/div>
           </div>
 
-          <div class="col-md-3 col-sm-3 col-xs-10">
+          <div class="col-md-2 col-sm-2 col-xs-10">
             <div class="moin-navbar-header">
               <div class="navbar-brand">{{ input.title }}</div>
             </div>
           </div>
 
-          <div class="col-md-5 col-sm-5 col-xs-6">
+          <div class="col-md-6 col-sm-6 col-xs-6">
             <div class="moin-navbar-collapse navbar-collapse collapse in">
               <ul class="nav navbar-nav moin-pull-right">
                 {% if input.pygal_user.may_admin() %}
@@ -69,6 +69,14 @@
                     <a href="{{ input.url_prefix + input.app.prefix_admin + input.url_extention }}" title="{{ input.lang.admin }}" rel="nofollow">
                       <span><img src="{{input.url_prefix}}/static/common/img/admin.png"></span>
                       <span class="hidden-sm hidden-xs">{{ input.lang.admin }}</span>
+                    </a>
+                  </li>
+                {% endif %}
+                {% if input.pygal_user.may_upload() %}
+                  <li>
+                    <a href="{{ input.url_prefix + input.app.prefix_upload }}" title="{{ input.lang.upload }}" rel="nofollow">
+                      <span><img src="{{input.url_prefix}}/static/common/img/upload.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ input.lang.upload }}</span>
                     </a>
                   </li>
                 {% endif %}

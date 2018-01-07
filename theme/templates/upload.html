@@ -1,0 +1,27 @@
+<div id="moin-page" lang="en" dir="ltr">
+  <div id="moin-content">
+    <div class="moin-form">
+      <form name="upload" id="upload" action="{{ input.config.url_prefix + input.app.prefix_upload + input.url_extention }}" method="post" enctype="multipart/form-data">
+        <dt>
+          <label class="required" for="f_container_name">Container Name</label>
+        </dt>
+        <dd>
+          <input class="required" required="required" type="text" name="container_name" id="f_container_name" placeholder="Container Name" />
+        </dd>
+        <dt>
+          <label class="required" for="f_files">Choose Files</label>
+        </dt>
+        <dd>
+        <input  class="required" required="required" type="file" name="file[]" id="f_files" multiple>
+        </dd>
+        <dt>
+          <label for="f_submit"></label>
+        </dt>
+        <dd>
+        <input type="submit" value="Upload" class="button" id="f_submit" />
+        </dd>
+      </form>
+    </div>
+  </div>
+</div>
+    

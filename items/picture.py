@@ -25,6 +25,10 @@ import time
 import urllib
 
 
+def is_picture(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in picture.mime_types.keys()
+
+
 class picture(base_item_props, report.logit):
     LOG_PREFIX = 'picture:'
     mime_types = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'jpe': 'image/jpeg', 'png': 'image/png', 'tif': 'image/tiff', 'tiff': 'image/tiff', 'gif': 'image/gif'}
@@ -175,8 +179,11 @@ class picture(base_item_props, report.logit):
             if info is not None:
                 infos.append([desc, info])
 
-        add_info('Date:', self.strtime())
+        add_info('Itemdate:', self.strtime())
         add_info('Name:', self.name(True))
+        add_info('Uploaddate:', self.get_upload_strtime())
+        add_info('Uploaduser:', self.get_upload_user())
+        add_info('Upload IP:', self.get_upload_src_ip())
         add_info('Size:', self.strfilesize())
         add_info('Resolution:', self.resolution())
         add_info('Camera:', self.camera())

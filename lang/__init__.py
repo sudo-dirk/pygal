@@ -35,6 +35,7 @@ if LANGUAGE == 'DE':
     search = 'Suche'
     search_results = 'Sucheergebnisse: %s'
     title_info = 'Allgemeine Information'
+    upload = 'Upload'
     user = decode('Benutzer')
     userprofile = 'Benutzerprofil editieren...'
     user_in_admin_group = "Der Benutzer %s ist bereits in der Administrator Gruppe registriert. Zum Anlegen des Benutzerprofils kontaktieren Sie bitte einen Administrator."
@@ -68,6 +69,7 @@ else:
     search = 'search'
     search_results = 'Search results: %s'
     title_info = 'Information'
+    upload = 'Upload'
     user = 'User'
     userprofile = 'Edit Userprofile...'
     user_in_admin_group = "Unable to create user %s. User is already part of the Admin-Group. Please contact the Administrator of this page."

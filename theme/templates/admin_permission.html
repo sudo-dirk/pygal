@@ -81,10 +81,10 @@
 </script>
 
 
-<div id="moin-page" lang="en" dir="ltr">
-  <div id="moin-content">
+    <h2>Permissions</h2>
     <div class="moin-form">
-      <form method="get" action="{{ input.this.admin_url() }}">
+      <form action="{{ input.this.admin_url() }}">
+        <input type="hidden" name="admin_issue" value="permission" />
         <dl>
           <div>
             <dt>
@@ -110,6 +110,12 @@
          <input type="submit" value="Set permissions" class="button" name="action"/>
          <dl>
            <div>
+             <dt>
+               <label class="required" for="upload-right">Upload:</label>
+             </dt>
+             <dd>
+               <input type="checkbox" name="upload-right" value="true" id="download-right"  {% if input.pygal_user.admin_upload_right(input.user_to_admin) %}checked{% endif %}>
+             </dd>
              <dt>
                <label class="required" for="download-right">Download:</label>
              </dt>
@@ -146,5 +152,3 @@
          <input type="submit" value="Set permissions" class="button" name="action"/>
       </form>
     </div>
-  </div>
-</div>

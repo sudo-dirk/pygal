@@ -4,7 +4,10 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - delete cache auf Seitenebene für Administratoren einführen
+# TODO: - Erstellen eines Unterordners
+#       - required attribut für js-tree in admin.staging
+#       - Staging Area aufhübschen und für delete und commit eine Auswahl ermöglichen
+#       - delete cache auf Seitenebene für Administratoren einführen
 #       - tar statt zip in download + stream statt memory element
 #       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
 #       - Problem mit png und mit Bild in Linde/orig (Ausrichtung) - Test mit originaldaten erforderlich

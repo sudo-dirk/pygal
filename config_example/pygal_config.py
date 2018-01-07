@@ -15,6 +15,7 @@ webnail_size_default = 1
 url_prefix = urllib.quote('')
 basepath = os.path.abspath(os.path.dirname(__file__))
 trash_path = os.path.join(basepath, 'data/trash')
+staging_path = os.path.join(basepath, 'data/staging')
 item_folder = os.path.join(basepath, 'data/items')
 database_folder = os.path.join(basepath, 'data/database')
 citem_folder = os.path.join(basepath, 'data/cache/citems')

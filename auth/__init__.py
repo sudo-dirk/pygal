@@ -32,6 +32,7 @@ class user_data_handler(dict):
     KEY_RIGHTS_DELETE = 'delete'
     KEY_RIGHTS_DOWNLOAD = 'download'
     KEY_RIGHTS_EDIT = 'edit'
+    KEY_RIGHTS_UPLOAD = 'upload'
     KEY_RIGHTS_VIEW = 'view'
 
     def __init__(self, user=None):
@@ -58,6 +59,9 @@ class user_data_handler(dict):
         except TypeError:
             pass
         return False
+
+    def chk_rights_upload(self, user=None):
+        return self.get_rights_upload(user) is not None and self.get_rights_upload(user)
 
     def chk_rights_view(self, item_path, user=None):
         try:
@@ -108,6 +112,12 @@ class user_data_handler(dict):
         except (TypeError, KeyError):
             return None
 
+    def get_rights_upload(self, user=None):
+        try:
+            return self.get_rights(user)[self.KEY_RIGHTS_UPLOAD]
+        except (TypeError, KeyError):
+            return None
+
     def get_rights_view(self, user=None):
         try:
             return self.get_rights(user)[self.KEY_RIGHTS_VIEW]
@@ -151,6 +161,12 @@ class user_data_handler(dict):
         if self.KEY_RIGHTS not in self:
             self[self.KEY_RIGHTS] = {}
         self[self.KEY_RIGHTS][self.KEY_RIGHTS_EDIT] = right_list
+
+    def set_rights_upload(self, right, user=None):
+        self.load_user(user)
+        if self.KEY_RIGHTS not in self:
+            self[self.KEY_RIGHTS] = {}
+        self[self.KEY_RIGHTS][self.KEY_RIGHTS_UPLOAD] = right
 
     def set_rights_view(self, right_list, user=None):
         self.load_user(user)
@@ -236,42 +252,44 @@ class session_data_handler(object):
         return user_exists and user_data_handler(username).chk_password(password)
 
 
+class folder_list(list):
+    def __init__(self):
+        list.__init__(self)
+
+    def append(self, rel_path, selected=False):
+        o = dict()
+        o['id'] = rel_path
+        o['text'] = os.path.basename(rel_path)
+        o['state'] = {"selected": selected}
+        o['children'] = folder_list()
+        try:
+            list.append(self.object_to_append(o), o)
+        except TypeError:
+            list.append(self, o)
+
+    def object_to_append(self, o):
+        rv = None
+        for item in self:
+            rv = item['children'].object_to_append(o)
+            if rv is not None:
+                return rv
+            if os.path.dirname(o['id']) == item['id']:
+                return item['children']
+        return rv
+
+
 class pygal_auth(object):
     def _admin_right_list_(self, user, perm_name):
-        class admin_folder_list(list):
-            def __init__(self):
-                list.__init__(self)
-
-            def append(self, rel_path, selected=False):
-                o = dict()
-                o['id'] = rel_path
-                o['text'] = os.path.basename(rel_path)
-                o['state'] = {"selected": selected}
-                o['children'] = admin_folder_list()
-                try:
-                    list.append(self.object_to_append(o), o)
-                except TypeError:
-                    list.append(self, o)
-
-            def object_to_append(self, o):
-                rv = None
-                for item in self:
-                    rv = item['children'].object_to_append(o)
-                    if rv is not None:
-                        return rv
-                    if os.path.dirname(o['id']) == item['id']:
-                        return item['children']
-                return rv
-        folder_list = fstools.dirlist(config.item_folder, True)
-        folder_list.sort()
+        folders = fstools.dirlist(config.item_folder, True)
+        folders.sort()
 
         if user is None:
             udh = public_data_handler()
         else:
             udh = user_data_handler(user)
-        al = admin_folder_list()
-        for i in range(0, len(folder_list)):
-            rel_path = decode(folder_list[i][len(config.item_folder) + 1:])
+        al = folder_list()
+        for i in range(0, len(folders)):
+            rel_path = decode(folders[i][len(config.item_folder) + 1:])
             try:
                 selected = rel_path in udh.get_rights().get(perm_name)
             except (AttributeError, TypeError):
@@ -287,6 +305,26 @@ class pygal_auth(object):
 
     def admin_delete_right_list(self, user):
         return json.dumps(self._admin_right_list_(user, 'delete'), indent=4, sort_keys=True)
+
+    def empty_folder_list(self):
+        folders = fstools.dirlist(config.item_folder, True)
+        folders.sort()
+
+        fl = folder_list()
+        for i in range(0, len(folders)):
+            rel_path = decode(folders[i][len(config.item_folder) + 1:])
+            fl.append(rel_path)
+        return json.dumps(fl, indent=4, sort_keys=True)
+
+    def admin_upload_right(self, user):
+        try:
+            if user is None:
+                udh = public_data_handler()
+            else:
+                udh = user_data_handler(user)
+            return udh.get_rights().get(udh.KEY_RIGHTS_UPLOAD)
+        except (AttributeError, TypeError):
+            return False
 
     def admin_download_right(self, user):
         try:
@@ -327,18 +365,9 @@ class pygal_auth(object):
         from app import prefix_userprofile
         return config.url_prefix + prefix_userprofile + url_extention
 
-    def may_view(self, item):
-        if len(item._rel_path) == 0:
-            return True
-        if not item.is_itemlist():
-            path = decode(os.path.dirname(item._rel_path))
-        else:
-            path = decode(item._rel_path)
-        user = self.get_session_user()
-        if user is None:
-            return public_data_handler().chk_rights_view(path)
-        else:
-            return user_data_handler(user).chk_rights_view(path)
+    def may_admin(self):
+        sdh = session_data_handler()
+        return sdh.chk_login() and sdh.get_user() in config.admin_group
 
     def may_delete(self, item):
         if not item.is_itemlist():
@@ -373,9 +402,25 @@ class pygal_auth(object):
         else:
             return user_data_handler(user).chk_rights_edit(path)
 
-    def may_admin(self):
-        sdh = session_data_handler()
-        return sdh.chk_login() and sdh.get_user() in config.admin_group
+    def may_upload(self):
+        user = self.get_session_user()
+        if user is None:
+            return public_data_handler().chk_rights_upload()
+        else:
+            return user_data_handler(user).chk_rights_upload()
+
+    def may_view(self, item):
+        if len(item._rel_path) == 0:
+            return True
+        if not item.is_itemlist():
+            path = decode(os.path.dirname(item._rel_path))
+        else:
+            path = decode(item._rel_path)
+        user = self.get_session_user()
+        if user is None:
+            return public_data_handler().chk_rights_view(path)
+        else:
+            return user_data_handler(user).chk_rights_view(path)
 
 
 pygal_user = pygal_auth()
