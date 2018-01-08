@@ -29,6 +29,7 @@ import StringIO
 import zipfile
 from auth import pygal_user
 from items.video import is_video
+import uuid
 
 
 @item.route(prefix_admin + '/<itemname:item_name>', methods=['GET', 'POST'])
@@ -120,8 +121,6 @@ def admin(item_name):
                 elif admin_issue == 'folder structure':
                     action = flask.request.form.get('action', action)
                     target_path = flask.request.form.get('target_path')
-                    if target_path == '':
-                        return app_views.make_response(app_views.RESP_TYPE_ADMIN, item_name, item=i, error='You need to check a folder!', hint='Mark the folder you want to delete or where you want to create a subfolder.')
                     target = os.path.join(config.item_folder, target_path)
                     if action == 'create':
                         folder_name = flask.request.form.get('folder_name')
@@ -284,13 +283,16 @@ def download(item_name):
                             arc.write(entry.raw_path(), entry._rel_path)
                         else:
                             add_to_archive(arc, entry)
-                mf = StringIO.StringIO()
-                with zipfile.ZipFile(mf, mode='w', compression=zipfile.ZIP_STORED) as zf:
-                    add_to_archive(zf, item)
-                response = flask.make_response(mf.getvalue())
-                response.headers['Content-Type'] = 'application/zip'
-                response.headers["Content-Disposition"] = 'attachment; filename="%s.zip"' % item.name()
-                return response
+                temp_file = os.path.join(config.temp_path, str(uuid.uuid4()) + '.zip')
+                with open(temp_file, 'w') as fh:
+                    with zipfile.ZipFile(fh, mode='w', compression=zipfile.ZIP_STORED, allowZip64=True) as zf:
+                        add_to_archive(zf, item)
+
+                @flask.ctx.after_this_request
+                def remove_file(response):
+                    os.remove(temp_file)
+                    return response
+                return flask.send_file(temp_file, mimetype='application/zip', as_attachment=True, attachment_filename='%s.zip' % encode(item.name()))
     flask.abort(404)
 
 
