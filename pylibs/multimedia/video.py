@@ -120,6 +120,9 @@ class video_info(base_info):
     def _ffprobe_command(self):
         return ['ffprobe', '-v', 'quiet', '-show_format', '-show_streams', self.filename]
 
+    def _avprobe_command(self):
+        return ['avprobe', '-v', 'quiet', '-show_format', '-show_streams', self.filename]
+
     def _get_info(self):
         TAG_TRANSLATION = {'TAG:creation_time': self.TIME,
                            'duration': self.DURATION,
@@ -127,7 +130,10 @@ class video_info(base_info):
                            'width': self.WIDTH,
                            'display_aspect_ratio': self.RATIO}
         self._info = dict()
-        ffprobe_txt = subprocess.check_output(self._ffprobe_command())
+        try:
+            ffprobe_txt = subprocess.check_output(self._avprobe_command())
+        except OSError:
+            ffprobe_txt = subprocess.check_output(self._ffprobe_command())
         for line in ffprobe_txt.splitlines():
             try:
                 key, val = [snippet.strip() for snippet in line.split('=')]
@@ -161,7 +167,10 @@ class video_info(base_info):
                 self._info[self.HEIGHT] = int(round(self._info[self.WIDTH] * float(y) / float(x)))
 
     def __str__(self):
-        return subprocess.check_output(self._ffprobe_command())
+        try:
+            return subprocess.check_output(self._avprobe_command())
+        except OSError:
+            return subprocess.check_output(self._ffprobe_command())
 
 
 class video_info_cached(video_info):
