@@ -125,6 +125,7 @@ class video_info(base_info):
 
     def _get_info(self):
         TAG_TRANSLATION = {'TAG:creation_time': self.TIME,
+                           'creation_time': self.TIME,
                            'duration': self.DURATION,
                            'height': self.HEIGHT,
                            'width': self.WIDTH,
@@ -151,12 +152,8 @@ class video_info(base_info):
                 self._info[self.TIME] = self._info[self.TIME][:self._info[self.TIME].index('.')]
             except ValueError:
                 pass # time string seems to have no '.' 
-            if '/' in self._info[self.TIME]:
-                format_string = '%Y-%m-%d/ %H:%M'
-            elif 'T' in self._info[self.TIME]:
-                format_string = '%Y-%m-%dT%H:%M:%S'
-            else:
-                format_string = '%Y-%m-%d %H:%M:%S'
+            self._info[self.TIME] = self._info[self.TIME].replace('T', ' ').replace('/', '').replace('\\', '')
+            format_string = '%Y-%m-%d %H:%M:%S'
             try:
                 self._info[self.TIME] = calendar.timegm(time.strptime(self._info[self.TIME], format_string))
             except ValueError:
