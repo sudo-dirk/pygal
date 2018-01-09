@@ -162,7 +162,7 @@ class video_info(base_info):
             except ValueError:
                 self._info[self.TIME] = 1
         if self.WIDTH in self._info and self.RATIO in self._info:
-            x, y = [int(num) for num in self._info[self.RATIO].split(':')]
+            x, y = [int(num) for num in self._info[self.RATIO].replace('\\', '').split(':')]
             if x != 0 and y != 0:
                 self._info[self.HEIGHT] = int(round(self._info[self.WIDTH] * float(y) / float(x)))
 
