@@ -368,7 +368,7 @@ class pygal_auth(object):
             sdh = session_data_handler()
             return sdh.chk_login() and sdh.get_user() in config.admin_group
         else:
-            return self._force_user in config.admin_group
+            return item._force_user in config.admin_group
 
     def may_delete(self, item):
         user = session_data_handler().get_user() if item._force_user is None else item._force_user
