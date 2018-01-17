@@ -1,0 +1,9 @@
+{% with item = item.prv(), action_bar=False, itemlink=True, legend=False %}
+  {% include 'item_thumbnail.html' %}
+{% endwith %}
+
+{% include 'item_baseitem.html' %}
+
+{% with item = item.nxt(), action_bar=False, itemlink=True, legend=False %}
+  {% include 'item_thumbnail.html' %}
+{% endwith %}

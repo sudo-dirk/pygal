@@ -8,6 +8,7 @@ LANGUAGE = 'DE'
 if LANGUAGE == 'DE':
     admin = 'Administration'
     email_desc = 'Ihre E-Mail - Adresse'
+    delete = decode('Löschen von %s')
     error_passwords_not_equal_userprofile = decode('Die eingegebenen Passwörter stimmen nicht überein! Das Passwort wurde nicht geändert.')
     error_passwords_not_equal_register = decode('Die eingegebenen Passwörter stimmen nicht überein! Der Benutzer wurde nicht angelegt.')
     error_password_empty_userprofile = decode('Das neue Passwort ist leer. Das Passwort wurde nicht geändet.')
@@ -16,7 +17,7 @@ if LANGUAGE == 'DE':
     error_permission_denied = decode('Der Zugriff wurde verweigert. Bitte kontaktieren Sie den Administrator!')
     error_user_already_exists = decode('Der Benutzer existiert bereits! Der Benutzer wurde nicht angelegt. <a href="%s">Passwort vergessen?</a>')
     error_user_already_in_admin_group = decode('Der gewählte Benutzer ist bereits in der Administrator Gruppe. Bitte kontaktieren Sie den Administrator!')
-    hint_resolution = decode('Möglicherweise ist das Löschen des Browser-Cache erforderlich, um die Bilder in der neuen Auflösung zu erhalten!')
+    info_empty_search = decode('Die Suche hat keine Treffer ergeben.')
     info_login = decode('Wenn Sie keinen Account haben, <a href="%s">können Sie einen anlegen</a>. <a href="%s">Passwort vergessen?</a>')
     info_logout_performed = decode('Logout durchgeführt. Sie koennen sich <a href="%s">hier</a> anmelden.')
     info_lostpass = decode('Es reicht eins der beiden Felder auszufüllen.')
@@ -42,6 +43,7 @@ if LANGUAGE == 'DE':
 else:
     admin = 'Admin'
     email_desc = 'Your E-Mail adress'
+    delete = decode('Delete of %s')
     error_passwords_not_equal_userprofile = 'The commited passwords are not equal! Password has not been changed.'
     error_passwords_not_equal_register = 'The commited passwords are not equal! Account has not been created.'
     error_password_empty_userprofile = 'The commited password is empty! Password has not been changed.'
@@ -50,7 +52,7 @@ else:
     error_permission_denied = 'Permission denied. Please contact the administrator.'
     error_user_already_exists = 'User already exists. Account has not been created. <a href="%s">Forgot your password?</a>'
     error_user_already_in_admin_group = 'This user is already in the admin group. Please contact the administrator.'
-    hint_resolution = 'You possibly need to delete the browser cache to get pictures with the new resolution!'
+    info_empty_search = decode('No search results.')
     info_login = 'If you do not have an account, <a href="%s">you can create one now</a>. <a href="%s">Forgot your password?</a>'
     info_logout_performed = 'Logout performed. You are able to login<a href="%s">here</a>.'
     info_lostpass = 'Please note that you only need to fill out one form field.'

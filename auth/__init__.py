@@ -3,6 +3,7 @@ import hashlib
 from helpers import decode
 import json
 import os
+from prefixes import prefix_userprofile
 import pygal_config as config
 from pylibs import fstools
 
@@ -193,9 +194,11 @@ class user_data_handler(dict):
 
 class public_data_handler(user_data_handler):
     def data_filename(self, user):
+        (user)
         return os.path.join(basepath, 'public.json')
 
     def load_store_condition(self, user):
+        (user)
         return True
 
 
@@ -209,13 +212,13 @@ class session_data_handler(object):
         return flask.session.get(self.KEY_PASSWORD)
 
     def get_thumbnail_index(self):
-        return flask.session.get(self.KEY_THUMBNAIL_SIZE_INDEX)
+        return flask.session.get(self.KEY_THUMBNAIL_SIZE_INDEX, config.thumbnail_size_default)
 
     def get_webnail_index(self):
-        return flask.session.get(self.KEY_WEBNAIL_SIZE_INDEX)
+        return flask.session.get(self.KEY_WEBNAIL_SIZE_INDEX, config.webnail_size_default)
 
     def get_user(self):
-        return flask.session.get(self.KEY_USERNAME)
+        return flask.session.get(self.KEY_USERNAME, '')
 
     def set_password(self, password):
         if password is None:
@@ -280,16 +283,16 @@ class folder_list(list):
 
 class pygal_auth(object):
     def _admin_right_list_(self, user, perm_name):
-        folders = fstools.dirlist(config.item_folder, True)
+        folders = fstools.dirlist(config.item_path, True)
         folders.sort()
 
-        if user is None:
+        if user == '':
             udh = public_data_handler()
         else:
             udh = user_data_handler(user)
         al = folder_list()
         for i in range(0, len(folders)):
-            rel_path = decode(folders[i][len(config.item_folder) + 1:])
+            rel_path = decode(folders[i][len(config.item_path) + 1:])
             try:
                 selected = rel_path in udh.get_rights().get(perm_name)
             except (AttributeError, TypeError):
@@ -307,18 +310,18 @@ class pygal_auth(object):
         return json.dumps(self._admin_right_list_(user, 'delete'), indent=4, sort_keys=True)
 
     def empty_folder_list(self):
-        folders = fstools.dirlist(config.item_folder, True)
+        folders = fstools.dirlist(config.item_path, True)
         folders.sort()
 
         fl = folder_list()
         for i in range(0, len(folders)):
-            rel_path = decode(folders[i][len(config.item_folder) + 1:])
+            rel_path = decode(folders[i][len(config.item_path) + 1:])
             fl.append(rel_path)
         return json.dumps(fl, indent=4, sort_keys=True)
 
     def admin_upload_right(self, user):
         try:
-            if user is None:
+            if user == '':
                 udh = public_data_handler()
             else:
                 udh = user_data_handler(user)
@@ -328,7 +331,7 @@ class pygal_auth(object):
 
     def admin_download_right(self, user):
         try:
-            if user is None:
+            if user == '':
                 udh = public_data_handler()
             else:
                 udh = user_data_handler(user)
@@ -360,64 +363,63 @@ class pygal_auth(object):
     def users(self):
         return user_data_handler().users()
 
-    def user_url(self, url_extention=''):  # TODO: move this method to a more sensefull place
-        # TODO: reduce late impoerts
-        from app import prefix_userprofile
-        return config.url_prefix + prefix_userprofile + url_extention
-
-    def may_admin(self):
-        sdh = session_data_handler()
-        return sdh.chk_login() and sdh.get_user() in config.admin_group
+    def may_admin(self, item):
+        if item._force_user is None:
+            sdh = session_data_handler()
+            return sdh.chk_login() and sdh.get_user() in config.admin_group
+        else:
+            return self._force_user in config.admin_group
 
     def may_delete(self, item):
+        user = session_data_handler().get_user() if item._force_user is None else item._force_user
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
             path = decode(item._rel_path)
-        user = self.get_session_user()
-        if user is None:
+        if user is '':
             return public_data_handler().chk_rights_delete(path)
         else:
             return user_data_handler(user).chk_rights_delete(path)
 
     def may_download(self, item):
+        user = session_data_handler().get_user() if item._force_user is None else item._force_user
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
             path = decode(item._rel_path)
-        user = self.get_session_user()
-        if user is None:
+        if user is '':
             return public_data_handler().chk_rights_download(path)
         else:
             return user_data_handler(user).chk_rights_download(path)
 
     def may_edit(self, item):
+        user = session_data_handler().get_user() if item._force_user is None else item._force_user
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
             path = decode(item._rel_path)
-        user = self.get_session_user()
-        if user is None:
+        if user is '':
             return public_data_handler().chk_rights_edit(path)
         else:
             return user_data_handler(user).chk_rights_edit(path)
 
-    def may_upload(self):
-        user = self.get_session_user()
-        if user is None:
+    def may_upload(self, item):
+        user = session_data_handler().get_user() if item._force_user is None else item._force_user
+        if user is '':
             return public_data_handler().chk_rights_upload()
         else:
             return user_data_handler(user).chk_rights_upload()
+            
 
     def may_view(self, item):
+        user = session_data_handler().get_user() if item._force_user is None else item._force_user
         if len(item._rel_path) == 0:
             return True
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
             path = decode(item._rel_path)
-        user = self.get_session_user()
-        if user is None:
+        if user is '':
             return public_data_handler().chk_rights_view(path)
         else:
             return user_data_handler(user).chk_rights_view(path)

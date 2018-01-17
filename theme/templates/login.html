@@ -1,8 +1,8 @@
 <div id="moin-page" lang="en" dir="ltr">
   <div id="moin-content">
     <div class="moin-form">
-      <h2>{{ input.lang.login }}</h2>
-      <form name="login" action="{{ input.url_prefix + input.app.prefix_login + input.url_extention }}" method="post">
+      <h2>{{ lang.login }}</h2>
+      <form name="login" action="{{ item.login_url() }}" method="post">
         <dl>
           <dt>
             <label class="required" for="f_login_username">Name</label>

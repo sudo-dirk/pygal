@@ -1,6 +1,5 @@
-        <h2>{{ input.filename }}</h2>
+        <h2>{{ filename }}</h2>
         <div id="dest"></div>
-        <script type="text/javascript" src="renderjson.js"></script>
         <script>
           document.getElementById("dest").appendChild
           (
@@ -9,7 +8,7 @@
                       .set_icons('+', '-')
                       //.set_max_string_length(50)
             (
-              {{ input.json_str|safe }}
+              {{ json_str|safe }}
             )
           );
         </script>

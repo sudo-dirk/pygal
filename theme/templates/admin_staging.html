@@ -2,7 +2,7 @@
   $(function () {
     //
     // tree data in json format
-    var json_target_list = {{ input.pygal_user.empty_folder_list()|safe }};
+    var json_target_list = {{ pygal_user.empty_folder_list()|safe }};
     //
     // initilise target-tree as checkbox tree
     $("#target-tree").jstree({
@@ -30,25 +30,25 @@
         selectedRights.push($(this).attr('id'));
       }
     });
-    document.getElementById('target_path').value = selectedRights;
+    document.getElementById('{{ arg_name.STR_ARG_ADMIN_TARGET }}').value = selectedRights;
   }
 </script>
 
 
     <h2>Staging</h2>
     <div class="moin-form">
-      <form action="{{ input.this.admin_url() }}" method="get">
-        <input type="hidden" name="admin_issue" value="staging" />
-        <input type="hidden" name="action" value="{{ input.action }}" />
+      <form action="{{ item.admin_url() }}" method="get">
+        <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_STAGING }}" />
+        <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" value="{{ action }}" />
         <dl>
           <div>
             <dt>
-              <label class="required" for="container_uuid">Choose a Staging-Container:</label>
+              <label class="required" for="{{ arg_name.STR_ARG_ADMIN_CONTAINER }}">Choose a Staging-Container:</label>
             </dt>
             <dd>
-              <select name="container_uuid" onchange="this.form.submit()"/>
-                {% for container in input.containers.values() %}
-                <option value="{{ container._uuid_ }}" {% if container._uuid_ == input.container_uuid %}selected{% endif %}>{{ container.container_name }}</option>
+              <select name="{{ arg_name.STR_ARG_ADMIN_CONTAINER }}" onchange="this.form.submit()"/>
+                {% for container in containers.values() %}
+                <option value="{{ container._uuid_ }}" {% if container._uuid_ == container_uuid %}selected{% endif %}>{{ container.container_name }}</option>
                 {% endfor %}
               </select>
             </dd>
@@ -57,26 +57,20 @@
       </form>
     </div>
 
-    <h2>Content:</h2>
-    {% for file in input.containers[input.container_uuid].container_files %}
-    <img src="{{ input.url_prefix + input.app.prefix_admin }}?admin_issue=staging&action=thumb&container_uuid={{ input.container_uuid }}&filename={{ file }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ file }}"></a>
-    {% endfor %}
-
- 
     <h2>Action:</h2>
     <div class="moin-form">
-      <form action="{{ input.this.admin_url() }}" method="get">
-        <input type="hidden" name="admin_issue" value="staging" />
-        <input type="hidden" name="container_uuid" value="{{ input.container_uuid }}" />
+      <form action="{{ item.admin_url() }}" method="get">
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_STAGING }}" />
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_CONTAINER }}" value="{{ container_uuid }}" />
         <dl>
           <div>
             <dt>
-              <label class="required" for="user">Choose an Action:</label>
+              <label class="required" for="{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
             </dt>
             <dd>
-              <select name="action" onchange="this.form.submit()"/>
-                {% for action in ['delete', 'commit'] %}
-                <option value="{{ action }}" {% if input.action == action %}selected{% endif %}>{{ action }}</option>
+              <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()"/>
+                {% for this_action in [arg_name.STR_ARG_ADMIN_ACTION_DELETE, arg_name.STR_ARG_ADMIN_ACTION_COMMIT] %}
+                <option value="{{ this_action }}" {% if action == this_action %}selected{% endif %}>{{ this_action }}</option>
                 {% endfor %}
               </select>
             </dd>
@@ -86,12 +80,12 @@
     </div>
   
     <div class="moin-form">
-      <form name="choose_target" action="{{ input.this.admin_url() }}" method="post" onsubmit="submitRightTree()">
-         <input type="hidden" name="admin_issue" value="staging" />
-         <input type="hidden" name="container_uuid" value="{{ input.container_uuid }}" />
-         <input type="hidden" name="action" value="{{ input.action }}" />
-{% if input.action == 'commit' %}
-         <input type="hidden" name="target_path" id="target_path" value="" />
+      <form name="choose_target" action="{{ item.admin_url() }}" method="post" onsubmit="submitRightTree()">
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_STAGING }}" />
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_CONTAINER }}" value="{{ container_uuid }}" />
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" value="{{ action }}" />
+{% if action == arg_name.STR_ARG_ADMIN_ACTION_COMMIT %}
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_TARGET }}" id="{{ arg_name.STR_ARG_ADMIN_TARGET }}" value="" />
          <input type="submit" value="Make it so" class="button" name="button"/><br>
            <div style="float: left;">
              <dt>
@@ -106,4 +100,13 @@
          <input type="submit" value="Make it so" class="button" name="button"/>
       </form>
     </div>
-  
+
+    <h2>Content:</h2>
+    {% with itemlist=containers[container_uuid], legend=True %}
+    <div id="thumb_overview">
+        {% for item in itemlist.get_itemlist() %}
+          {% include 'item_thumbnail.html' %}
+        {% endfor %}
+    </div>
+    {% endwith %}
+    <br style="clear:both" />

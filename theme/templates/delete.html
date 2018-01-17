@@ -1,18 +1,10 @@
-<div id="moin-page" lang="en" dir="ltr">
-
-  <div id="moin-content">
-
-    <div class="moin-form">
-      <h2>Delete '{{ input.this.name() }}'</h2>
-      <form name="delete" action="{{ input.this.delete_url() }}" method="post">
-        <input type="hidden" name="delete_submit" value="1" class="" id="f_delete_submit" />
-        <input type="submit" value="Delete" class="button" />
-      </form>
-      
-      <img src="{{ input.this.webnail_url() }}">
-      
-    </div>
-
-  </div>
-
+<div class="moin-form" {% if item.is_picture() or item.is_video() or item.is_itemlist() %}style="background-image:url({{ item.webnail_url() }}); background-repeat: no-repeat; min-height: {{ item.webnail_y() }}px; background-color: rgba(255,255,255,0.75); background-blend-mode: lighten;"{% endif %}>
+  <form name="delete" action="{{ item.delete_url() }}" method="post">
+    <input type="hidden" name="delete_submit" value="1" class="" id="f_delete_submit" />
+    <input type="submit" value="Delete" class="button" />
+  </form>
 </div>
+
+{% if not item.is_picture() and not  item.is_video() and not item.is_itemlist() %}
+{% include 'item_baseitem.html' %}
+{% endif %}

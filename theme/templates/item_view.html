@@ -1,0 +1,13 @@
+{% if item.is_baseitem() %}
+  {% include 'baseitem.html' %}
+{% elif item.is_itemlist() %}
+  {% with itemlist = item %}
+    {% include 'overview.html' %}
+  {% endwith %}
+{% elif item.is_picture() %}
+    {% include 'picture.html' %}
+{% elif item.is_video() and item.use_internal_player() %}
+    {% include 'video.html' %}
+{% elif item.is_video() %}
+    {% include 'picture.html' %}
+{% endif %}

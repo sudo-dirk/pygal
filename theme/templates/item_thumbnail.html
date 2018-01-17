@@ -1,0 +1,23 @@
+<! 'item_thumbnail.html': Needs item instance and supports action_bar, itemlink, legend>
+
+<div id="{{ item.name() }}" class="thumb_border" style="width: {{item.thumbnail_xy_max() + 12}}px; height: {% if legend %}{{item.thumbnail_xy_max() + 12 + 65 }}{% else %}{{item.thumbnail_xy_max() + 12 }}{% endif %}px;">
+  {% if legend %}
+    <b>{{ item.name() }}</b><br>
+    <i><small>{{ item.strtime() }}</small></i><br><br>
+  {% endif %}
+  {% if action_bar %}
+    <ul id="pygal-actions" class="panel">
+      {% for action in item.actions() %}
+        <li class="pygal-action"><a href="{{ action.url }}"><img src="{{ action.pic }}" alt="{{ action.name }}"></a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <div class="thumb_image_bg" style="width: {{item.thumbnail_x() + 12}}px; height: {{item.thumbnail_y() + 12}}px; margin-top: 0px;">
+    {% if itemlink %}
+    <a href="{{ item.item_url()|safe }}"><img src="{{ item.thumbnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ item.name() }}"></a>
+    {% else %}
+    <img src="{{ item.thumbnail_url()|safe }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ item.name() }}">
+    {% endif %}
+  </div>
+  <p></p>
+</div>

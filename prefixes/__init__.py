@@ -1,0 +1,15 @@
+prefix_add_tag = '/+add_tag'                        # items
+prefix_admin = '/+admin'                            # items
+prefix_delete = '/+delete'                          # items
+prefix_download = '/+download'                      # items
+prefix_info = '/+info'                              # items
+prefix_login = '/+login'                            # base_func
+prefix_logout = '/+logout'                          # base_func
+prefix_lostpass = '/+lostpass'                      # base_func
+prefix_raw = '/+raw'                                # items
+prefix_register = '/+register'                      # base_func
+prefix_slideshow = '/+slideshow'                    # items
+prefix_thumbnail = '/+thumbnail'                    # items
+prefix_upload = '/+upload'                          # items
+prefix_userprofile = '/+userprofile'                # base_func
+prefix_webnail = '/+webnail'                        # items

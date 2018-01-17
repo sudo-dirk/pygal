@@ -1,43 +1,18 @@
-  <div id="moin-page" lang="en" dir="ltr">
-    <div id="moin-content">
-      <div id="moin-flash"></div>
-      <div id="moin-content-data"></div>
+<! 'test.html': Needs item instance >
 
+{% with item = item.prv(), action_bar=False, itemlink=True, legend=False %}
+  {% include 'item_thumbnail.html' %}
+{% endwith %}
 
-    <div id="thumb_overview">
-
-        <div class="thumb_border" style="width: {{input.this.prv().thumbnail_xy_max() + 12}}px; height: {{input.this.prv().thumbnail_xy_max() + 12}}px;">
-          <div class="thumb_image_bg" style="width: {{input.this.prv().thumbnail_x() + 12}}px; height: {{input.this.prv().thumbnail_y() + 12}}px;">
-            <a href="{{ input.this.prv().url() }}"><img 175 src="{{ input.this.prv().thumbnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ input.this.prv().name() }}"></a>
-          </div>
-        </div>
-
-        <div id="main" class="thumb_border" style="width: {{input.this.webnail_x() + 12}}px; height: {{input.this.webnail_y() + 12}}px;">
-          <div class="thumb_image_bg" style="width: {{input.this.webnail_x() + 12}}px; height: {{input.this.webnail_y() + 12}}px;">
-            <video id="MY_VIDEO_1" class="video-js vjs-default-skin" controls poster="{{input.this.webnail_url()}}" preload="auto" width="{{ input.this.webnail_x() }}" height="{{ input.this.webnail_y() }}" {% if input.this.slideshow() %}autoplay="true"{% endif %} data-setup="{}">
-              <source src="{{ input.this.raw_url() }}" type='{{ input.this.mime_type() }}'>
-              <p class="vjs-no-js">To view {{input.this.name()}} please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
-            </video>
-          </div>
-          <ul class="moin-nav nav-tabs moin-shadow">
-            {% for tag_id in input.this.get_tag_id_list() %}
-              <li>
-                <a  href="{{input.this.add_tag_url(tag_id)}}" title="{{input.this.get_tag_text(tag_id)}}" rel="nofollow">
-                  <span><img src="{{input.this.get_tag_icon(tag_id)}}"></span>
-                  <span class="hidden-sm hidden-xs">{{input.this.get_tag_text(tag_id)}}</span>
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-
-        <div class="thumb_border" style="width: {{input.this.nxt().thumbnail_xy_max() + 12}}px; height: {{input.this.nxt().thumbnail_xy_max() + 12}}px;">
-          <div class="thumb_image_bg" style="width: {{input.this.nxt().thumbnail_x() + 12}}px; height: {{input.this.nxt().thumbnail_y() + 12}}px;">
-            <a href="{{ input.this.nxt().url() }}"><img src="{{ input.this.nxt().thumbnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ input.this.nxt().name() }}"></a>
-          </div>
-        </div>
-    <div id="thumb_footer"></div>
-    </div>
-
-    </div>
+<div id="main" class="thumb_border" style="width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
+  <div class="thumb_image_bg" style="width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
+    <video id="MY_VIDEO_1" class="video-js vjs-default-skin" controls poster="{{item.webnail_url()}}" preload="auto" width="{{ item.webnail_x() }}" height="{{ item.webnail_y() }}" {% if item.slideshow() %}autoplay="true"{% endif %} data-setup="{}">
+      <source src="{{ item.raw_url() }}" type='{{ item.mime_type() }}'>
+      <p class="vjs-no-js">To view {{item.name()}} please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+    </video>
   </div>
+</div>
+
+{% with item = item.nxt(), action_bar=False, itemlink=True, legend=False %}
+  {% include 'item_thumbnail.html' %}
+{% endwith %}

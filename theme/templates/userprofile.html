@@ -1,7 +1,7 @@
 <div id="moin-page" lang="en" dir="ltr">
   <div id="moin-content">
     <div class="moin-form">
-      <form name="userprofile" id="userprofile" action="{{ input.config.url_prefix + input.app.prefix_userprofile + input.url_extention }}" method="post">
+      <form name="userprofile" id="userprofile" action="{{ item.userprofile_url() }}" method="post">
         <dl>
         <input type="submit" value="Update Userprofile" class="button" />
         </dl>
@@ -12,8 +12,8 @@
           </dt>
           <dd>
             <select name="select_thumbnail_size" form="userprofile" />
-              {% for thumbnail_size in input.config.thumbnail_size_list %}
-              <option value="{{ loop.index-1 }}"{% if input.pygal_user.get_thumbnail_size() == thumbnail_size %} selected{% endif %}>{{ thumbnail_size }}</option>
+              {% for thumbnail_size in config.thumbnail_size_list %}
+              <option value="{{ loop.index-1 }}"{% if pygal_user.get_thumbnail_size() == thumbnail_size %} selected{% endif %}>{{ thumbnail_size }}</option>
               {% endfor %}
             </select>
           </dd>
@@ -22,8 +22,8 @@
           </dt>
           <dd>
             <select name="select_webnail_size" form="userprofile" />
-              {% for webnail_size in input.config.webnail_size_list %}
-              <option value="{{ loop.index-1 }}"{% if input.pygal_user.get_webnail_size() == webnail_size %} selected{% endif %}>{{ webnail_size }}</option>
+              {% for webnail_size in config.webnail_size_list %}
+              <option value="{{ loop.index-1 }}"{% if pygal_user.get_webnail_size() == webnail_size %} selected{% endif %}>{{ webnail_size }}</option>
               {% endfor %}
             </select>
           </dd>
@@ -33,25 +33,25 @@
           <label for="f_userprofile_password_current">Current Password</label>
         </dt>
         <dd>
-          <input type="password" name="userprofile_password_current" id="f_userprofile_password_current" placeholder="{{ input.lang.password_desc }}" />
+          <input type="password" name="userprofile_password_current" id="f_userprofile_password_current" placeholder="{{ lang.password_desc }}" />
         </dd>
         <dt>
           <label for="f_userprofile_password1">New Password</label>
         </dt>
         <dd>
-          <input type="password" name="userprofile_password1" id="f_userprofile_password1" placeholder="{{ input.lang.password_desc }}" />
+          <input type="password" name="userprofile_password1" id="f_userprofile_password1" placeholder="{{ lang.password_desc }}" />
         </dd>
         <dt>
           <label for="f_userprofile_password2">New Password</label>
         </dt>
         <dd>
-          <input type="password" name="userprofile_password2" id="f_userprofile_password2" placeholder="{{ input.lang.password2_desc }}" />
+          <input type="password" name="userprofile_password2" id="f_userprofile_password2" placeholder="{{ lang.password2_desc }}" />
         </dd>
         <dt>
           <label class="required" for="f_userprofile_email">E-Mail</label>
         </dt>
         <dd>
-          <input type="email" name="userprofile_email" value="{{ input.pygal_user.get_my_email() }}" class="required" id="f_userprofile_email" placeholder="{{ input.lang.email_desc }}" required="required" />
+          <input type="email" name="userprofile_email" value="{{ pygal_user.get_my_email() }}" class="required" id="f_userprofile_email" placeholder="{{ lang.email_desc }}" required="required" />
         </dd>
         <br>
         <input type="submit" value="Update Userprofile" class="button" />

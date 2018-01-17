@@ -2,9 +2,9 @@
   <div id="moin-content">
     <div id="moin-flash">  
     </div>
-    <h1>{{ input.lang.lostpass }}</h1>
+    <h1>{{ lang.lostpass }}</h1>
     <div class="moin-form">
-      <form name="lostpass" action="{{ input.url_prefix + input.app.prefix_lostpass + input.url_extention }}" method="post">
+      <form name="lostpass" action="{{ item.lostpass_url() }}" method="post">
         <dl>
           <dt>
             <label for="f_lostpass_username">Name</label>

@@ -1,31 +1,24 @@
-<div id="moin-page" lang="en" dir="ltr">
-  <div id="moin-content">
-
-    <h2>Choose Administration issue</h2>
-    <div class="moin-form">
-      <form action="{{ input.this.admin_url() }}" method="get">
-        <dl>
-          <div>
-            <dt>
-              <label class="required" for="admin_issue">Administration issue:</label>
-            </dt>
-            <dd>
-              <select name="admin_issue" onchange="this.form.submit()"/>
-                {% for issue in ['permission', 'staging', 'folder structure'] %}
-                <option value="{{ issue }}" {% if input.admin_issue == issue %}selected{% endif %}>{{ issue }}</option>
-                {% endfor %}
-              </select>
-            </dd>
-          </div>
-        </dl>
-      </form>
-    </div>
-
-  {% if input.admin_issue == 'permission' %}{% include 'admin_permission.html' %}
-  {% elif input.admin_issue == 'staging' %}{% include 'admin_staging.html' %}
-  {% elif input.admin_issue == 'folder structure' %}{% include 'admin_folders.html' %}
-  {% endif %}
-  
-
-  </div>
+<h2>Choose Administration issue</h2>
+<div class="moin-form">
+  <form action="{{ item.admin_url() }}" method="get">
+    <dl>
+      <div>
+        <dt>
+          <label class="required" for="{{ arg_name.STR_ARG_ADMIN_ISSUE }}">Administration issue:</label>
+        </dt>
+        <dd>
+          <select name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" onchange="this.form.submit()"/>
+            {% for issue in [arg_name.STR_ARG_ADMIN_ISSUE_PERMISSION, arg_name.STR_ARG_ADMIN_ISSUE_STAGING, arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS] %}
+            <option value="{{ issue }}" {% if admin_issue == issue %}selected{% endif %}>{{ issue }}</option>
+            {% endfor %}
+          </select>
+        </dd>
+      </div>
+    </dl>
+  </form>
 </div>
+
+{% if admin_issue == arg_name.STR_ARG_ADMIN_ISSUE_PERMISSION %}{% include 'admin_permission.html' %}
+{% elif admin_issue == arg_name.STR_ARG_ADMIN_ISSUE_STAGING %}{% include 'admin_staging.html' %}
+{% elif admin_issue == arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS %}{% include 'admin_folders.html' %}
+{% endif %}

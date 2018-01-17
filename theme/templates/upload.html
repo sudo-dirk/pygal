@@ -1,7 +1,7 @@
 <div id="moin-page" lang="en" dir="ltr">
   <div id="moin-content">
     <div class="moin-form">
-      <form name="upload" id="upload" action="{{ input.config.url_prefix + input.app.prefix_upload + input.url_extention }}" method="post" enctype="multipart/form-data">
+      <form name="upload" id="upload" action="{{ item.upload_url() }}" method="post" enctype="multipart/form-data">
         <dt>
           <label class="required" for="f_container_name">Container Name</label>
         </dt>

@@ -1,21 +1,43 @@
+{% if item.is_picture() %}
+<script type="text/javascript">
+  function preview(img, selection) {}
+    $(function () {
+      $('#tag_img').imgAreaSelect({
+{% if item is not none and item.tag_id_exists(tag_id) and item.tag_has_coordinates(tag_id) %}
+        x1: {{item.get_tag_wn_x(tag_id)}}, 
+        x2: {{item.get_tag_wn_x2(tag_id)}}, 
+        y1: {{item.get_tag_wn_y(tag_id)}}, 
+        y2: {{item.get_tag_wn_y2(tag_id)}}, 
+{% endif %}
+        onSelectEnd: function (img, selection) {
+        $('input[name="x1"]').val(selection.x1);
+        $('input[name="y1"]').val(selection.y1);
+        $('input[name="x2"]').val(selection.x2);
+        $('input[name="y2"]').val(selection.y2);
+      }
+    });
+  });
+</script>
+{% endif %}
 <div id="moin-page" lang="en" dir="ltr">
 
   <div id="moin-content">
 
     <div class="moin-form">
-      <h2>Add Tag to '{{ input.this.name() }}</h2>
-      <form name="add_tag" action="{{ input.this.add_tag_url() }}" method="post">
-{% if input.this.tag_id_exists(input.tag_id) %}        <input type="hidden" name="tag_id" value="{{input.tag_id}}" />{% endif %}
-        <input type="hidden" name="x1" value="{{input.this.get_tag_wn_x(input.tag_id)}}" />
-        <input type="hidden" name="y1" value="{{input.this.get_tag_wn_y(input.tag_id)}}" />
-        <input type="hidden" name="x2" value="{{input.this.get_tag_wn_x2(input.tag_id)}}" />
-        <input type="hidden" name="y2" value="{{input.this.get_tag_wn_y2(input.tag_id)}}" />
+      <h2>Add Tag to '{{ item.name() }}</h2>
+      <form name="add_tag" action="{{ item.add_tag_url() }}" method="post">
+{% if item.tag_id_exists(tag_id) %}
+        <input type="hidden" name="tag_id" value="{{tag_id}}" />{% endif %}
+        <input type="hidden" name="x1" value="{{item.get_tag_wn_x(tag_id)}}" />
+        <input type="hidden" name="y1" value="{{item.get_tag_wn_y(tag_id)}}" />
+        <input type="hidden" name="x2" value="{{item.get_tag_wn_x2(tag_id)}}" />
+        <input type="hidden" name="y2" value="{{item.get_tag_wn_y2(tag_id)}}" />
         <dl>
           <dt>
             <label class="required" for="f_login_username">Tag</label>
           </dt>
           <dd>
-            <input type="text" name="tag_text" value="{{input.this.get_tag_text(input.tag_id)}}" autofocus="autofocus" class="required" id="f_add_tag" required="required" />
+            <input type="text" name="tag_text" value="{{item.get_tag_text(tag_id)}}" autofocus="autofocus" class="required" id="f_add_tag" required="required" />
           </dd>
         </dl>
         <input type="hidden" name="tag_submit" value="1" class="" id="f_tag_submit" />
@@ -23,15 +45,14 @@
          <input type="submit" value="Delete Tag" class="button" name="action"/>
       </form>
     </div>
-
     <br>
-
-    <div id="main" class="thumb_border" style="position:relative; width: {{input.this.webnail_x() + 12}}px; height: {{input.this.webnail_y() + 12}}px;">
-      <div class="thumb_image_bg" style="width: {{input.this.webnail_x() + 12}}px; height: {{input.this.webnail_y() + 12}}px;">
-        <img id="tag_img" src="{{ input.this.webnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ input.this.name() }}">
+{% if item.is_picture() %}
+    Include item_...
+    <div id="main" class="thumb_border" style="position:relative; width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
+      <div class="thumb_image_bg" style="width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
+        <img id="tag_img" src="{{ item.webnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ item.name() }}">
       </div>
     </div>
-
+{% endif %}
   </div>
-
 </div>

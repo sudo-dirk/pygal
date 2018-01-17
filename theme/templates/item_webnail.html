@@ -1,0 +1,27 @@
+<div id="main" class="thumb_border" style="position:relative; width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
+  <div class="thumb_image_bg" style="width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
+    {% if item.user_may_download() %}<a href="{{ item.raw_url() }}">{% endif %}<img src="{{ item.webnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ item.name() }}">{% if item.user_may_download() %}</a>{% endif %}
+      {% if not item.slideshow() %}
+        {% for tag_id in item.get_tag_id_list() %}
+          {% if item.tag_has_coordinates(tag_id) %}
+            <a title="{{item.get_tag_text(tag_id)}}" href="{{item.add_tag_url(tag_id)}}" style="border: 3px solid rgba(255,100,100,.55);display:block; width:{{item.get_tag_wn_w(tag_id)}}px; height:{{item.get_tag_wn_h(tag_id)}}px; left: {{item.get_tag_wn_x(tag_id)+6}}px; top: {{item.get_tag_wn_y(tag_id)+6}}px; position:absolute;"></a>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    {% if not item.slideshow() %}
+      <ul class="moin-nav nav-tabs moin-shadow">
+        {% for tag_id in item.get_tag_id_list() %}
+          {% if not item.tag_has_coordinates(tag_id) %}
+            <li>
+              <a  href="{{item.add_tag_url(tag_id)}}" title="{{item.get_tag_text(tag_id)}}" rel="nofollow">
+                <span><img src="{{item.get_tag_icon(tag_id)}}"></span>
+                <span class="hidden-sm hidden-xs">{{item.get_tag_text(tag_id)}}</span>
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</div>

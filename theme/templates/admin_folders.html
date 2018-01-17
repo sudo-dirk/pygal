@@ -2,7 +2,7 @@
   $(function () {
     //
     // tree data in json format
-    var json_target_list = {{ input.pygal_user.empty_folder_list()|safe }};
+    var json_target_list = {{ pygal_user.empty_folder_list()|safe }};
     //
     // initilise target-tree as checkbox tree
     $("#target-tree").jstree({
@@ -30,7 +30,7 @@
         selectedRights.push($(this).attr('id'));
       }
     });
-    document.getElementById('target_path').value = selectedRights;
+    document.getElementById('{{ arg_name.STR_ARG_ADMIN_TARGET }}').value = selectedRights;
   }
 </script>
 
@@ -38,17 +38,17 @@
 
     <h2>Folders</h2>
     <div class="moin-form">
-      <form action="{{ input.this.admin_url() }}" method="get">
-        <input type="hidden" name="admin_issue" value="folder structure" />
+      <form action="{{ item.admin_url() }}" method="get">
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
         <dl>
           <div>
             <dt>
-              <label class="required" for="user">Choose an Action:</label>
+              <label class="required" for="{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
             </dt>
             <dd>
-              <select name="action" onchange="this.form.submit()"/>
-                {% for action in ['delete', 'create'] %}
-                <option value="{{ action }}" {% if input.action == action %}selected{% endif %}>{{ action }}</option>
+              <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()"/>
+                {% for this_action in [arg_name.STR_ARG_ADMIN_ACTION_DELETE, arg_name.STR_ARG_ADMIN_ACTION_CREATE] %}
+                <option value="{{ this_action }}" {% if action == this_action %}selected{% endif %}>{{ this_action }}</option>
                 {% endfor %}
               </select>
             </dd>
@@ -58,18 +58,18 @@
     </div>
   
     <div class="moin-form">
-      <form name="choose_target" action="{{ input.this.admin_url() }}" method="post" onsubmit="submitRightTree()">
-         <input type="hidden" name="admin_issue" value="folder structure" />
-         <input type="hidden" name="action" value="{{ input.action }}" />
-         <input type="hidden" name="target_path" id="target_path" value="" />
+      <form name="choose_target" action="{{ item.admin_url() }}" method="post" onsubmit="submitRightTree()">
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" value="{{ action }}" />
+         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_TARGET }}" id="{{ arg_name.STR_ARG_ADMIN_TARGET }}" value="" />
          <input type="submit" value="Make it so" class="button" name="button"/><br>
            <div style="float: left;">
-{% if input.action == 'create' %}
+{% if action == 'create' %}
              <dt>
                <label class="required" for="f_folder_name">Folder Name</label>
              </dt>
              <dd>
-               <input class="required" required="required" type="text" name="folder_name" id="f_folder_name" placeholder="Folder Name" />
+               <input class="required" required="required" type="text" name="{{ arg_name.STR_ARG_ADMIN_NAME }}" id="f_folder_name" placeholder="Folder Name" />
              </dd>
 {% endif %}
              <dt>

@@ -3,46 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% if input.has_attr('this') and input.this.slideshow() %}
-      <meta http-equiv="refresh" content="{{ input.this.stay_time() }};url={{ input.this.prv().slideshow_url() }}">
+    {% if is_slideshow %}
+      <meta http-equiv="refresh" content="{{ item.stay_time() }};url={{ item.prv().slideshow_url() }}">
     {% endif %}
-    <title>{{ input.title }}</title>
-    <link rel="shortcut icon" href="{{input.url_prefix}}/static/common/logos/favicon.ico" />
-    <link media="all" rel="stylesheet" href="{{input.url_prefix}}/static/common/css/theme.css" />
-    <link media="all" rel="stylesheet" href="{{input.url_prefix}}/static/common/css/pygal.css" />
+    <title>{{ title }}</title>
+    <link rel="shortcut icon" href="{{url_prefix}}/static/common/logos/favicon.ico" />
+    <link media="all" rel="stylesheet" href="{{url_prefix}}/static/common/css/theme.css" />
+    <link media="all" rel="stylesheet" href="{{url_prefix}}/static/common/css/pygal.css" />
 
-    <link href="{{ input.url_prefix }}/static/video-js/video-js.css" rel="stylesheet">
-    <script src="{{ input.url_prefix }}/static/video-js/video.js"></script>
+    <link href="{{ url_prefix }}/static/video-js/video-js.css" rel="stylesheet">
+    <script src="{{ url_prefix }}/static/video-js/video.js"></script>
 
-    <script type="text/javascript" src="{{input.url_prefix}}/static/jquery.min.js"></script>
+    <script type="text/javascript" src="{{url_prefix}}/static/jquery.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="{{input.url_prefix}}/static/common/css/imgareaselect-default.css" />
-    <script type="text/javascript" src="{{input.url_prefix}}/static/imgareaselect-js/jquery.imgareaselect.pack.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{url_prefix}}/static/common/css/imgareaselect-default.css" />
+    <script type="text/javascript" src="{{url_prefix}}/static/imgareaselect-js/jquery.imgareaselect.pack.js"></script>
 
-    <link rel="stylesheet" href="{{input.url_prefix}}/static/tree-js/themes/default/style.min.css" />
-    <script type="text/javascript" src="{{input.url_prefix}}/static/tree-js/jstree.js"></script>
-    <script type="text/javascript">
-      function preview(img, selection) {}
-        $(function () {
-          $('#tag_img').imgAreaSelect({
-{% if input.has_attr('this') and input.this.tag_id_exists(input.tag_id) and input.this.tag_has_coordinates(input.tag_id) %}
-            x1: {{input.this.get_tag_wn_x(input.tag_id)}}, 
-            x2: {{input.this.get_tag_wn_x2(input.tag_id)}}, 
-            y1: {{input.this.get_tag_wn_y(input.tag_id)}}, 
-            y2: {{input.this.get_tag_wn_y2(input.tag_id)}}, 
-{% endif %}
-	        onSelectEnd: function (img, selection) {
-	          $('input[name="x1"]').val(selection.x1);
-	          $('input[name="y1"]').val(selection.y1);
-	          $('input[name="x2"]').val(selection.x2);
-	          $('input[name="y2"]').val(selection.y2);
-	        }
-          });
-        });
-      </script>
+    <link rel="stylesheet" href="{{url_prefix}}/static/tree-js/themes/default/style.min.css" />
+    <script type="text/javascript" src="{{url_prefix}}/static/tree-js/jstree.js"></script>
 
-    <link href="{{ input.url_prefix }}/static/renderjson-js/renderjson.css" rel="stylesheet">
-    <script type="text/javascript" src="{{input.url_prefix}}/static/renderjson-js/renderjson.js"></script>
+    <link href="{{ url_prefix }}/static/renderjson-js/renderjson.css" rel="stylesheet">
+    <script type="text/javascript" src="{{url_prefix}}/static/renderjson-js/renderjson.js"></script>
   </head>
   <body lang="en" dir="ltr">
 
@@ -51,62 +32,62 @@
         <div class="row">
           <div class="col-md-1 col-sm-1 col-xs-2">
             <!div class="moin-logo">
-              <a href="{{ input.url_prefix }}/"><img src="{{ input.url_prefix }}/static/common/logos/pygal_logo.png" id="moin-img-logo" alt="Logo"></a>
+              <a href="{{ url_prefix }}/"><img src="{{ url_prefix }}/static/common/logos/pygal_logo.png" id="moin-img-logo" alt="Logo"></a>
             <!/div>
           </div>
 
           <div class="col-md-2 col-sm-2 col-xs-10">
             <div class="moin-navbar-header">
-              <div class="navbar-brand">{{ input.title }}</div>
+              <div class="navbar-brand">{{ title }}</div>
             </div>
           </div>
 
           <div class="col-md-6 col-sm-6 col-xs-6">
             <div class="moin-navbar-collapse navbar-collapse collapse in">
               <ul class="nav navbar-nav moin-pull-right">
-                {% if input.pygal_user.may_admin() %}
+                {% if item.user_may_admin() %}
                   <li>
-                    <a href="{{ input.url_prefix + input.app.prefix_admin + input.url_extention }}" title="{{ input.lang.admin }}" rel="nofollow">
-                      <span><img src="{{input.url_prefix}}/static/common/img/admin.png"></span>
-                      <span class="hidden-sm hidden-xs">{{ input.lang.admin }}</span>
+                    <a href="{{ item.admin_url() }}" title="{{ lang.admin }}" rel="nofollow">
+                      <span><img src="{{url_prefix}}/static/common/img/admin.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ lang.admin }}</span>
                     </a>
                   </li>
                 {% endif %}
-                {% if input.pygal_user.may_upload() %}
+                {% if item.user_may_upload() %}
                   <li>
-                    <a href="{{ input.url_prefix + input.app.prefix_upload }}" title="{{ input.lang.upload }}" rel="nofollow">
-                      <span><img src="{{input.url_prefix}}/static/common/img/upload.png"></span>
-                      <span class="hidden-sm hidden-xs">{{ input.lang.upload }}</span>
+                    <a href="{{ item.upload_url() }}" title="{{ lang.upload }}" rel="nofollow">
+                      <span><img src="{{url_prefix}}/static/common/img/upload.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ lang.upload }}</span>
                     </a>
                   </li>
                 {% endif %}
-                {% if input.pygal_user.chk_login() %}
+                {% if pygal_user.chk_login() %}
                   <li>
-                    <a href="{{ input.pygal_user.user_url(input.url_extention) }}" title="{{ input.lang.userprofile }}" rel="nofollow">
-                      <span><img src="{{input.url_prefix}}/static/common/img/user.png"></span>
-                      <span class="hidden-sm hidden-xs">{{ input.pygal_user.get_session_user() }}</span>
+                    <a href="{{ item.userprofile_url() }}" title="{{ lang.userprofile }}" rel="nofollow">
+                      <span><img src="{{url_prefix}}/static/common/img/user.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ pygal_user.get_session_user() }}</span>
                     </a>
                   </li>
                   <li>
-                    <a href="{{ input.url_prefix + input.app.prefix_logout + input.url_extention }}" title="{{ input.lang.logout }}" rel="nofollow">
-                      <span><img src="{{input.url_prefix}}/static/common/img/logout.png"></span>
-                      <span class="hidden-sm hidden-xs">{{ input.lang.logout }}</span>
+                    <a href="{{ item.logout_url() }}" title="{{ lang.logout }}" rel="nofollow">
+                      <span><img src="{{url_prefix}}/static/common/img/logout.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ lang.logout }}</span>
                     </a>
                   </li>
                 {% else %}
-                  <li><a href="{{ input.url_prefix + input.app.prefix_login + input.url_extention }}" rel="nofollow">{{ input.lang.login }}</a></li>
+                  <li><a href="{{ item.login_url() }}" rel="nofollow">{{ lang.login }}</a></li>
                 {% endif %}
               </ul>
             </div>
           </div>
 
           <div class="col-md-3 col-sm-3 col-xs-6">
-            <form class="moin-navbar-form" action="{{input.url_prefix or '/'}}" method="get" role="search">
+            <form class="moin-navbar-form" action="{{url_prefix or '/'}}" method="get" role="search">
               <div class="input-group">
-                <input name='q' type="text" class="form-control" placeholder="{{ input.lang.search }}...">
+                <input name='q' type="text" class="form-control" placeholder="{{ lang.search }}...">
                 <div class="input-group-btn">
                   <button class="btn btn-primary" type="submit">
-                    <img src="{{ input.url_prefix }}/static/common/img/search.png">
+                    <img src="{{ url_prefix }}/static/common/img/search.png">
                   </button>
                 </div>
               </div>
@@ -117,8 +98,17 @@
         </div>
       </nav> 
 
+      <div class="moin-content">
+        <div id="moin-flash">  
+{% if error or info or hint %}
+          {% if error %}<p class="moin-flash moin-flash-error">{{ error|safe }}</p>{% endif %}
+          {% if info %}<p class="moin-flash moin-flash-info">{{ info|safe }}</p>{% endif %}
+          {% if hint %}<p class="moin-flash moin-flash-hint">{{ hint|safe }}</p>{% endif %}
+{% endif %}
+        </div>
+        
       <ul class="moin-breadcrumb">
-      {% for navi in input.navigation_list %}
+      {% for navi in navigation_list %}
         <li>
           <h4 class="moin-location-breadcrumb">
             <small> / </small>
@@ -127,14 +117,10 @@
         </li>
       {% endfor %}
       </ul> 
-    
-      <div class="moin-content">
-        <div id="moin-flash">
-        </div>
-        
+
         <ul class="moin-nav nav-tabs moin-shadow">
-        {% if input.has_attr('this')  and input.action_bar %}
-          {% for action in input.this.actions() %}
+        {% if item is not none and action_bar %}
+          {% for action in item.actions() %}
           <li>
             <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">
               <span><img src="{{action.pic}}"></span>
@@ -145,10 +131,5 @@
         {% endif %}
         </ul>
 
-{% if input.error or input.info or input.hint %}
-    <div id="moin-flash">  
-      {% if input.error %}<p class="moin-flash moin-flash-error">{{ input.error|safe }}</p>{% endif %}
-      {% if input.info %}<p class="moin-flash moin-flash-info">{{ input.info|safe }}</p>{% endif %}
-      {% if input.hint %}<p class="moin-flash moin-flash-hint">{{ input.hint|safe }}</p>{% endif %}
-    </div>
-{% endif %}
+        <div id="moin-page" lang="en" dir="ltr">
+          <div id="moin-content">
