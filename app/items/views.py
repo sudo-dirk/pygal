@@ -121,13 +121,13 @@ def admin(item_name):
                     if action == helpers.STR_ARG_ADMIN_ACTION_CREATE:
                         target = os.path.join(target, name)
                         try:
-                            os.mkdir(os.path.join(config.item_path, target))
+                            os.mkdir(os.path.join(config.item_path, helpers.encode(target)))
                         except OSError:
                             return app_views.make_response(app_views.RESP_TYPE_ADMIN, i, tmc, error='Folder %s can not be created. The parent folder has possibly insufficient rights' % target, hint='Mark the folder you want to delete or where you want to create a subfolder.')
                         return app_views.make_response(app_views.RESP_TYPE_ADMIN, i, tmc, info='Folder %s succesfully created.' % target, hint='Mark the folder you want to delete or where you want to create a subfolder.')
                     elif action == helpers.STR_ARG_ADMIN_ACTION_DELETE:
                         try:
-                            os.rmdir(os.path.join(config.item_path, target))
+                            os.rmdir(os.path.join(config.item_path, helpers.encode(target)))
                         except OSError:
                             return app_views.make_response(app_views.RESP_TYPE_ADMIN, i, tmc, error='Folder %s can not be deleted. The folder is possibly not empty' % target, hint='Mark the folder you want to delete or where you want to create a subfolder.')
                         return app_views.make_response(app_views.RESP_TYPE_ADMIN, i, tmc, info='Folder %s succesfully deleted.' % target, hint='Mark the folder you want to delete or where you want to create a subfolder.')
