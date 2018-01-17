@@ -749,7 +749,6 @@ class __itemlist__(base_object, report.logit):
             for key in TYPE_NAMES:
                 d[key] = 0
         if self.user_may_view() and len(self.get_itemlist()) > 0:
-            self.logit_critical(logger, 'Adding a gallerie % s', self.name())
             d[self.TYPE] += 1
             for item in self.get_itemlist():
                 d = item.count(d)
@@ -840,10 +839,11 @@ class __itemlist__(base_object, report.logit):
 
 
 class __itemlist_prepared_cache__(__itemlist__):
+    CACHE_KEY_FILESIZE = 'filesize'
     CACHE_KEY_ITEM_COMPOSITION = 'item_composition'
     CACHE_KEY_SORTED_ITEMLIST = 'sorted_itemlist'
     CACHE_KEY_THUMB_ITEM_REL_PATH = 'thumb_item_rel_path'
-    CACHE_KEYS = [CACHE_KEY_ITEM_COMPOSITION, CACHE_KEY_SORTED_ITEMLIST, CACHE_KEY_THUMB_ITEM_REL_PATH]
+    CACHE_KEYS = [CACHE_KEY_FILESIZE, CACHE_KEY_ITEM_COMPOSITION, CACHE_KEY_SORTED_ITEMLIST, CACHE_KEY_THUMB_ITEM_REL_PATH]
     VERS = 2
 
     def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
@@ -853,7 +853,9 @@ class __itemlist_prepared_cache__(__itemlist__):
         return self.VERS
 
     def get(self, key, default=None):
-        if key == self.CACHE_KEY_ITEM_COMPOSITION:
+        if key == self.CACHE_KEY_FILESIZE:
+            return __itemlist__.filesize(self)
+        elif key == self.CACHE_KEY_ITEM_COMPOSITION:
             return __itemlist__.item_composition(self)
         elif key == self.CACHE_KEY_SORTED_ITEMLIST:
             self._sorted_itemlist = __itemlist__.sorted_itemlist(self)
@@ -861,6 +863,9 @@ class __itemlist_prepared_cache__(__itemlist__):
         elif key == self.CACHE_KEY_THUMB_ITEM_REL_PATH:
             return __itemlist__.thumb_item_rel_path(self)
         return default
+
+    def filesize(self):
+        return self.get(self.CACHE_KEY_FILESIZE)
 
     def item_composition(self):
         return self.get(self.CACHE_KEY_ITEM_COMPOSITION)
