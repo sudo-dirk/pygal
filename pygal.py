@@ -4,15 +4,15 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Ausführlicher Test, Aufräumen, Commit und Verwendung auf minefield und docs
-#       - Verschieben aus Staging funktioniert nicht immer (warnings hinzu). (Es blieben mehrfach Reste des Stagings, die sich anschließend nicht löschen lassen. Verschieben hat aber einmal zumindest vollständig geklappt, aber Reste blieben im JSON-File.
+# TODO: - Verschieben aus Staging funktioniert nicht immer (warnings hinzu). (Es blieben mehrfach Reste des Stagings, die sich anschließend nicht löschen lassen. Verschieben hat aber einmal zumindest vollständig geklappt, aber Reste blieben im JSON-File.
+#       - Beim Löschen und Verschieben die Cache und Databasefiles mit betrachten 
+#       - switch user implementieren
 #       - Timing Anzeige aufhübschen
 #       - Der Bereich Admin, Upload, ... ist zu breit und der Anzeigename zu schmal. Prüfen des Verhaltens bei schmaler werdendem Fenster.
 #       - restlichen str_args -> helpers (login, logout, register, lostpass, userprefs, ...?)
 #       - Bildgröße in Staging Area scheint zwischen Rahmen und Bild unterschiedlich zu sein (Rahmen default?) Anzeige des Namens
 #       - flask.redirect möglichst  eliminieren, vor allem neu eingebautes, da Meldungen hier nicht weitergereicht werden können.
 #       - Drehung der Bilder passt oft nicht (orientation 6 ist falsch, 1 ist richtig; orientation 8 ist falsch --- siehe /2018/Neujahr Klein Breesen)
-#       - Leere Ordner bei Manueller auswahl oder nach löschvorgang ohne Fehlermedung anzeigen (user_may_view ändern?)
 #       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
 #       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
 #       - delete -> staging (inkl. database) - auch ganze Ordner
@@ -58,7 +58,6 @@ else:
     url_prefix = ''
 
 if len(url_prefix) > 1:
-    flask
     app = flask.Flask('pygal', static_folder=static_folder, template_folder=template_folder, static_url_path=url_prefix + '/static')
 else:
     app = flask.Flask('pygal', static_folder=static_folder, template_folder=template_folder)

@@ -500,6 +500,9 @@ class base_object(gallery_urls):
         self._force_user = force_user
         self._get_item_by_path = get_item_by_path
 
+    def __len__(self):
+        return 1 if self.exists() else 0
+
     def actions(self):
         rv = list()
         rv.append(piclink(self.info_url(), 'Info', config.url_prefix + '/static/common/img/info.png'))
@@ -692,6 +695,10 @@ class __itemlist__(base_object, report.logit):
         self._itemlist = None
         self._cache_path = cache_path
         self._sorted_itemlist = None
+        self._thumb_item = None
+
+    def __len__(self):
+        return len(self.get_itemlist())
 
     def __init_itemlist__(self):
         if not self._itemlist:
@@ -711,8 +718,8 @@ class __itemlist__(base_object, report.logit):
                     for entry in os.listdir(self.raw_path()):
                         entry_rel_path = os.path.join(self._rel_path, entry)
                         item = self._get_item_by_path(entry_rel_path, self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
-                        if item is not None and item.exists() and item.user_may_view():  # entry is an supported item and access granted
-                                self._itemlist.append(item)
+                        if item is not None and len(item) > 0 and item.user_may_view():  # entry is an supported item and access granted
+                            self._itemlist.append(item)
 
             def cmp_objects_reverse_chronologic(a, b):
                 if a.time() > b.time():
@@ -802,30 +809,42 @@ class __itemlist__(base_object, report.logit):
     def sorted_itemlist(self):
         return [item._rel_path for item in self.get_itemlist()]
 
+    def thumb_item_rel_path(self):
+        item = self
+        while item.is_itemlist():
+            try:
+                item = item.get_itemlist()[0]
+            except IndexError:
+                return None
+        return item._rel_path
+
+    def thumb_item(self):
+        if self._thumb_item is None:
+            self._thumb_item = self._get_item_by_path(self.thumb_item_rel_path(), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
+        return self._thumb_item
+
     def thumbnail_x(self):
-        return self.get_itemlist()[0].thumbnail_x()
+        return self.thumb_item().thumbnail_x()
 
     def thumbnail_xy_max(self):
-        return self.get_itemlist()[0].thumbnail_xy_max()
+        return self.thumb_item().thumbnail_xy_max()
 
     def thumbnail_y(self):
-        return self.get_itemlist()[0].thumbnail_y()
+        return self.thumb_item().thumbnail_y()
 
     def thumbnail_url(self, i=None):
-        return self.get_itemlist()[0].thumbnail_url(i)
+        return self.thumb_item().thumbnail_url(i)
 
     def time(self):
-        return self.get_itemlist()[0].time()
-
-    def user_may_view(self):
-        return len(self.get_itemlist()) > 0
+        return self.thumb_item().time()
 
 
 class __itemlist_prepared_cache__(__itemlist__):
     CACHE_KEY_ITEM_COMPOSITION = 'item_composition'
     CACHE_KEY_SORTED_ITEMLIST = 'sorted_itemlist'
-    CACHE_KEYS = [CACHE_KEY_SORTED_ITEMLIST]
-    VERS = 1
+    CACHE_KEY_THUMB_ITEM_REL_PATH = 'thumb_item_rel_path'
+    CACHE_KEYS = [CACHE_KEY_ITEM_COMPOSITION, CACHE_KEY_SORTED_ITEMLIST, CACHE_KEY_THUMB_ITEM_REL_PATH]
+    VERS = 2
 
     def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
         __itemlist__.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user)
@@ -836,9 +855,11 @@ class __itemlist_prepared_cache__(__itemlist__):
     def get(self, key, default=None):
         if key == self.CACHE_KEY_ITEM_COMPOSITION:
             return __itemlist__.item_composition(self)
-        if key == self.CACHE_KEY_SORTED_ITEMLIST:
+        elif key == self.CACHE_KEY_SORTED_ITEMLIST:
             self._sorted_itemlist = __itemlist__.sorted_itemlist(self)
             return self._sorted_itemlist
+        elif key == self.CACHE_KEY_THUMB_ITEM_REL_PATH:
+            return __itemlist__.thumb_item_rel_path(self)
         return default
 
     def item_composition(self):
@@ -854,6 +875,13 @@ class __itemlist_prepared_cache__(__itemlist__):
             if isinstance(sil[i], unicode):
                 sil[i] = sil[i].encode('utf-8')
         return sil
+
+    def thumb_item_rel_path(self):
+        # TODO: check for a better solution to avoid encode decode errors (itemnames are converted from str to unicode after they are stored in cache file)
+        rv = self.get(self.CACHE_KEY_THUMB_ITEM_REL_PATH)
+        if isinstance(rv, unicode):
+            rv = rv.encode('utf-8')
+        return rv
 
     def uid(self):
         return fstools.uid(self.raw_path()) + '_' + rights_uid(pygal_user.get_session_user() if self._force_user is None else self._force_user)

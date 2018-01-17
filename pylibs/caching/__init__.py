@@ -184,11 +184,11 @@ class property_cache_pickle(report.logit):
             self.__init_cache(logger=logger)
         if self._key_filter(key) not in self._cached_props:
             val = self._source_instance.get(key, None)
-            self.logit_debug(logger, 'Loading property for "%s" from source instance (%s)', key, unicode(val))
+            self.logit_debug(logger, 'Loading property for "%s" from source instance (%s)', key, repr(val))
             self._cached_props[self._key_filter(key)] = val
             self._save_cache(logger)
         else:
-            self.logit_debug(logger, 'Providing property for "%s" from cache (%s)', key, unicode(self._cached_props.get(self._key_filter(key), default)))
+            self.logit_debug(logger, 'Providing property for "%s" from cache (%s)', key, repr(self._cached_props.get(self._key_filter(key), default)))
         return self._cached_props.get(self._key_filter(key), default)
 
     def keys(self):
