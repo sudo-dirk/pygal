@@ -856,7 +856,7 @@ class __itemlist_prepared_cache__(__itemlist__):
         return sil
 
     def uid(self):
-        return fstools.uid(self.raw_path()) + '_' + rights_uid(self._force_user or pygal_user.get_session_user())
+        return fstools.uid(self.raw_path()) + '_' + rights_uid(pygal_user.get_session_user() if self._force_user is None else self._force_user)
 
 
 class itemlist(__itemlist_prepared_cache__):
@@ -864,7 +864,7 @@ class itemlist(__itemlist_prepared_cache__):
         __itemlist_prepared_cache__.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user)
         self._cache_path = cache_path
 
-        user = force_user or session_data_handler().get_user()
+        user = session_data_handler().get_user() if force_user is None else force_user
         self._cached_data = caching.property_cache_json(__itemlist_prepared_cache__(rel_path, base_path, slideshow, db_path, cache_path, force_user), self._prop_file(user), load_all_on_init=True)
 
     def __init_itemlist__(self):
