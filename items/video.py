@@ -35,8 +35,8 @@ class video(picture):
         self._info_filename = os.path.join(cache_path, self.uid() + '_info.json')
         self._info = video_info_cached(self.raw_path(), self._info_filename)
 
-    def _create_citem(self, size, force=False):
-        this_method_version = '0.1.0'
+    def _create_citem(self, size, force=False, logger=None):
+        this_method_version = '0.1.1'
         if self._xnail_info is None:
             try:
                 with open(self.xnail_info_filename, 'r') as fh:
@@ -88,6 +88,10 @@ class video(picture):
 
     def mime_type(self):
         return self.mime_types[os.path.splitext(self._rel_path)[1][1:]]
+
+    def orientation(self):
+        # TODO: implement orientation if available
+        return 0
 
     def stay_time(self):
         if os.path.splitext(self._rel_path)[1][1:] in self.internal_player:

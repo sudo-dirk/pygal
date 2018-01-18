@@ -40,8 +40,8 @@ class picture(items.base_item, report.logit):
         self._info_filename = os.path.join(cache_path, self.uid() + '_info.json')
         self._info = picture_info_cached(self.raw_path(), self._info_filename)
 
-    def _create_citem(self, size, force=False):
-        this_method_version = '.0.1.0'
+    def _create_citem(self, size, force=False, logger=None):
+        this_method_version = '.0.1.1'
         if self._xnail_info is None:
             try:
                 with open(self._xnail_info_filename, 'r') as fh:
@@ -53,8 +53,8 @@ class picture(items.base_item, report.logit):
             self.logit_info(logger, 'creating citem (%d) for %s', size, self.name())
             try:
                 p = picture_edit(self.raw_path())
-                p.resize(min(size, self.raw_xy_max()))
-                p.rotate(self.orientation())
+                p.resize(min(size, self.raw_xy_max()), logger=logger)
+                p.rotate(self.orientation(), logger=logger)
             except IOError:
                 self.logit_error(logger, 'error creating citem (%d) for %s', size, self.name())
             else:
@@ -126,10 +126,10 @@ class picture(items.base_item, report.logit):
         return self._citem_filename % size
 
     def create_thumbnail(self, index):
-        self._create_citem(config.thumbnail_size_list[index])
+        self._create_citem(config.thumbnail_size_list[index], logger=logger)
 
     def create_webnail(self, index):
-        self._create_citem(config.webnail_size_list[index])
+        self._create_citem(config.webnail_size_list[index], logger=logger)
 
     def exposure_time(self):
         et = self._info.get(self._info.EXPOSURE_TIME, None, logger=logger)
@@ -197,16 +197,20 @@ class picture(items.base_item, report.logit):
         return self._info.get(self._info.MODEL, None, logger=logger)
 
     def orientation(self):
-        return self._info.get(self._info.ORIENTATION, logger) 
+        return self._info.get(self._info.ORIENTATION, logger)
 
     def ratio_x(self):
         w = self._info.get(self._info.WIDTH, logger)
         h = self._info.get(self._info.HEIGHT, logger)
+        if self.orientation() in [6, 8]:
+            return float(h) / max(w, h)  # rotation 90 or 270
         return float(w) / max(w, h)
 
     def ratio_y(self):
         w = self._info.get(self._info.WIDTH, logger)
         h = self._info.get(self._info.HEIGHT, logger)
+        if self.orientation() in [6, 8]:
+            return float(w) / max(w, h)
         return float(h) / max(w, h)
 
     def raw_x(self):

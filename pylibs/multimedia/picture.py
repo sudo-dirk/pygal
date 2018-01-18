@@ -102,7 +102,7 @@ class picture_edit(report.logit):
             self.logit_debug(logger, 'Rotating picture %s by %d°', self._filename(), angle)
             if self._im is None:
                 self._load_im()
-            self._im = self._im.rotate(angle)
+            self._im = self._im.rotate(angle, expand=True)
 
     def save(self, filename, logger=None):
         """
