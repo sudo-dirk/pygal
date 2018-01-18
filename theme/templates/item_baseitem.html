@@ -1,5 +1,5 @@
 <div id="main" class="thumb_border">
-  <h2>{{ item.name(True) }}</h2>
+  <h2><a href="{{ item.raw_url() }}">{{ item.name(True) }}</a></h2>
   <table>
     <tbody>
 {% for entry in item.get_infos() %}
