@@ -112,6 +112,8 @@ class database_handler(dict):
         self._initialised = False
 
     def _load_tags(self):
+        if self.KEY_DATA_ID not in self:
+            self[self.KEY_DATA_ID] = dict()
         if self._db_filename is not None:
             try:
                 dict.__init__(self, json.loads(open(self._db_filename, 'r').read()))
@@ -123,8 +125,6 @@ class database_handler(dict):
                         self._id = int(ident)
                 except ValueError:
                     pass  # nothing to do
-            if self.KEY_DATA_ID not in self:
-                self[self.KEY_DATA_ID] = dict()
             if self.KEY_DATA_ID_REL_PATH not in self[self.KEY_DATA_ID]:
                 try:
                     self[self.KEY_DATA_ID][self.KEY_DATA_ID_REL_PATH] = self.rel_path()
@@ -133,6 +133,18 @@ class database_handler(dict):
                 else:
                     self._save_tags()
             self._initialised = True
+
+    def get_database_content(self):
+        if not self._initialised:
+            self._load_tags()
+        rv = dict()
+        for key in self:
+            rv[key] = self[key]
+        try:
+            del rv[self.KEY_DATA_ID][self.KEY_DATA_ID_REL_PATH]
+        except KeyError:
+            pass
+        return rv
 
     def get_rel_path(self):
         if not self._initialised:
@@ -312,87 +324,53 @@ class database_handler(dict):
             return False
         return True
 
-
-class staging_container(dict):
+class staging_container(report.logit, dict):
+    LOG_PREFIX = 'StageCont:'
     CONTAINER_INFO_FILE_EXTENTION = 'json'
 
-    KEY_TIMESTAMP = database_handler.KEY_DATA_ID_TIMESTAMP_UPLOAD
     KEY_UUID = '_uuid_'
-    KEY_CONTAINER_FILES = 'container_files'
-    KEY_USERNAME = database_handler.KEY_DATA_ID_USERNAME_UPLOAD
-    KEY_CONTAINERNAME = 'container_name'
-    KEY_SRC_IP = database_handler.KEY_DATA_ID_SRC_IP_UPLOAD
+    KEY_CONTAINERNAME = '_container_name_'
+    KEY_FILES = '_files'
+    KEYS = [KEY_UUID, KEY_CONTAINERNAME]
 
-    DATABASE_KEYS = [KEY_TIMESTAMP, KEY_USERNAME, KEY_SRC_IP]
-    """
-    Class handle a staging container
-
-    :param str staging_path: The path, where the staging items will be stored
-    :param instance filelist: A list of file instance which has at least the following variables and methods (.filename, .save(path))
-    :param str uploading_user: The user which uploaded the files
-    :param method allowed_extentions: A list of allowed extentions for the files
-    :param str name: The name of the Container
-    :param str src_ip: The IP oft the client uploading the files
-    """
-
-    def __init__(self, staging_path, filelist, allowed_extentions, uploading_user, name, src_ip):
+    def __init__(self, staging_path, uuid_for_container, name, allowed_extentions):
         dict.__init__(self)
-        # system
         self._staging_path = staging_path
-        self._filelist = filelist
-        if config.multimedia_only:
-            self._allowed_extentions = allowed_extentions
+        if uuid_for_container is None:
+            self[self.KEY_UUID] = str(uuid.uuid4())
         else:
-            self._allowed_extentions = None
-        # generated information
-        self[self.KEY_TIMESTAMP] = time.time()
-        self[self.KEY_UUID] = str(uuid.uuid4())
-        # given information
-        if filelist is not None:
-            self[self.KEY_CONTAINER_FILES] = [f.filename for f in filelist]
-        else:
-            self[self.KEY_CONTAINER_FILES] = list()
-        self[self.KEY_USERNAME] = uploading_user
+            self[self.KEY_UUID] = uuid_for_container
         self[self.KEY_CONTAINERNAME] = name
-        self[self.KEY_SRC_IP] = src_ip
+        self[self.KEY_FILES] = {}
+        self._allowed_extentions = allowed_extentions
+        self.load()
 
-    def allowed_files(self):
-        if self._allowed_extentions is None:
-            return self.get(self.KEY_CONTAINER_FILES)
-        else:
-            rv = list()
-            for filename in self.get(self.KEY_CONTAINER_FILES):
-                if '.' in filename and filename.rsplit('.', 1)[1].lower() in self._allowed_extentions:
-                    rv.append(filename)
-            return rv
 
-    def rejected_files(self):
-        rv = list()
-        if self._allowed_extentions is not None:
-            for filename in self.get(self.KEY_CONTAINER_FILES):
-                if not ('.' in filename and filename.rsplit('.', 1)[1].lower() in self._allowed_extentions):
-                    rv.append(filename)
-        return rv
+    def append_file_upload(self, file_storage, database):
+        container_folder = os.path.dirname(self.get_container_file_path('dummy'))
+        if not os.path.exists(container_folder):
+            os.mkdir(container_folder)
+        if self.is_allowed(file_storage.filename):
+            file_storage.save(self.get_container_file_path(file_storage.filename))
+            self[self.KEY_FILES][file_storage.filename] = database
+            self.save()
+            return True
+        return False
 
-    def save(self):
-        if self._staging_path is not None and len(self.allowed_files()) > 0:
-            # generate container_info_file
-            cif = os.path.join(self._staging_path, self.get(self.KEY_UUID) + '.' + self.CONTAINER_INFO_FILE_EXTENTION)
-            with open(cif, 'w') as fh:
-                fh.write(json.dumps(self, indent=4, sort_keys=True))
-            # generate container_files
-            if self._filelist is not None:
-                file_path = os.path.join(self._staging_path, self.get(self.KEY_UUID))
-                os.mkdir(file_path)
-                for f in self._filelist:
-                    if f.filename in self.allowed_files():
-                        f.save(os.path.join(file_path, f.filename))
+    def append_file_delete(self, filename, database):
+        container_folder = os.path.dirname(self.get_container_file_path('dummy'))
+        if not os.path.exists(container_folder):
+            os.mkdir(container_folder)
+        if os.path.exists(filename) and self.is_allowed(filename):
+            print type(filename), filename
+            print type(os.path.basename(filename)), os.path.basename(filename)
+            shutil.copyfile(filename, self.get_container_file_path(os.path.basename(filename)))
+            self[self.KEY_FILES][os.path.basename(filename)] = database
+            self.save()
 
-    def get_container_info_file_by_uuid(self, uuid):
-        if self._staging_path is None:
-            return None
-        else:
-            return os.path.join(self._staging_path, uuid + '.' + self.CONTAINER_INFO_FILE_EXTENTION)
+    def delete(self):
+        shutil.rmtree(os.path.dirname(self.get_container_file_path('dummy')))
+        os.remove(self.get_container_info_file_by_uuid(self[self.KEY_UUID]))
 
     def get_container_file_path(self, filename):
         if self._staging_path is None or self[self.KEY_UUID] is None:
@@ -400,35 +378,59 @@ class staging_container(dict):
         else:
             return os.path.join(self._staging_path, self[self.KEY_UUID], filename)
 
-    def load(self, container_info_file):
-        self._staging_path = os.path.dirname(container_info_file)
-        with open(container_info_file, 'r') as fh:
-            data = json.loads(fh.read())
-        dict.__init__(self, data)
+    def get_container_info_file_by_uuid(self, uuid):
+        if self._staging_path is None or uuid is None:
+            return None
+        else:
+            return os.path.join(self._staging_path, uuid + '.' + self.CONTAINER_INFO_FILE_EXTENTION)
 
-    def delete(self):
-        shutil.rmtree(os.path.join(self._staging_path, self[self.KEY_UUID]))
-        os.remove(self.get_container_info_file_by_uuid(self[self.KEY_UUID]))
+    def get_container_name(self):
+        return self.get(self.KEY_CONTAINERNAME)
+
+    def get_uuid(self):
+        return self.get(self.KEY_UUID)
+
+    def is_allowed(self, filename):
+        if self._allowed_extentions is None:
+            return True
+        else:
+            if '.' in filename and filename.rsplit('.', 1)[1].lower() in self._allowed_extentions:
+                return True
+        return False
 
     def is_empty(self):
-        return len(self[self.KEY_CONTAINER_FILES]) == 0
+        return len(self[self.KEY_FILES]) == 0
+
+    def load(self):
+        cif = self.get_container_info_file_by_uuid(self.get(self.KEY_UUID))
+        if cif is not None and os.path.exists(cif):
+            with open(cif, 'r') as fh:
+                data = json.loads(fh.read())
+            dict.__init__(self, data)
 
     def move(self, items_target_path, database_path, item_path):
         # iteration over files
-        for filename in list(self[self.KEY_CONTAINER_FILES]):
+        for filename in self[self.KEY_FILES].copy():
             database_filename = os.path.join(database_path, os.path.join(items_target_path, filename).replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json')
             item_filename = os.path.join(item_path, items_target_path, filename)
             if not os.path.exists(database_filename) and not os.path.exists(item_filename) and fstools.is_writeable(os.path.dirname(database_filename)) and fstools.is_writeable(os.path.dirname(item_filename)):
                 dbh = database_handler(database_filename)
-                for key in self.DATABASE_KEYS:
-                    dbh.add_data(key, self.get(key))
+                dict.__init__(dbh, self[self.KEY_FILES][filename])
                 dbh._save_tags()
+                self.logit_info(logger, 'Moving File %s to %s.', self.get_container_file_path(filename), item_filename)
                 os.rename(self.get_container_file_path(filename), item_filename)
-                self[self.KEY_CONTAINER_FILES].remove(filename)
+                del self[self.KEY_FILES][filename]
         if self.is_empty():
             self.delete()
         else:
             self.save()
+
+    def save(self):
+        cif = self.get_container_info_file_by_uuid(self.get(self.KEY_UUID))
+        if cif is not None and len(self) > 0:
+            # generate container_info_file
+            with open(cif, 'w') as fh:
+                fh.write(json.dumps(self, indent=4, sort_keys=True))
 
 
 class gallery_urls(object):
@@ -489,7 +491,8 @@ class gallery_urls(object):
         return self._url(prefix_webnail) + strargs({helpers.STR_ARG_WEB_INDEX: i})
 
 
-class base_object(gallery_urls):
+class base_object(report.logit, gallery_urls):
+    LOG_PREFIX = 'BaseObj:'
     ICON_SIZE = 128
     TYPE = None
 
@@ -610,6 +613,7 @@ class base_object(gallery_urls):
 
 
 class base_item(base_object, database_handler):
+    LOG_PREFIX = 'BaseItem:'
     TYPE = TYPE_BASEITEM
 
     def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
@@ -639,8 +643,10 @@ class base_item(base_object, database_handler):
 
     def delete(self):
         if self.user_may_delete():
-            delete_path = os.path.join(config.trash_path, self._rel_path.replace(os.path.sep, '_'))
-            shutil.move(self.raw_path(), delete_path)
+            if os.path.exists(self.raw_path()):
+                os.remove(self.raw_path())
+            if os.path.exists(self._db_path):
+                os.remove(self._db_filename)
 
     def filesize(self):
         return os.path.getsize(self.raw_path())
@@ -654,13 +660,14 @@ class base_item(base_object, database_handler):
             infos.append(simple_info('Upload IP:', self.get_upload_src_ip()))
         return infos
 
+    def parent(self):
+        return self._get_item_by_path(os.path.dirname(self._rel_path), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
+
     def nxt(self):
-        il = self._get_item_by_path(os.path.dirname(self._rel_path), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
-        return il.get_nxt(self)
+        return self.parent().get_nxt(self)
 
     def prv(self):
-        il = self._get_item_by_path(os.path.dirname(self._rel_path), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
-        return il.get_prv(self)
+        return self.parent().get_prv(self)
 
     def thumbnail_url(self, i=None):
         (i)
@@ -685,9 +692,9 @@ class base_item(base_object, database_handler):
         return self.thumbnail_url(i)
 
 
-class __itemlist__(base_object, report.logit):
+class __itemlist__(base_object):
+    LOG_PREFIX = 'Itemlist:'
     TYPE = TYPE_ITEMLIST
-    LOG_PREFIX = 'itemlist:'
 
     def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
         base_object.__init__(self, rel_path, base_path, slideshow, force_user)
@@ -942,10 +949,8 @@ class staging_itemlist(staging_container, __itemlist__):
     TYPE = TYPE_STAGING_ITEMLIST
 
     def __init__(self, rel_path, base_path, slideshow, db_path):
-        container_path = os.path.dirname(base_path)
         uuid = os.path.basename(base_path)
-        staging_container.__init__(self, None, None, None, None, None, None)
-        self.load(os.path.join(container_path, uuid + '.' + self.CONTAINER_INFO_FILE_EXTENTION))
+        staging_container.__init__(self, config.staging_path, uuid, None, None)
         #
         base_object.__init__(self, rel_path, base_path, slideshow, None)
         self._db_path = db_path

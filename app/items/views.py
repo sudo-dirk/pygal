@@ -19,6 +19,7 @@ from prefixes import prefix_raw
 import pygal_config as config
 from pylibs.multimedia import picture, video
 import StringIO
+import time
 import zipfile
 from auth import pygal_user
 from items.video import is_video
@@ -44,8 +45,7 @@ def admin(item_name):
                 if admin_issue == helpers.STR_ARG_ADMIN_ISSUE_STAGING and action == helpers.STR_ARG_ADMIN_ACTION_THUMB:
                     if container_uuid is not None and name is not None:
                         # thumbnail picture
-                        sc = items.staging_container(config.staging_path, None, None, None, None, None)
-                        sc.load(sc.get_container_info_file_by_uuid(container_uuid))
+                        sc = items.staging_container(config.staging_path, container_uuid, None, None)
                         if items.picture.is_picture(name):
                             i = picture.picture_edit(sc.get_container_file_path(name))
                             i.resize(pygal_user.get_thumbnail_size())
@@ -103,8 +103,7 @@ def admin(item_name):
                 elif admin_issue == helpers.STR_ARG_ADMIN_ISSUE_STAGING:
                     if action == helpers.STR_ARG_ADMIN_ACTION_COMMIT:
                         if target != '':
-                            sc = items.staging_container(config.staging_path, None, None, None, None, None)
-                            sc.load(sc.get_container_info_file_by_uuid(container_uuid))
+                            sc = items.staging_container(config.staging_path, container_uuid, None, None)
                             sc.move(target, config.database_path, config.item_path)
                             if sc.is_empty():
                                 return flask.redirect(config.url_prefix + target)
@@ -113,8 +112,7 @@ def admin(item_name):
                         else:
                             return app_views.make_response(app_views.RESP_TYPE_ADMIN, i, tmc, error='You need to check a folder!')
                     elif action == helpers.STR_ARG_ADMIN_ACTION_DELETE:
-                        sc = items.staging_container(config.staging_path, None, None, None, None, None)
-                        sc.load(sc.get_container_info_file_by_uuid(container_uuid))
+                        sc = items.staging_container(config.staging_path, container_uuid, None, None)
                         sc.delete()
                         return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info='Staging-Container %s deleted' % sc.get(sc.KEY_CONTAINERNAME))
                 elif admin_issue == helpers.STR_ARG_ADMIN_ISSUE_FOLDERS:
@@ -212,19 +210,28 @@ def upload(item_name):
             if flask.request.method == 'GET':
                 return app_views.make_response(app_views.RESP_TYPE_UPLOAD, i, tmc)
             else:
-                sc = items.staging_container(config.staging_path, flask.request.files.getlist("file[]"), items.supported_extentions(), pygal_user.get_session_user(), flask.request.form.get('container_name'), flask.request.environ['REMOTE_ADDR'])
-                sc.save()
-                if len(sc.allowed_files()) > 0:
-                    hint = 'Successfully uploaded the following files to Container %s:<br>* ' % sc.get(sc.KEY_UUID)
-                    hint += '<br>* '.join(sc.allowed_files())
+                db = items.database_handler(None)
+                db.add_data(db.KEY_DATA_ID_USERNAME_UPLOAD, pygal_user.get_session_user())
+                db.add_data(db.KEY_DATA_ID_TIMESTAMP_UPLOAD, time.time())
+                db.add_data(db.KEY_DATA_ID_SRC_IP_UPLOAD, flask.request.environ['REMOTE_ADDR'])
+                if config.multimedia_only:
+                    sc = items.staging_container(config.staging_path, None, flask.request.form.get('container_name'), items.supported_extentions())
+                else:
+                    sc = items.staging_container(config.staging_path, None, flask.request.form.get('container_name'), None)
+                failed_files = []
+                for f in flask.request.files.getlist("file[]"):
+                    success = sc.append_file_upload(f, db)
+                    if not success:
+                        failed_files.append(f.filename)
+                if len(failed_files) == 0:
+                    hint = 'Successfully uploaded all files to Container %s.' % sc.get(sc.KEY_UUID)
+                    error = None
                 else:
                     hint = None
-                if len(sc.rejected_files()) > 0:
-                    error = 'Upload failed for the following files:<br>* '
-                    error += '<br>* '.join(sc.rejected_files())
-                else:
-                    error = None
-                return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=error, hint=hint)
+                    error = 'Upload failed for the following files:<br>'
+                    for filename in failed_files:
+                        error += ' * %s<br>' % filename
+                return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, error=error, hint=hint)
         else:
             return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=lang.error_permission_denied)
     flask.abort(404)
@@ -337,8 +344,14 @@ def delete(item_name):
                 if flask.request.method == 'GET':
                     return app_views.make_response(app_views.RESP_TYPE_DELETE, i, tmc)
                 elif flask.request.method == 'POST' and flask.request.form.get('delete_submit') == '1':
+                    n = 0
+                    sc = items.staging_container(config.staging_path, os.path.basename(i.raw_path()), i.name(), None)
+                    while not sc.is_empty():
+                        n += 1
+                        sc = items.staging_container(config.staging_path, os.path.basename(i.raw_path()) + '-%d' % n, i.name() + '-%d' % n, None)
+                    sc.append_file_delete(i.raw_path(), i.get_database_content())
                     i.delete()
-                    return flask.redirect(i.parent_url())
+                    return app_views.make_response(app_views.RESP_TYPE_ITEM, i.parent(), tmc, info=lang.info_item_deleted % i.name(True))
             else:
                 return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=lang.error_permission_denied)
     flask.abort(404)

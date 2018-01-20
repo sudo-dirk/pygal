@@ -18,6 +18,7 @@ if LANGUAGE == 'DE':
     error_user_already_exists = decode('Der Benutzer existiert bereits! Der Benutzer wurde nicht angelegt. <a href="%s">Passwort vergessen?</a>')
     error_user_already_in_admin_group = decode('Der gewählte Benutzer ist bereits in der Administrator Gruppe. Bitte kontaktieren Sie den Administrator!')
     info_empty_search = decode('Die Suche hat keine Treffer ergeben.')
+    info_item_deleted = decode('Das Element %s wurde erfolgreich entfernt.')
     info_login = decode('Wenn Sie keinen Account haben, <a href="%s">können Sie einen anlegen</a>. <a href="%s">Passwort vergessen?</a>')
     info_logout_performed = decode('Logout durchgeführt. Sie koennen sich <a href="%s">hier</a> anmelden.')
     info_lostpass = decode('Es reicht eins der beiden Felder auszufüllen.')
@@ -53,6 +54,7 @@ else:
     error_user_already_exists = 'User already exists. Account has not been created. <a href="%s">Forgot your password?</a>'
     error_user_already_in_admin_group = 'This user is already in the admin group. Please contact the administrator.'
     info_empty_search = decode('No search results.')
+    info_item_deleted = decode('Item %s had been successfully deleted.')
     info_login = 'If you do not have an account, <a href="%s">you can create one now</a>. <a href="%s">Forgot your password?</a>'
     info_logout_performed = 'Logout performed. You are able to login<a href="%s">here</a>.'
     info_lostpass = 'Please note that you only need to fill out one form field.'

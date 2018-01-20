@@ -48,7 +48,7 @@
             <dd>
               <select name="{{ arg_name.STR_ARG_ADMIN_CONTAINER }}" onchange="this.form.submit()"/>
                 {% for container in containers.values() %}
-                <option value="{{ container._uuid_ }}" {% if container._uuid_ == container_uuid %}selected{% endif %}>{{ container.container_name }}</option>
+                <option value="{{ container.get_uuid() }}" {% if container.get_uuid() == container_uuid %}selected{% endif %}>{{ container.get_container_name() }}</option>
                 {% endfor %}
               </select>
             </dd>

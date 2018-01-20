@@ -119,6 +119,15 @@ class picture(items.base_item, report.logit):
         else:
             return '%s - %s' % (self.manufactor(), self.model())
 
+    def delete(self):
+        items.base_item.delete(self)
+        if self.user_may_delete():
+            for cf in fstools.filelist(self._cache_path, self.uid() + '*'):
+                if os.path.exists(cf):
+                    os.remove(cf)
+            if os.path.exists(self._info_filename):
+                os.remove(self._info_filename)
+
     def exposure_program(self):
         return self._info.get(self._info.EXPOSURE_PROGRAM, None, logger=logger)
 

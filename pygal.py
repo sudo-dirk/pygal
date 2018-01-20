@@ -4,21 +4,17 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - Verschieben aus Staging funktioniert nicht immer (warnings hinzu). (Es blieben mehrfach Reste des Stagings, die sich anschließend nicht löschen lassen. Verschieben hat aber einmal zumindest vollständig geklappt, aber Reste blieben im JSON-File.
-#       - Beim Löschen und Verschieben die Cache und Databasefiles mit betrachten 
+# TODO: - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
 #       - switch user implementieren
 #       - Timing Anzeige aufhübschen
 #       - Der Bereich Admin, Upload, ... ist zu breit und der Anzeigename zu schmal. Prüfen des Verhaltens bei schmaler werdendem Fenster.
 #       - restlichen str_args -> helpers (login, logout, register, lostpass, userprefs, ...?)
 #       - Bildgröße in Staging Area scheint zwischen Rahmen und Bild unterschiedlich zu sein (Rahmen default?) Anzeige des Namens
 #       - flask.redirect möglichst  eliminieren, vor allem neu eingebautes, da Meldungen hier nicht weitergereicht werden können.
-#       - Drehung der Bilder passt oft nicht (orientation 6 ist falsch, 1 ist richtig; orientation 8 ist falsch --- siehe /2018/Neujahr Klein Breesen)
 #       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
 #       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
-#       - delete -> staging (inkl. database) - auch ganze Ordner
-#       - Löschen in die Stagin Area statt in einen Folder
 #       - Löschdialog für Ordner (Anzeige aller Elemente)
-#       - Staging Area: Für delete und commit eine Auswahl ermöglichen (commit und delete aus Ordner)
+#       - Staging Area und Delete-Page: Für delete und commit eine Auswahl ermöglichen (commit und delete aus Ordner)
 #       - logging ergänzen mit erben der classe report.logit (itemlist, picture, ...)
 #       - Sortierung einstellbar machen (Name, Zeit, ...) Änderung führt dazu, dass der Cache ungültig wird => Userdata und nicht Sessiondata
 #       - required attribut für js-tree in admin.staging
@@ -29,9 +25,8 @@
 #       - Select all Button bei der Administration der Rechte hinzufügen
 #       - Beispieldaten einfügen
 #       - Erweiterte Suche einbauen. Zugang über flash-Bereich analog login.
-#       - Admin-User darf zu einem anderen Benutzer wechseln. Logout führt zu ursprünglichem Nutzer.
-#       - Nach texten auf der Oberfläche suchen, die in das Modul lang gehören (z.B.: Button- und Labeltexte)
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
+#       - Nach texten auf der Oberfläche suchen, die in das Modul lang gehören (z.B.: Button- und Labeltexte)
 #       - E-Mailbenachrichtigung bei neuem Benutzer und Passwortrücksetzung, Upload, ...
 ###############################################################################################################
 #       - Session nur für die jeweilige Unterseite anlegen (Test ob tiefere Seiten okay)
@@ -72,7 +67,7 @@ app.debug_log_format = """~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 File "%(pathname)s", line %(lineno)d, in %(funcName)s
 %(asctime)s: %(levelname)-7s - %(message)s'"""
 
-app.logger.setLevel(logging.INFO)
+app.logger.setLevel(logging.DEBUG)
 
 app.debug = DEBUG
 app.secret_key = secret_key
