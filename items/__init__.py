@@ -2,6 +2,7 @@ from pylibs import caching
 import auth
 from auth import pygal_user, session_data_handler
 from auth import rights_uid
+from database import database_handler
 import flask
 import helpers
 from helpers import encode
@@ -98,232 +99,6 @@ def get_staging_item_by_path(rel_path, base_path, slideshow, db_path, cache_path
         return staging_baseitem(rel_path, base_path, False, None, None, None)
 
 
-class database_handler(dict):
-    KEY_DATA_ID = '_common_'
-    KEY_DATA_ID_REL_PATH = 'rel_path'
-    KEY_DATA_ID_TIMESTAMP_UPLOAD = 'upload_timestamp'
-    KEY_DATA_ID_USERNAME_UPLOAD = 'upload_user_name'
-    KEY_DATA_ID_SRC_IP_UPLOAD = 'upload_src_ip'
-
-    def __init__(self, db_filename):
-        self._db_filename = db_filename
-
-        self._id = 0
-        self._initialised = False
-
-    def _load_tags(self):
-        if self.KEY_DATA_ID not in self:
-            self[self.KEY_DATA_ID] = dict()
-        if self._db_filename is not None:
-            try:
-                dict.__init__(self, json.loads(open(self._db_filename, 'r').read()))
-            except IOError:
-                dict.__init__(self)
-            for ident in self:
-                try:
-                    if int(ident) > self._id:
-                        self._id = int(ident)
-                except ValueError:
-                    pass  # nothing to do
-            if self.KEY_DATA_ID_REL_PATH not in self[self.KEY_DATA_ID]:
-                try:
-                    self[self.KEY_DATA_ID][self.KEY_DATA_ID_REL_PATH] = self.rel_path()
-                except AttributeError:
-                    pass
-                else:
-                    self._save_tags()
-            self._initialised = True
-
-    def get_database_content(self):
-        if not self._initialised:
-            self._load_tags()
-        rv = dict()
-        for key in self:
-            rv[key] = self[key]
-        try:
-            del rv[self.KEY_DATA_ID][self.KEY_DATA_ID_REL_PATH]
-        except KeyError:
-            pass
-        return rv
-
-    def get_rel_path(self):
-        if not self._initialised:
-            self._load_tags()
-        return encode(self.get(self.KEY_DATA_ID, {}).get(self.KEY_DATA_ID_REL_PATH, ''))
-
-    def matches(self, query):
-        if not self._initialised:
-            self._load_tags()
-        for tag_id in self.get_tag_id_list():
-            if query.lower() in self.get_tag_text(tag_id).lower():
-                return True
-        return False
-
-    def tag_id_exists(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        return tag_id in self and tag_id != self.KEY_DATA_ID
-
-    def get_tag_id_list(self):
-        if not self._initialised:
-            self._load_tags()
-        rv = self.keys()
-        if self.KEY_DATA_ID in rv:
-            rv.remove(self.KEY_DATA_ID)
-        rv.sort()
-        return rv
-
-    def get_tag_wn_x(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        try:
-            return int(self[tag_id]['x'] * self.webnail_x())
-        except:
-            return ''
-
-    def get_tag_wn_y(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        try:
-            return int(self[tag_id]['y'] * self.webnail_y())
-        except:
-            return ''
-
-    def get_tag_wn_w(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        try:
-            return int(self[tag_id]['w'] * self.webnail_x())
-        except:
-            return ''
-
-    def get_tag_wn_h(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        try:
-            return int(self[tag_id]['h'] * self.webnail_y())
-        except:
-            return ''
-
-    def get_tag_wn_x2(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        try:
-            return self.get_tag_wn_x(tag_id) + self.get_tag_wn_w(tag_id)
-        except:
-            return ''
-
-    def get_tag_wn_y2(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        try:
-            return self.get_tag_wn_y(tag_id) + self.get_tag_wn_h(tag_id)
-        except:
-            return ''
-
-    def get_tag_text(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        try:
-            return self[tag_id]['tag']
-        except:
-            return ''
-
-    def get_tag_icon(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        return config.url_prefix + '/static/common/img/%d.png' % (int(tag_id) % 10)
-
-    def get_upload_src_ip(self):
-        if not self._initialised:
-            self._load_tags()
-        if self.KEY_DATA_ID_SRC_IP_UPLOAD in self[self.KEY_DATA_ID]:
-            return self[self.KEY_DATA_ID][self.KEY_DATA_ID_SRC_IP_UPLOAD]
-        else:
-            return ''
-
-    def get_upload_strtime(self):
-        if not self._initialised:
-            self._load_tags()
-        if self.KEY_DATA_ID_TIMESTAMP_UPLOAD in self[self.KEY_DATA_ID]:
-            return time.strftime("%d.%m.%Y - %H:%M:%S", time.gmtime(self[self.KEY_DATA_ID][self.KEY_DATA_ID_TIMESTAMP_UPLOAD]))
-        else:
-            return ''
-
-    def get_upload_user(self):
-        if not self._initialised:
-            self._load_tags()
-        if self.KEY_DATA_ID_USERNAME_UPLOAD in self[self.KEY_DATA_ID]:
-            return self[self.KEY_DATA_ID][self.KEY_DATA_ID_USERNAME_UPLOAD]
-        else:
-            return ''
-
-    def add_data(self, key, data):
-        if not self._initialised:
-            self._load_tags()
-        self[self.KEY_DATA_ID][key] = data
-
-    def add_tag_wn(self, tag, ident=None):
-        if not self._initialised:
-            self._load_tags()
-        tag_dict = dict()
-        tag_dict['tag'] = tag
-        if ident is None:
-            self._id += 1
-            self[str(self._id)] = tag_dict
-        else:
-            self[str(ident)] = tag_dict
-        self._save_tags()
-
-    def add_tag_wn_xywh(self, x, y, w, h, tag, ident=None):
-        if not self._initialised:
-            self._load_tags()
-        tag_dict = dict()
-        tag_dict['x'] = float(x) / self.webnail_x()
-        tag_dict['y'] = float(y) / self.webnail_y()
-        tag_dict['w'] = float(w) / self.webnail_x()
-        tag_dict['h'] = float(h) / self.webnail_y()
-        tag_dict['tag'] = tag
-        if ident is None:
-            self._id += 1
-            self[str(self._id)] = tag_dict
-        else:
-            self[str(ident)] = tag_dict
-        self._save_tags()
-
-    def add_tag_wn_x1y1x2y2(self, x1, y1, x2, y2, tag_text, tag_id=None):
-        if not self._initialised:
-            self._load_tags()
-        self.add_tag_wn_xywh(min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1), tag_text, tag_id)
-
-    def delete_tag(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        if self.tag_id_exists(tag_id):
-            del self[tag_id]
-            self._save_tags()
-
-    def _save_tags(self):
-        if self._db_filename is not None:
-            if not self._initialised:
-                self._load_tags()
-            if self._db_filename is not None:
-                with open(self._db_filename, 'w') as fh:
-                    fh.write(json.dumps(self, indent=4, sort_keys=True))
-
-    def tag_has_coordinates(self, tag_id):
-        if not self._initialised:
-            self._load_tags()
-        if self.get_tag_wn_x(tag_id) == '':
-            return False
-        if self.get_tag_wn_y(tag_id) == '':
-            return False
-        if self.get_tag_wn_w(tag_id) == '':
-            return False
-        if self.get_tag_wn_h(tag_id) == '':
-            return False
-        return True
-
 class staging_container(report.logit, dict):
     LOG_PREFIX = 'StageCont:'
     CONTAINER_INFO_FILE_EXTENTION = 'json'
@@ -352,7 +127,7 @@ class staging_container(report.logit, dict):
             os.mkdir(container_folder)
         if self.is_allowed(file_storage.filename):
             file_storage.save(self.get_container_file_path(file_storage.filename))
-            self[self.KEY_FILES][file_storage.filename] = database
+            self[self.KEY_FILES][file_storage.filename] = database.get_database_content()
             self.save()
             return True
         return False
@@ -376,13 +151,13 @@ class staging_container(report.logit, dict):
         if self._staging_path is None or self[self.KEY_UUID] is None:
             return None
         else:
-            return os.path.join(self._staging_path, self[self.KEY_UUID], filename)
+            return os.path.join(self._staging_path, encode(self[self.KEY_UUID]), filename)
 
     def get_container_info_file_by_uuid(self, uuid):
         if self._staging_path is None or uuid is None:
             return None
         else:
-            return os.path.join(self._staging_path, uuid + '.' + self.CONTAINER_INFO_FILE_EXTENTION)
+            return os.path.join(self._staging_path, encode(uuid) + '.' + self.CONTAINER_INFO_FILE_EXTENTION)
 
     def get_container_name(self):
         return self.get(self.KEY_CONTAINERNAME)
@@ -411,14 +186,13 @@ class staging_container(report.logit, dict):
     def move(self, items_target_path, database_path, item_path):
         # iteration over files
         for filename in self[self.KEY_FILES].copy():
-            database_filename = os.path.join(database_path, os.path.join(items_target_path, filename).replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json')
-            item_filename = os.path.join(item_path, items_target_path, filename)
+            database_filename = os.path.join(database_path, os.path.join(items_target_path, encode(filename)).replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json')
+            item_filename = os.path.join(item_path, items_target_path, encode(filename))
             if not os.path.exists(database_filename) and not os.path.exists(item_filename) and fstools.is_writeable(os.path.dirname(database_filename)) and fstools.is_writeable(os.path.dirname(item_filename)):
-                dbh = database_handler(database_filename)
-                dict.__init__(dbh, self[self.KEY_FILES][filename])
-                dbh._save_tags()
-                self.logit_info(logger, 'Moving File %s to %s.', self.get_container_file_path(filename), item_filename)
-                os.rename(self.get_container_file_path(filename), item_filename)
+                dbh = database_handler(database_filename, os.path.join(items_target_path, encode(filename)))
+                dbh._init_database_(self[self.KEY_FILES][filename])
+                self.logit_info(logger, 'Moving File %s to %s.', self.get_container_file_path(encode(filename)), item_filename)
+                os.rename(self.get_container_file_path(encode(filename)), item_filename)
                 del self[self.KEY_FILES][filename]
         if self.is_empty():
             self.delete()
@@ -619,9 +393,9 @@ class base_item(base_object, database_handler):
     def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
         base_object.__init__(self, rel_path, base_path, slideshow, force_user)
         if db_path is not None:
-            database_handler.__init__(self, os.path.join(db_path, rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json'))
+            database_handler.__init__(self, os.path.join(db_path, rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json'), rel_path)
         else:
-            database_handler.__init__(self, None)
+            database_handler.__init__(self, None, rel_path)
         self._db_path = db_path
         self._cache_path = cache_path
 
@@ -637,6 +411,18 @@ class base_item(base_object, database_handler):
             rv.append(piclink(self.delete_url(), 'Delete', config.url_prefix + '/static/common/img/delete.png'))
         return rv
 
+    def cache_data(self):
+        rv = list()
+        entry = list()
+        entry.append('User data')
+        entry.append(decode(self._db_filename))
+        rv.append(entry)
+        # Add Link
+        for i in range(0, len(rv)):
+            rv[i].append(self.info_url(i))
+        return rv
+
+
     def count(self, d):
         d[self.TYPE] += 1
         return d
@@ -645,7 +431,7 @@ class base_item(base_object, database_handler):
         if self.user_may_delete():
             if os.path.exists(self.raw_path()):
                 os.remove(self.raw_path())
-            if os.path.exists(self._db_path):
+            if os.path.exists(self._db_filename):
                 os.remove(self._db_filename)
 
     def filesize(self):
@@ -659,6 +445,9 @@ class base_item(base_object, database_handler):
             infos.append(simple_info('Uploaduser:', self.get_upload_user()))
             infos.append(simple_info('Upload IP:', self.get_upload_src_ip()))
         return infos
+
+    def has_cache_data(self):
+        return True
 
     def parent(self):
         return self._get_item_by_path(os.path.dirname(self._rel_path), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
@@ -709,19 +498,21 @@ class __itemlist__(base_object):
 
     def __init_itemlist__(self):
         if not self._itemlist:
-            logger.info('Building itemlist from filestructure %s', self._rel_path)
             self._itemlist = []
             if self.is_a_searchresult():
                 search_query = flask.request.args.get('q', '')
+                self.logit_info(logger, "Building itemlist with search query %s", search_query)
                 if self._db_path is not None:
                     for f in fstools.filelist(self._db_path, '*.json'):
-                        t = database_handler(f)
+                        t = database_handler(f, None)
                         if t.matches(search_query):
+                            self.logit_debug(logger, "%s (%s) matches the query - adding element", t.get_rel_path(), f)
                             item = self._get_item_by_path(t.get_rel_path(), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
                             if item is not None and not item.is_itemlist() and item.exists() and item.user_may_view():  # entry is an supported item and access granted
                                 self._itemlist.append(item)
             else:
                 if self.exists():
+                    self.logit_info(logger, 'Building itemlist from filestructure %s', self._rel_path)
                     for entry in os.listdir(self.raw_path()):
                         entry_rel_path = os.path.join(self._rel_path, entry)
                         item = self._get_item_by_path(entry_rel_path, self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)

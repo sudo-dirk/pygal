@@ -104,7 +104,7 @@ def admin(item_name):
                     if action == helpers.STR_ARG_ADMIN_ACTION_COMMIT:
                         if target != '':
                             sc = items.staging_container(config.staging_path, container_uuid, None, None)
-                            sc.move(target, config.database_path, config.item_path)
+                            sc.move(helpers.encode(target), config.database_path, config.item_path)
                             if sc.is_empty():
                                 return flask.redirect(config.url_prefix + target)
                             else:
@@ -210,16 +210,17 @@ def upload(item_name):
             if flask.request.method == 'GET':
                 return app_views.make_response(app_views.RESP_TYPE_UPLOAD, i, tmc)
             else:
-                db = items.database_handler(None)
-                db.add_data(db.KEY_DATA_ID_USERNAME_UPLOAD, pygal_user.get_session_user())
-                db.add_data(db.KEY_DATA_ID_TIMESTAMP_UPLOAD, time.time())
-                db.add_data(db.KEY_DATA_ID_SRC_IP_UPLOAD, flask.request.environ['REMOTE_ADDR'])
+                db = items.database.database_handler(None, None)
+                db.add_data(db.KEY_UPLOAD_USERNAME, pygal_user.get_session_user())
+                db.add_data(db.KEY_UPLOAD_TIMESTAMP, time.time())
+                db.add_data(db.KEY_UPLOAD_SRC_IP, flask.request.environ['REMOTE_ADDR'])
                 if config.multimedia_only:
                     sc = items.staging_container(config.staging_path, None, flask.request.form.get('container_name'), items.supported_extentions())
                 else:
                     sc = items.staging_container(config.staging_path, None, flask.request.form.get('container_name'), None)
                 failed_files = []
                 for f in flask.request.files.getlist("file[]"):
+                    f.filename = helpers.encode(f.filename)
                     success = sc.append_file_upload(f, db)
                     if not success:
                         failed_files.append(f.filename)

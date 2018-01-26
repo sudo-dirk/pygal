@@ -26,6 +26,8 @@ def decode(string):
             return string.decode(i)
         except UnicodeEncodeError:
             pass
+        except UnicodeDecodeError:
+            pass
     return string
 
 
@@ -34,6 +36,8 @@ def encode(string):
         try:
             return string.encode(i)
         except UnicodeEncodeError:
+            pass
+        except UnicodeDecodeError:
             pass
     return string
 

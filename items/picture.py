@@ -68,7 +68,7 @@ class picture(items.base_item, report.logit):
                         with open(self._xnail_info_filename, 'w') as fh:
                             fh.write(json.dumps(self._xnail_info, sort_keys=True, indent=4))
                     except IOError:
-                        self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)
+                        self.logit_warning(logger, 'Error while writing cache file (%s)', self._xnail_info_filename)
 
     def actions(self):
         rv = items.base_item.actions(self)
@@ -86,6 +86,10 @@ class picture(items.base_item, report.logit):
 
     def cache_data(self):
         rv = list()
+        entry = list()
+        entry.append('User data')
+        entry.append(decode(self._db_filename))
+        rv.append(entry)
         for i in range(0, len(config.thumbnail_size_list)):
             entry = list()
             entry.append('Thumbnail (%d)' % i)
@@ -103,10 +107,6 @@ class picture(items.base_item, report.logit):
         entry = list()
         entry.append('Item data')
         entry.append(decode(self._info_filename))
-        rv.append(entry)
-        entry = list()
-        entry.append('User data')
-        entry.append(decode(self._db_filename))
         rv.append(entry)
         # Add Link
         for i in range(0, len(rv)):

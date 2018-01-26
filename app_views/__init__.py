@@ -57,10 +57,8 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
         # read staging data
         staging_content = dict()
         admin_issue = flask.request.form.get(helpers.STR_ARG_ADMIN_ISSUE) or flask.request.args.get(helpers.STR_ARG_ADMIN_ISSUE, helpers.STR_ARG_ADMIN_ISSUE_PERMISSION)
-        rv = flask.render_template('header.html', error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=lang.admin, url_prefix=config.url_prefix)
         if admin_issue == helpers.STR_ARG_ADMIN_ISSUE_PERMISSION:
-            rv += flask.render_template('admin.html', arg_name=helpers, admin_issue=admin_issue, item=item, lang=lang, pygal_user=auth.pygal_user, user_to_admin=get_form_user())
-            return rv
+            content = flask.render_template('admin.html', arg_name=helpers, admin_issue=admin_issue, item=item, lang=lang, pygal_user=auth.pygal_user, user_to_admin=get_form_user())
         elif admin_issue == helpers.STR_ARG_ADMIN_ISSUE_STAGING:
             for scif in fstools.filelist(config.staging_path, '*' + staging_container.CONTAINER_INFO_FILE_EXTENTION):
                 sc = items.staging_itemlist('', os.path.splitext(scif)[0], False, None)
@@ -70,16 +68,17 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
                 action = flask.request.form.get(helpers.STR_ARG_ADMIN_ACTION) or flask.request.args.get(helpers.STR_ARG_ADMIN_ACTION, helpers.STR_ARG_ADMIN_ACTION_COMMIT)
                 container_uuid = flask.request.args.get(helpers.STR_ARG_ADMIN_CONTAINER) or flask.request.args.get(helpers.STR_ARG_ADMIN_CONTAINER, staging_content.keys()[0])
                 content = flask.render_template('admin.html', arg_name=helpers, action=action, admin_issue=admin_issue, container_uuid=container_uuid, containers=staging_content, item=item, pygal_user=auth.pygal_user, url_prefix=config.url_prefix)
-                info = None
             else:
                 content = ''
                 info = 'No data in Staging-Area'
-            rv += content
         elif admin_issue == helpers.STR_ARG_ADMIN_ISSUE_FOLDERS:
             action = flask.request.args.get(helpers.STR_ARG_ADMIN_ACTION, helpers.STR_ARG_ADMIN_ACTION_CREATE)
-            rv += flask.render_template('admin.html', arg_name=helpers, action=action, admin_issue=admin_issue, item=item, pygal_user=auth.pygal_user)
+            content = flask.render_template('admin.html', arg_name=helpers, action=action, admin_issue=admin_issue, item=item, pygal_user=auth.pygal_user)
         else:
-            return make_response(RESP_TYPE_EMPTY, item, error='Unknown admin_issue="%s"' % admin_issue)
+            content = ''
+            error = 'Unknown admin_issue="%s"' % admin_issue
+        rv = flask.render_template('header.html', error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=lang.admin, url_prefix=config.url_prefix)
+        rv += content
         rv += flask.render_template('footer.html', tmc=tmc)
         return rv
     elif resp_type is RESP_TYPE_DELETE and item is not None:
@@ -106,24 +105,24 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             cache_filename = decode(os.path.basename(data[index][1]))
             if item.is_itemlist():
                 try:
-                    with open(data[index][1], 'r') as fh:
+                    with open(encode(data[index][1]), 'r') as fh:
                         json_str = fh.read()
                 except IOError:
                     json_str = ''
                 html_data = flask.render_template('single_json.html', item=item, json_str=json_str, filename=cache_filename)
             else:
                 # TODO: implement a safe way returning the cache data files!
-                if index in range(0, 6):
-                    if index in range(0, 3):
-                        url = item.thumbnail_url(index)
-                        xy_max = config.thumbnail_size_list[index]
+                if index in range(1, 7):
+                    if index in range(1, 4):
+                        url = item.thumbnail_url(index - 1)
+                        xy_max = config.thumbnail_size_list[index - 1]
                     else:
-                        url = item.webnail_url(index - 3)
-                        xy_max = config.webnail_size_list[index - 3]
+                        url = item.webnail_url(index - 4)
+                        xy_max = config.webnail_size_list[index - 4]
                     html_data = flask.render_template('single_picture.html', item=item, x=int(xy_max * item.ratio_x()), y=int(xy_max * item.ratio_y()), xy_max=xy_max, url=url, filename=cache_filename)
-                if index in [6, 7, 8]:
+                if index in [0, 7, 8]:
                     try:
-                        with open(data[index][1], 'r') as fh:
+                        with open(encode(data[index][1]), 'r') as fh:
                             json_str = fh.read()
                     except IOError:
                         json_str = ''

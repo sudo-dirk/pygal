@@ -15,7 +15,7 @@ def password_salt_and_hash(password):
 
 
 def rights_uid(user):
-    if user is None:
+    if user is '':
         filename = public_data_handler().data_filename(user)
     else:
         filename = user_data_handler().data_filename(user)

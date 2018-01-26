@@ -4,28 +4,30 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
 
 
-# TODO: - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
+# TODO: - Der Bereich Admin, Upload, ... ist zu breit und der Anzeigename zu schmal. Prüfen des Verhaltens bei schmaler werdendem Fenster.
+#       - Bildgröße in Staging Area scheint zwischen Rahmen und Bild unterschiedlich zu sein (Rahmen default?) Anzeige des Namens
+#       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
+#       - Ansicht der Cache Daten verbessern (modal dialog)
+#       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
+#       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
+#       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
+#       - PullDownMenu bei Administration instead of form element in admin*.html
+#       - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
 #       - switch user implementieren
 #       - Timing Anzeige aufhübschen
-#       - Der Bereich Admin, Upload, ... ist zu breit und der Anzeigename zu schmal. Prüfen des Verhaltens bei schmaler werdendem Fenster.
 #       - restlichen str_args -> helpers (login, logout, register, lostpass, userprefs, ...?)
-#       - Bildgröße in Staging Area scheint zwischen Rahmen und Bild unterschiedlich zu sein (Rahmen default?) Anzeige des Namens
 #       - flask.redirect möglichst  eliminieren, vor allem neu eingebautes, da Meldungen hier nicht weitergereicht werden können.
-#       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
-#       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
 #       - Löschdialog für Ordner (Anzeige aller Elemente)
 #       - Staging Area und Delete-Page: Für delete und commit eine Auswahl ermöglichen (commit und delete aus Ordner)
 #       - logging ergänzen mit erben der classe report.logit (itemlist, picture, ...)
 #       - Sortierung einstellbar machen (Name, Zeit, ...) Änderung führt dazu, dass der Cache ungültig wird => Userdata und nicht Sessiondata
 #       - required attribut für js-tree in admin.staging
 #       - delete cache auf Seitenebene für Administratoren einführen
-#       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
 #       - Problem mit png und mit Bild in Linde/orig (Ausrichtung) - Test mit originaldaten erforderlich
 #       - Zusätzlich Infos auf Info-Seite für itemlist (Datum, uid, ) siehe Bilder
 #       - Select all Button bei der Administration der Rechte hinzufügen
 #       - Beispieldaten einfügen
 #       - Erweiterte Suche einbauen. Zugang über flash-Bereich analog login.
-#       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
 #       - Nach texten auf der Oberfläche suchen, die in das Modul lang gehören (z.B.: Button- und Labeltexte)
 #       - E-Mailbenachrichtigung bei neuem Benutzer und Passwortrücksetzung, Upload, ...
 ###############################################################################################################
@@ -106,6 +108,7 @@ if __name__ == "__main__":
 
     parser = optparse.OptionParser("usage: %prog [options] arg1 arg2")
     parser.add_option("-c", "--cache", action="store_true", dest="cache", default=False, help="create the cache files for all items (thumbnails, webnails, property cache)")
+    parser.add_option("-d", "--database", action="store_true", dest="database", default=False, help="updates and cleans the database files to the current storage version")
     (options, args) = parser.parse_args()
     if options.cache:
         for user in [''] + user_data_handler().users():
@@ -114,5 +117,17 @@ if __name__ == "__main__":
                 il.create_thumbnail(i)
             for i in range(0, len(config.webnail_size_list)):
                 il.create_webnail(i)
+    elif options.database:
+        def db_update_cleanup(itemlist):
+            for item in itemlist.get_itemlist():
+                if item.is_itemlist():
+                    db_update_cleanup(item)
+                else:
+                    if item.db_is_empty():
+                        os.remove(item._db_filename)
+                    else:
+                        item._save_()
+        for user in [''] + user_data_handler().users():
+            db_update_cleanup(itemlist("", config.item_path, False, config.database_path, config.cache_path, user))
     else:
         app.run(config.ip_to_serve_from, 5000)
