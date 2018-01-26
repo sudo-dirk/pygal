@@ -99,6 +99,28 @@
       </nav> 
 
       <div class="moin-content">
+        <ul class="moin-breadcrumb">
+        {% for navi in navigation_list %}
+          <li>
+            <h4 class="moin-location-breadcrumb">
+              <small> / </small>
+              <a href="{{navi.url}}">{{navi.name}}</a>
+            </h4>
+          </li>
+        {% endfor %}
+        </ul> 
+
+        <ul class="moin-nav nav-tabs moin-shadow">
+        {% for action in action_bar %}
+          <li>
+            <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">
+              <span><img src="{{action.pic}}"></span>
+              <span class="hidden-sm hidden-xs">{{action.name}}</span>
+            </a>
+          </li>
+        {% endfor %}
+        </ul>
+
         <div id="moin-flash">  
 {% if error or info or hint %}
           {% if error %}<p class="moin-flash moin-flash-error">{{ error|safe }}</p>{% endif %}
@@ -107,29 +129,5 @@
 {% endif %}
         </div>
         
-      <ul class="moin-breadcrumb">
-      {% for navi in navigation_list %}
-        <li>
-          <h4 class="moin-location-breadcrumb">
-            <small> / </small>
-            <a href="{{navi.url}}">{{navi.name}}</a>
-          </h4>
-        </li>
-      {% endfor %}
-      </ul> 
-
-        <ul class="moin-nav nav-tabs moin-shadow">
-        {% if item is not none and action_bar %}
-          {% for action in item.actions() %}
-          <li>
-            <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">
-              <span><img src="{{action.pic}}"></span>
-              <span class="hidden-sm hidden-xs">{{action.name}}</span>
-            </a>
-          </li>
-          {% endfor %}
-        {% endif %}
-        </ul>
-
         <div id="moin-page" lang="en" dir="ltr">
           <div id="moin-content">

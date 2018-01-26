@@ -36,6 +36,7 @@
 
 
     <h2>Staging</h2>
+    {% if containers|length > 0 %}
     <div class="moin-form">
       <form action="{{ item.admin_url() }}" method="get">
         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_STAGING }}" />
@@ -110,3 +111,4 @@
     </div>
     {% endwith %}
     <br style="clear:both" />
+    {% endif %}
