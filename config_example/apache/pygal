@@ -1,6 +1,7 @@
 <Directory /home/dirk/pygal>
 	Order allow,deny
 	allow from all
+        Require all granted
 </Directory>
 
 WSGIScriptAlias /pygal /home/dirk/pygal/pygal.wsgi

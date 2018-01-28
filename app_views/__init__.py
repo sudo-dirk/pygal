@@ -59,7 +59,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
         tag_id = flask.request.args.get(helpers.STR_ARG_TAG_INDEX)
         rv = flask.render_template('header.html', action_bar=item.actions(), error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title='Add Tag: %s' % item.name(), url_prefix=config.url_prefix)
         rv += flask.render_template('add_tag.html', item=item, tag_id=tag_id)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_ADMIN and item is not None:
         # read staging data
@@ -88,27 +88,27 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             error = 'Unknown admin_issue="%s"' % admin_issue
         rv = flask.render_template('header.html', action_bar=admin_actions(item), error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=lang.admin, url_prefix=config.url_prefix)
         rv += content
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_DELETE and item is not None:
         rv = flask.render_template('header.html', action_bar=item.actions(), error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=lang.delete % item.name(True), url_prefix=config.url_prefix)
         rv += flask.render_template('delete.html', item=item)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_EMPTY and item is not None:
         rv = flask.render_template('header.html', action_bar=[], error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title='', url_prefix=config.url_prefix)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_FORM_DATA and item is not None:
         hint = 'Form args:\n' + json.dumps(flask.request.form, indent=4, sort_keys=True) + '\n\nArgs:\n' + json.dumps(flask.request.args, indent=4, sort_keys=True)
         hint = hint.replace('\n', '<br>').replace(' ', '&nbsp')
         rv = flask.render_template('header.html', action_bar=[], error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title='', url_prefix=config.url_prefix)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_INFO and item is not None:
         rv = flask.render_template('header.html', action_bar=item.actions(), error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=item.name(), url_prefix=config.url_prefix)
         index = int(flask.request.args.get(helpers.STR_ARG_CACHEDATA_INDEX, -1))
-        html_data = ''
+        modal_html = ''
         if index >= 0:
             data = item.cache_data()
             cache_filename = decode(os.path.basename(data[index][1]))
@@ -118,7 +118,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
                         json_str = fh.read()
                 except IOError:
                     json_str = ''
-                html_data = flask.render_template('single_json.html', item=item, json_str=json_str, filename=cache_filename)
+                modal_html = flask.render_template('single_json.html', item=item, json_str=json_str, filename=cache_filename)
             else:
                 # TODO: implement a safe way returning the cache data files!
                 if index in range(1, 7):
@@ -128,46 +128,46 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
                     else:
                         url = item.webnail_url(index - 4)
                         xy_max = config.webnail_size_list[index - 4]
-                    html_data = flask.render_template('single_picture.html', item=item, x=int(xy_max * item.ratio_x()), y=int(xy_max * item.ratio_y()), xy_max=xy_max, url=url, filename=cache_filename)
+                    modal_html = flask.render_template('single_picture.html', item=item, x=int(xy_max * item.ratio_x()), y=int(xy_max * item.ratio_y()), xy_max=xy_max, url=url, filename=cache_filename)
                 if index in [0, 7, 8]:
                     try:
                         with open(encode(data[index][1]), 'r') as fh:
                             json_str = fh.read()
                     except IOError:
                         json_str = ''
-                    html_data = flask.render_template('single_json.html', item=item, json_str=json_str, filename=cache_filename)
-        rv += flask.render_template('info.html', html_data=html_data, item=item, pygal_user=auth.pygal_user)
-        rv += flask.render_template('footer.html', tmc=tmc)
+                    modal_html = flask.render_template('single_json.html', item=item, json_str=json_str, filename=cache_filename)
+        rv += flask.render_template('info.html', modal_html=modal_html, item=item, pygal_user=auth.pygal_user)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_ITEM and item is not None:
         rv = flask.render_template('header.html', action_bar=item.actions(), error=error, hint=hint, info=info, is_slideshow=item.slideshow(), item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=item.name(), url_prefix=config.url_prefix)
         rv += flask.render_template('item_view.html', item=item)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_LOGIN and item is not None:
         rv = flask.render_template('header.html', action_bar=[], error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=lang.login, url_prefix=config.url_prefix)
         rv += flask.render_template('login.html', item=item, lang=lang, url_prefix=config.url_prefix)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_LOSTPASS and item is not None:
         rv = flask.render_template('header.html', action_bar=[], error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=lang.lostpass, url_prefix=config.url_prefix)
         rv += flask.render_template('lostpass.html', item=item, lang=lang, url_prefix=config.url_prefix)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_REGISTER and item is not None:
         rv = flask.render_template('header.html', action_bar=[], error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=lang.register, url_prefix=config.url_prefix)
         rv += flask.render_template('register.html', item=item, lang=lang, url_prefix=config.url_prefix)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_UPLOAD and item is not None:
         rv = flask.render_template('header.html', action_bar=[], error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=lang.upload, url_prefix=config.url_prefix)
         rv += flask.render_template('upload.html', config=config, item=item)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_USERPROFILE and item is not None:
         rv = flask.render_template('header.html', action_bar=[], error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title=lang.userprofile, url_prefix=config.url_prefix)
         rv += flask.render_template('userprofile.html', config=config, item=item, lang=lang, pygal_user=auth.pygal_user)
-        rv += flask.render_template('footer.html', tmc=tmc)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     else:
         return make_response(RESP_TYPE_EMPTY, item, error='Internal Error while generating response (unknown response type)!<br>resp_type: %d<br>type(item): %s' % (resp_type, str(type(item))))

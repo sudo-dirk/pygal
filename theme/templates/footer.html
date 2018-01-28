@@ -2,9 +2,22 @@
         </div>  
       </div>
     </div>
-    <div id="moin-footer">
-      {{ tmc.get_time_str() }}
-    </div>
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <nav class="navbar">
+        <div class="row">
+          <div class="col-md-10 col-sm-10 col-xs-12">
+            <div class="moin-navbar-header">
+              <div class="navbar-brand">{{ tmc.get_time_str() }}</div>
+            </div>
+          </div>
+
+          <div class="col-md-2 col-sm-2 col-xs-1">
+                    <img src="{{ url_prefix }}/static/common/logos/python_powered.png">
+          </div>
+        </div>
+      </nav> 
+
   </body>
 </html>
 

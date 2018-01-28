@@ -7,14 +7,11 @@
 # TODO: - Der Bereich Admin, Upload, ... ist zu breit und der Anzeigename zu schmal. Prüfen des Verhaltens bei schmaler werdendem Fenster.
 #       - Bildgröße in Staging Area scheint zwischen Rahmen und Bild unterschiedlich zu sein (Rahmen default?) Anzeige des Namens
 #       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
-#       - Ansicht der Cache Daten verbessern (modal dialog)
 #       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
 #       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
 #       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
-#       - PullDownMenu bei Administration instead of form element in admin*.html
 #       - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
 #       - switch user implementieren
-#       - Timing Anzeige aufhübschen
 #       - restlichen str_args -> helpers (login, logout, register, lostpass, userprefs, ...?)
 #       - flask.redirect möglichst  eliminieren, vor allem neu eingebautes, da Meldungen hier nicht weitergereicht werden können.
 #       - Löschdialog für Ordner (Anzeige aller Elemente)
