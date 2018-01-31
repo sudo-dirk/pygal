@@ -2,6 +2,7 @@ prefix_add_tag = '/+add_tag'                        # items
 prefix_admin = '/+admin'                            # items
 prefix_delete = '/+delete'                          # items
 prefix_download = '/+download'                      # items
+prefix_help = '/+help'                              # items
 prefix_info = '/+info'                              # items
 prefix_login = '/+login'                            # base_func
 prefix_logout = '/+logout'                          # base_func

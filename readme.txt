@@ -10,6 +10,7 @@ Requirements:
 * python-flask >= 0.10
 * python-pip
 * python-imaging
+* python-whoosh
 * ffmpeg
 
 Apache:

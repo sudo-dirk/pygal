@@ -199,9 +199,9 @@ class video_info_cached(video_info):
         time <type 'int'> 1414951903
     """
 
-    def __init__(self, filename, cache_filename, load_all_on_init=True):
+    def __init__(self, filename, cache_filename, load_all_on_init=True, callback_on_data_storage=None):
         video_info.__init__(self, filename)
-        self._cached_data = caching.property_cache_json(video_info(filename), cache_filename, load_all_on_init)
+        self._cached_data = caching.property_cache_json(video_info(filename), cache_filename, load_all_on_init, callback_on_data_storage)
 
     def get(self, key, default=None, logger=None):
         """

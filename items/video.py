@@ -33,7 +33,7 @@ class video(picture):
         self._xnail_info_filename = os.path.join(cache_path, self.uid() + '.json')
         self._citem_filename = os.path.join(cache_path, self.uid() + '_%s.jpg')
         self._info_filename = os.path.join(cache_path, self.uid() + '_info.json')
-        self._info = video_info_cached(self.raw_path(), self._info_filename)
+        self._info = video_info_cached(self.raw_path(), self._info_filename, callback_on_data_storage=self._info_data_changed)
 
     def _create_citem(self, size, force=False, logger=None):
         this_method_version = '0.1.1'

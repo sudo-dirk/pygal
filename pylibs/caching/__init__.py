@@ -166,10 +166,11 @@ class property_cache_pickle(report.logit):
     DATA_VERSION_TAG = '_property_cache_data_version_'
     UID_TAG = '_property_cache_uid_'
 
-    def __init__(self, source_instance, cache_filename, load_all_on_init=False):
+    def __init__(self, source_instance, cache_filename, load_all_on_init=False, callback_on_data_storage=None):
         self._source_instance = source_instance
         self._cache_filename = cache_filename
         self._load_all_on_init = load_all_on_init
+        self._callback_on_data_storage = callback_on_data_storage
         self._cached_props = None
 
     def get(self, key, default=None, logger=None):
@@ -258,6 +259,9 @@ class property_cache_pickle(report.logit):
                 self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
         except IOError:
             self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)
+        else:
+            if self._callback_on_data_storage is not None:
+                self._callback_on_data_storage()
 
     def _uid(self):
         if self._cached_props is None:
@@ -438,3 +442,6 @@ class property_cache_json(property_cache_pickle):
                 self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
         except IOError:
             self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)
+        else:
+            if self._callback_on_data_storage is not None:
+                self._callback_on_data_storage()

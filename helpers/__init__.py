@@ -1,6 +1,9 @@
 import flask
+import os
+import pygal_config as config
 import time
 import urllib
+from pylibs import fstools
 
 STR_ARG_CACHEDATA_INDEX = 'cache_data_index'
 STR_ARG_TAG_INDEX = 'tag_index'
@@ -19,6 +22,13 @@ STR_ARG_ADMIN_ISSUE_FOLDERS = 'folders'
 STR_ARG_ADMIN_NAME = 'name'
 STR_ARG_ADMIN_USER = 'username'
 STR_ARG_ADMIN_TARGET = 'target'
+
+def db_filename_by_relpath(db_path, rel_path):
+    return os.path.join(db_path, rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json')
+
+def info_filename_by_relpath(rel_path):
+    uid = fstools.uid(os.path.join(config.item_path, rel_path))
+    return os.path.join(config.cache_path, uid + '_info.json')
 
 def decode(string):
     for i in ['utf-8', 'cp1252']:

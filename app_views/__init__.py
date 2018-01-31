@@ -21,13 +21,14 @@ RESP_TYPE_ADMIN = 1
 RESP_TYPE_DELETE = 2
 RESP_TYPE_EMPTY = 3
 RESP_TYPE_FORM_DATA = 4
-RESP_TYPE_INFO = 5
-RESP_TYPE_ITEM = 6
-RESP_TYPE_LOGIN = 7
-RESP_TYPE_LOSTPASS = 8
-RESP_TYPE_REGISTER = 9
-RESP_TYPE_UPLOAD = 10
-RESP_TYPE_USERPROFILE = 11
+RESP_TYPE_HELP = 5
+RESP_TYPE_INFO = 6
+RESP_TYPE_ITEM = 7
+RESP_TYPE_LOGIN = 8
+RESP_TYPE_LOSTPASS = 9
+RESP_TYPE_REGISTER = 10
+RESP_TYPE_UPLOAD = 11
+RESP_TYPE_USERPROFILE = 12
 
 
 def navigation_list(item_name):
@@ -103,6 +104,11 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
         hint = 'Form args:\n' + json.dumps(flask.request.form, indent=4, sort_keys=True) + '\n\nArgs:\n' + json.dumps(flask.request.args, indent=4, sort_keys=True)
         hint = hint.replace('\n', '<br>').replace(' ', '&nbsp')
         rv = flask.render_template('header.html', action_bar=[], error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title='', url_prefix=config.url_prefix)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
+        return rv
+    elif resp_type is RESP_TYPE_HELP and item is not None:
+        rv = flask.render_template('header.html', action_bar=[], error=error, hint=hint, info=info, item=item, lang=lang, navigation_list=navigation_list(item._rel_path), pygal_user=auth.pygal_user, title='', url_prefix=config.url_prefix)
+        rv += item.help_content()
         rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_INFO and item is not None:

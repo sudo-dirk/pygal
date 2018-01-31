@@ -3,12 +3,15 @@ import app_views
 import auth
 import flask
 import items
+from items.help import help_object
+from items.video import is_video
 import lang
 import os
 from prefixes import prefix_add_tag
 from prefixes import prefix_admin
 from prefixes import prefix_delete
 from prefixes import prefix_download
+from prefixes import prefix_help
 from prefixes import prefix_info
 from prefixes import prefix_slideshow
 from prefixes import prefix_thumbnail
@@ -22,9 +25,9 @@ import StringIO
 import time
 import zipfile
 from auth import pygal_user
-from items.video import is_video
 import uuid
 import helpers
+
 
 @item.route(prefix_admin + '/<itemname:item_name>', methods=['GET', 'POST'])
 @item.route(prefix_admin, defaults=dict(item_name=u''), methods=['GET', 'POST'])
@@ -106,7 +109,7 @@ def admin(item_name):
                             sc = items.staging_container(config.staging_path, container_uuid, None, None)
                             sc.move(helpers.encode(target), config.database_path, config.item_path)
                             if sc.is_empty():
-                                return flask.redirect(config.url_prefix + target)
+                                return flask.redirect(os.path.join(config.url_prefix, target))
                             else:
                                 return app_views.make_response(app_views.RESP_TYPE_ADMIN, i, tmc, error='Not all elemets moved to target!')
                         else:
@@ -362,6 +365,12 @@ def delete(item_name):
 def slideshow(item_name):
     return item_view(item_name, slideshow=True)
 
+@item.route(prefix_help + '/<itemname:item_name>')
+def help_page(item_name):
+    tmc = helpers.time_measurement()
+    item_name = helpers.encode(item_name)
+    i = help_object('', None, None, None, item_name)
+    return app_views.make_response(app_views.RESP_TYPE_HELP, i, tmc)
 
 @item.route('/<itemname:item_name>', methods=['GET', 'POST'])
 def item_view(item_name, slideshow=False):
@@ -369,11 +378,15 @@ def item_view(item_name, slideshow=False):
     item_name = helpers.encode(item_name)
     i = items.get_item_by_path(item_name, config.item_path, slideshow, config.database_path, config.cache_path, None)
     if i is not None:
+        if i.is_a_searchresult():
+            hint = '<a href="%s">Here</a> you can find help on search.' % i.help_url('search')
+        else:
+            hint = None
         if i.exists() and i.user_may_view():
-            return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc)
+            return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, hint=hint)
         else:
             if i.is_a_searchresult():
-                return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, info=lang.info_empty_search)
+                return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, hint=hint, info=lang.info_empty_search)
             else:
                 return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=lang.error_permission_denied)
     flask.abort(404)

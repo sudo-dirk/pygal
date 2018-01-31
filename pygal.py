@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# requirements: python-flask (>= 0.1.), python-pillow, ffmpeg
+# requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: - Der Bereich Admin, Upload, ... ist zu breit und der Anzeigename zu schmal. Prüfen des Verhaltens bei schmaler werdendem Fenster.
+# TODO: - Download von Suchergebnissen geht nicht Link ist falsch (Weiterreichung von strarg erforderlich)
+#       - Anzeige der Bilder in Staging Area geht nicht (icon wird gezeigt)
+#       - Der Bereich Admin, Upload, ... ist zu breit und der Anzeigename zu schmal. Prüfen des Verhaltens bei schmaler werdendem Fenster.
 #       - Bildgröße in Staging Area scheint zwischen Rahmen und Bild unterschiedlich zu sein (Rahmen default?) Anzeige des Namens
 #       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
 #       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
 #       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
-#       - Suche in Tag-Files verbessern (whoosh?, indexing) und nach Filenamen, ...?
+#       - Nutze AJAX in flask für das Suchelement, Aufbau der Seite ohne neu zu laden
 #       - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
 #       - switch user implementieren
 #       - restlichen str_args -> helpers (login, logout, register, lostpass, userprefs, ...?)
@@ -66,7 +68,7 @@ app.debug_log_format = """~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 File "%(pathname)s", line %(lineno)d, in %(funcName)s
 %(asctime)s: %(levelname)-7s - %(message)s'"""
 
-app.logger.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.INFO)
 
 app.debug = DEBUG
 app.secret_key = secret_key

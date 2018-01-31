@@ -3,6 +3,7 @@ import auth
 from auth import pygal_user, session_data_handler
 from auth import rights_uid
 from database import database_handler
+from database import indexed_search
 import flask
 import helpers
 from helpers import encode
@@ -19,6 +20,7 @@ from prefixes import prefix_add_tag
 from prefixes import prefix_admin
 from prefixes import prefix_delete
 from prefixes import prefix_download
+from prefixes import prefix_help
 from prefixes import prefix_info
 from prefixes import prefix_login
 from prefixes import prefix_logout
@@ -226,6 +228,9 @@ class gallery_urls(object):
     def download_url(self):
         return self._url(prefix_download)
 
+    def help_url(self, rel_path):
+        return self._url(prefix_help) + '/' + rel_path
+
     def info_url(self, i=None):
         return self._url(prefix_info) + strargs({} if i is None else {helpers.STR_ARG_CACHEDATA_INDEX: i})
 
@@ -393,7 +398,7 @@ class base_item(base_object, database_handler):
     def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
         base_object.__init__(self, rel_path, base_path, slideshow, force_user)
         if db_path is not None:
-            database_handler.__init__(self, os.path.join(db_path, rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json'), rel_path)
+            database_handler.__init__(self, helpers.db_filename_by_relpath(db_path, rel_path), rel_path)
         else:
             database_handler.__init__(self, None, rel_path)
         self._db_path = db_path
@@ -429,6 +434,8 @@ class base_item(base_object, database_handler):
 
     def delete(self):
         if self.user_may_delete():
+            isearch = indexed_search()
+            isearch.delete_document_by_rel_path(self._rel_path)
             if os.path.exists(self.raw_path()):
                 os.remove(self.raw_path())
             if os.path.exists(self._db_filename):
@@ -500,16 +507,14 @@ class __itemlist__(base_object):
         if not self._itemlist:
             self._itemlist = []
             if self.is_a_searchresult():
-                search_query = flask.request.args.get('q', '')
-                self.logit_info(logger, "Building itemlist with search query %s", search_query)
-                if self._db_path is not None:
-                    for f in fstools.filelist(self._db_path, '*.json'):
-                        t = database_handler(f, None)
-                        if t.matches(search_query):
-                            self.logit_debug(logger, "%s (%s) matches the query - adding element", t.get_rel_path(), f)
-                            item = self._get_item_by_path(t.get_rel_path(), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
-                            if item is not None and not item.is_itemlist() and item.exists() and item.user_may_view():  # entry is an supported item and access granted
-                                self._itemlist.append(item)
+                search_txt = flask.request.args.get('q', '')
+                self.logit_info(logger, "Building itemlist with search text %s", search_txt)
+                isearch = indexed_search()
+                for rel_path in isearch.search(search_txt):
+                    item = self._get_item_by_path(rel_path, self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
+                    if item is not None and not item.is_itemlist() and item.exists() and item.user_may_view():  # entry is an supported item and access granted
+                        self.logit_debug(logger, "%s matches the query - adding element", rel_path)
+                        self._itemlist.append(item)
             else:
                 if self.exists():
                     self.logit_info(logger, 'Building itemlist from filestructure %s', self._rel_path)

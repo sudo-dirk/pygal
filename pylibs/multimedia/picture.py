@@ -521,9 +521,9 @@ class picture_info_cached(picture_info):
         gps <type 'dict'> {u'11': [12853, 10000], u'10': u'3', u'13': [2661, 1000], u'12': u'K', u'15': [34519, 100], u'14': u'T', u'17': [23725, 100], u'16': u'M', u'18': u'WGS-84', u'30': 0, u'29': u'2014:10:30', u'1': u'N', u'0': [2, 3, 0, 0], u'3': u'E', u'2': [[53, 1], [59, 1], [35037, 1000]], u'5': 1, u'4': [[11, 1], [22, 1], [30873, 1000]], u'7': [[15, 1], [29, 1], [7951, 1000]], u'6': [8320, 1000], u'9': u'A'}
     """
 
-    def __init__(self, filename, cache_filename, load_all_on_init=True):
+    def __init__(self, filename, cache_filename, load_all_on_init=True, callback_on_data_storage=None):
         picture_info.__init__(self, filename)
-        self._cached_data = caching.property_cache_json(picture_info(filename), cache_filename, load_all_on_init)
+        self._cached_data = caching.property_cache_json(picture_info(filename), cache_filename, load_all_on_init, callback_on_data_storage)
 
     def get(self, key, default=None, logger=None):
         """

@@ -3,10 +3,12 @@
 #
 import auth
 from helpers import decode
+from helpers import info_filename_by_relpath
 from helpers import link
 from helpers import piclink
 from helpers import simple_info
 import items
+from items.database import indexed_search
 import json
 import logging
 import os
@@ -37,8 +39,13 @@ class picture(items.base_item, report.logit):
         self._xnail_info_filename = os.path.join(cache_path, self.uid() + '.json')
         self._cache_path = cache_path
         self._citem_filename = os.path.join(cache_path, self.uid() + '_%s.jpg')
-        self._info_filename = os.path.join(cache_path, self.uid() + '_info.json')
-        self._info = picture_info_cached(self.raw_path(), self._info_filename)
+        self._info_filename = info_filename_by_relpath(rel_path) 
+        self._info = picture_info_cached(self.raw_path(), self._info_filename, callback_on_data_storage=self._info_data_changed)
+
+    def _info_data_changed(self):
+        isearch = indexed_search()
+        isearch.update_document_by_rel_path(self._rel_path)
+        self.logit_debug(logger, 'Item-Data changed => updating index for %s', self.name())
 
     def _create_citem(self, size, force=False, logger=None):
         this_method_version = '.0.1.1'
