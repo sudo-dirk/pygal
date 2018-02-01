@@ -272,7 +272,7 @@ class indexed_search(report.logit):
     # TODO: implement incremental init over all documents (update/ delete) and missing items (add) and check performance again
     LOG_PREFIX = 'WHOOSH:'
     #
-    DATA_VERS = 1
+    DATA_VERS = 1.1
     UPDATE_STRATEGY_INCREMANTAL = False
 
     def __init__(self):
@@ -336,7 +336,7 @@ class indexed_search(report.logit):
             if os.path.isfile(db_filename):
                 db = database_handler(db_filename, None)
                 # User-Data
-                tags = u' '.join([helpers.decode(db.get_tag_text(tag_id)) for tag_id in db.get_tag_id_list()]) + u' '
+                tags = u' '.join([helpers.decode(db.get_tag_text(tag_id)) for tag_id in db.get_tag_id_list()])
                 upload_user = helpers.decode(db.get_upload_user()) 
                 upload_ip = helpers.decode(db.get_upload_src_ip())
                 upload_date = datetime.datetime.fromtimestamp(db.get_upload_time()) if db.get_upload_time() is not None else None
@@ -412,7 +412,7 @@ class indexed_search(report.logit):
                 rel_path=helpers.decode(rel_path),
                 index_vers=self.DATA_VERS,
                 type=u' '.join([u'video' if is_video(rel_path) else u'picture' if is_picture(rel_path) else '', helpers.decode(os.path.splitext(rel_path)[1][1:])]), 
-                path=helpers.decode(' '.join(rel_path.split(os.path.sep)).strip()),
+                path=helpers.decode(' '.join(os.path.splitext(rel_path)[0].split(os.path.sep)).strip()),
                 # User-Data
                 user_data_uid=helpers.decode(fstools.uid(db_filename)),
                 tags=tags,
@@ -438,7 +438,7 @@ class indexed_search(report.logit):
                 rel_path=helpers.decode(rel_path),
                 index_vers=self.DATA_VERS,
                 type=u' '.join([u'video' if is_video(rel_path) else u'picture' if is_picture(rel_path) else '', helpers.decode(os.path.splitext(rel_path)[1][1:])]), 
-                path=helpers.decode(' '.join(rel_path.split(os.path.sep)).strip()),
+                path=helpers.decode(' '.join(os.path.splitext(rel_path)[0].split(os.path.sep)).strip()),
                 # User-Data
                 user_data_uid=helpers.decode(fstools.uid(db_filename)),
                 # Item-Data
