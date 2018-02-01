@@ -272,17 +272,18 @@ class indexed_search(report.logit):
     # TODO: implement incremental init over all documents (update/ delete) and missing items (add) and check performance again
     LOG_PREFIX = 'WHOOSH:'
     #
-    DATA_VERS = 0
+    DATA_VERS = 1
     UPDATE_STRATEGY_INCREMANTAL = False
 
     def __init__(self):
         self.schema = Schema(
             rel_path=ID(unique=True, stored=True), 
             index_vers=NUMERIC(stored=True),
+            type=TEXT,
+            path=TEXT, 
             # user_data
             user_data_uid=TEXT(stored=True),
             tags=TEXT, 
-            type=TEXT, 
             upload_user=TEXT, 
             upload_ip=TEXT, 
             upload_date=DATETIME,
@@ -411,6 +412,7 @@ class indexed_search(report.logit):
                 rel_path=helpers.decode(rel_path),
                 index_vers=self.DATA_VERS,
                 type=u' '.join([u'video' if is_video(rel_path) else u'picture' if is_picture(rel_path) else '', helpers.decode(os.path.splitext(rel_path)[1][1:])]), 
+                path=helpers.decode(' '.join(rel_path.split(os.path.sep)).strip()),
                 # User-Data
                 user_data_uid=helpers.decode(fstools.uid(db_filename)),
                 tags=tags,
@@ -436,6 +438,7 @@ class indexed_search(report.logit):
                 rel_path=helpers.decode(rel_path),
                 index_vers=self.DATA_VERS,
                 type=u' '.join([u'video' if is_video(rel_path) else u'picture' if is_picture(rel_path) else '', helpers.decode(os.path.splitext(rel_path)[1][1:])]), 
+                path=helpers.decode(' '.join(rel_path.split(os.path.sep)).strip()),
                 # User-Data
                 user_data_uid=helpers.decode(fstools.uid(db_filename)),
                 # Item-Data
@@ -506,7 +509,7 @@ class indexed_search(report.logit):
                 writer.commit()
 
     def search(self, search_txt):
-        qp = MultifieldParser(["rel_path", "tags"], schema=self.ix.schema)
+        qp = MultifieldParser(["tags", "path"], schema=self.ix.schema)
         qp.add_plugin(DateParserPlugin(free=True))
         q = qp.parse(search_txt)
 
