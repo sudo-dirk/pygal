@@ -275,7 +275,7 @@ class indexed_search(report.logit):
     DATA_VERS = 1.1
     UPDATE_STRATEGY_INCREMANTAL = False
 
-    def __init__(self):
+    def __init__(self, force_creation_from_scratch=False):
         self.schema = Schema(
             rel_path=ID(unique=True, stored=True), 
             index_vers=NUMERIC(stored=True),
@@ -301,26 +301,29 @@ class indexed_search(report.logit):
             exposure_program=TEXT,
             iso=NUMERIC,
             duration=NUMERIC)
-        try:
-            self.load_index()
-        except EmptyIndexError:
-            self.logit_info(logger, 'Initialising index from scratch caused by non existing index')
+        if force_creation_from_scratch:
             self.create_index_from_scratch()
         else:
-            if self.UPDATE_STRATEGY_INCREMANTAL:
-                self.update_index_incremental()
-                self.logit_info(logger, 'Previous stored Index loaded and updated incrementally')
+            try:
+                self.load_index()
+            except EmptyIndexError:
+                self.logit_info(logger, 'Initialising index from scratch caused by non existing index')
+                self.create_index_from_scratch()
             else:
-                with self.ix.searcher() as searcher:
-                    for field in searcher.all_stored_fields():
-                        index_version = field.get('index_vers')
-                        if index_version is not None:
-                            break
-                if index_version != self.DATA_VERS:
-                    self.logit_info(logger, 'Initialising index from scratch caused by new data version %d -> %d', index_version, self.DATA_VERS)
-                    self.create_index_from_scratch()
+                if self.UPDATE_STRATEGY_INCREMANTAL:
+                    self.update_index_incremental()
+                    self.logit_info(logger, 'Previous stored Index loaded and updated incrementally')
                 else:
-                    self.logit_info(logger, 'Previous stored Index loaded')
+                    with self.ix.searcher() as searcher:
+                        for field in searcher.all_stored_fields():
+                            index_version = field.get('index_vers')
+                            if index_version is not None:
+                                break
+                    if index_version != self.DATA_VERS:
+                        self.logit_info(logger, 'Initialising index from scratch caused by new data version %d -> %d', index_version, self.DATA_VERS)
+                        self.create_index_from_scratch()
+                    else:
+                        self.logit_info(logger, 'Previous stored Index loaded')
 
     def load_index(self):
         self.ix = index.open_dir(config.whoosh_path)

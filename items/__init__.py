@@ -292,6 +292,9 @@ class base_object(report.logit, gallery_urls):
             rv.append(piclink(self.download_url(), 'Download', config.url_prefix + '/static/common/img/download.png'))
         return rv
 
+    def download_url(self):
+        return gallery_urls.download_url(self) + (strargs({'q': flask.request.args.get('q')}) if self.is_a_searchresult() else '')
+
     def exists(self):
         return os.path.isfile(self.raw_path())
 
@@ -324,7 +327,7 @@ class base_object(report.logit, gallery_urls):
         return self.TYPE == TYPE_VIDEO
 
     def item_url(self):
-        return self._url() + (strargs({'q': flask.request.args.get('q')}) if self.is_a_searchresult() else '')
+        return gallery_urls.item_url(self) + (strargs({'q': flask.request.args.get('q')}) if self.is_a_searchresult() else '')
 
     def name(self, full_name=False):
         name = decode(os.path.basename(self._rel_path))
