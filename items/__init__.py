@@ -229,7 +229,7 @@ class gallery_urls(object):
         return self._url(prefix_download)
 
     def help_url(self, rel_path):
-        return self._url(prefix_help) + '/' + rel_path
+        return config.url_prefix + prefix_help + ('/' + rel_path if rel_path else '')
 
     def info_url(self, i=None):
         return self._url(prefix_info) + strargs({} if i is None else {helpers.STR_ARG_CACHEDATA_INDEX: i})
