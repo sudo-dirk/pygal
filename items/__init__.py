@@ -529,6 +529,10 @@ class __itemlist__(base_object):
                     return -1
                 elif a.time() < b.time():
                     return 1
+                elif a.name() > b.name():
+                    return -1
+                elif b.name() > a.name():
+                    return 1
                 else:
                     return 0
             #
