@@ -85,7 +85,7 @@ def get_item_by_path(rel_path, base_path, slideshow, db_path, cache_path, force_
     if config.multimedia_only:
         return None
     else:
-        return base_item(rel_path, base_path, slideshow, db_path, cache_path, force_user)
+        return base_item(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
 
 
 def get_staging_item_by_path(rel_path, base_path, slideshow, db_path, cache_path, force_user):
@@ -94,11 +94,11 @@ def get_staging_item_by_path(rel_path, base_path, slideshow, db_path, cache_path
     if bil.exists() and not rel_path:
         return bil
     if os.path.splitext(rel_path)[1][1:] in supported_extentions():
-        return staging_picviditem(rel_path, base_path, False, None, None, None)
+        return staging_picviditem(rel_path, base_path, False, None, None, None, False)
     if config.multimedia_only:
         return None
     else:
-        return staging_baseitem(rel_path, base_path, False, None, None, None)
+        return staging_baseitem(rel_path, base_path, False, None, None, None, False)
 
 
 class staging_container(report.logit, dict):
@@ -749,7 +749,7 @@ class itemlist(__itemlist_prepared_cache__):
         return True
 
 
-class staging_itemlist(staging_container, __itemlist__):
+class staging_itemlist(staging_container, base_object):
     TYPE = TYPE_STAGING_ITEMLIST
 
     def __init__(self, rel_path, base_path, slideshow, db_path):
@@ -761,8 +761,9 @@ class staging_itemlist(staging_container, __itemlist__):
         self._itemlist = None
         self._cache_path = None
         self._get_item_by_path = get_staging_item_by_path
-        self.__init_itemlist__()
 
+    def get_itemlist(self):
+        return [self._get_item_by_path(os.path.join(self.get_uuid(), filename), config.staging_path, None, None, None, None) for filename in self[self.KEY_FILES].keys()]
 
 class staging_baseitem(base_item):
     TYPE = TYPE_STAGING_BASEITEM
