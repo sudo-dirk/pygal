@@ -43,10 +43,11 @@ class database_handler(dict, report.logit):
     KEY_VERSION = '_db_version_'
     VERSION = 0.1
     
-    def __init__(self, db_filename, item_rel_path):
+    def __init__(self, db_filename, item_rel_path, disable_whoosh):
         self._db_filename = db_filename
         self._item_rel_path = item_rel_path
         self._initialised = False
+        self._disable_whoosh = disable_whoosh
 
     def _init_database_(self, init_data=None):
         if not self._initialised:
@@ -92,8 +93,9 @@ class database_handler(dict, report.logit):
             with open(self._db_filename, 'w') as fh:
                 json.dump(self, fh, indent=4, sort_keys=True)
             self.logit_debug(logger, 'Item-Data changed => updating index for %s', self._item_rel_path)
-            isearch = indexed_search()
-            isearch.update_document_by_rel_path(self._item_rel_path)
+            if not self._disable_whoosh:
+                isearch = indexed_search()
+                isearch.update_document_by_rel_path(self._item_rel_path)
     
     def add_data(self, key, data):
         self._init_database_()
@@ -337,7 +339,7 @@ class indexed_search(report.logit):
         if os.path.isfile(db_filename) or (os.path.isfile(info_filename) and (is_picture(rel_path) or is_video(rel_path))):
             self.logit_debug(logger, 'Adding/ Updating index document %s', rel_path)
             if os.path.isfile(db_filename):
-                db = database_handler(db_filename, None)
+                db = database_handler(db_filename, None, True)
                 # User-Data
                 tags = u' '.join([helpers.decode(db.get_tag_text(tag_id)) for tag_id in db.get_tag_id_list()])
                 upload_user = helpers.decode(db.get_upload_user()) 

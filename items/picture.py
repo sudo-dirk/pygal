@@ -33,14 +33,17 @@ class picture(items.base_item, report.logit):
     LOG_PREFIX = 'picture:'
     mime_types = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'jpe': 'image/jpeg', 'png': 'image/png', 'tif': 'image/tiff', 'tiff': 'image/tiff', 'gif': 'image/gif'}
 
-    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
-        items.base_item.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user)
+    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
+        items.base_item.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
         self._xnail_info = None
         self._xnail_info_filename = os.path.join(cache_path, self.uid() + '.json')
         self._cache_path = cache_path
         self._citem_filename = os.path.join(cache_path, self.uid() + '_%s.jpg')
         self._info_filename = info_filename_by_relpath(rel_path) 
-        self._info = picture_info_cached(self.raw_path(), self._info_filename, callback_on_data_storage=self._info_data_changed)
+        if disable_whoosh:
+            self._info = picture_info_cached(self.raw_path(), self._info_filename)
+        else:
+            self._info = picture_info_cached(self.raw_path(), self._info_filename, callback_on_data_storage=self._info_data_changed)
 
     def _info_data_changed(self):
         isearch = indexed_search()

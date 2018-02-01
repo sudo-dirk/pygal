@@ -27,26 +27,29 @@ class video(picture):
     mime_types = {'avi': 'video/x-msvideo', 'mpg': 'video/mpeg', 'mpeg': 'video/mpeg', 'mpe': 'video/mpeg', 'mov': 'video/quicktime', 'qt': 'video/quicktime', 'mp4': 'video/mp4', 'webm': 'video/webm', 'ogv': 'video/ogg', 'flv': 'video/x-flv', '3gp': 'video/3gpp'}
     internal_player = ['mp4', 'webm', 'ogv', 'flv', '3gp']
 
-    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
-        items.base_item.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user)
+    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
+        items.base_item.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
         self._xnail_info = None
         self._xnail_info_filename = os.path.join(cache_path, self.uid() + '.json')
         self._citem_filename = os.path.join(cache_path, self.uid() + '_%s.jpg')
         self._info_filename = os.path.join(cache_path, self.uid() + '_info.json')
-        self._info = video_info_cached(self.raw_path(), self._info_filename, callback_on_data_storage=self._info_data_changed)
+        if disable_whoosh:
+            self._info = video_info_cached(self.raw_path(), self._info_filename)
+        else:
+            self._info = video_info_cached(self.raw_path(), self._info_filename, callback_on_data_storage=self._info_data_changed)
 
     def _create_citem(self, size, force=False, logger=None):
         this_method_version = '0.1.1'
         if self._xnail_info is None:
             try:
-                with open(self.xnail_info_filename, 'r') as fh:
+                with open(self._xnail_info_filename, 'r') as fh:
                     self._xnail_info = json.loads(fh.read())
             except:
                 self._xnail_info = dict()
         VERSION = '__module_version_citem_creation_%d__' % size
         WATERMARK = '__watermark_uid_citem_creation_%d__' % size
         watermark_path = os.path.join(os.path.join(os.path.dirname(__file__), '..'), 'theme', 'static', 'common', 'img', 'thumbnail_movie.png')
-        if force or not os.path.exists(self._citem_filename % size) or self._xnail_info.get(VERSION) != __version__ + this_method_version or self._xnail_info.get(WATERMARK) != fstools.uid(watermark_path):
+        if force or not os.path.exists(self.citem_filename(size)) or self._xnail_info.get(VERSION) != __version__ + this_method_version or self._xnail_info.get(WATERMARK) != fstools.uid(watermark_path):
             self.logit_info(logger, 'creating citem (%d) for %s', size, self.name())
             try:
                 p = video_picture_edit(self.raw_path())

@@ -69,19 +69,19 @@ def supported_extentions():
     return picture.mime_types.keys() + video.mime_types.keys()
 
 
-def get_item_by_path(rel_path, base_path, slideshow, db_path, cache_path, force_user):
+def get_item_by_path(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
     from .picture import picture
     from .video import video
 
     path = os.path.join(base_path, rel_path)
     ext = os.path.splitext(path)[1][1:].lower()
-    bil = itemlist(rel_path, base_path, slideshow, db_path, cache_path, force_user)
+    bil = itemlist(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
     if bil.exists():
         return bil
     possible_item_classes = [picture, video]
     for class_for_file in possible_item_classes:
         if ext in class_for_file.mime_types.keys():
-            return class_for_file(rel_path, base_path, slideshow, db_path, cache_path, force_user)
+            return class_for_file(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
     if config.multimedia_only:
         return None
     else:
@@ -191,7 +191,7 @@ class staging_container(report.logit, dict):
             database_filename = os.path.join(database_path, os.path.join(items_target_path, encode(filename)).replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json')
             item_filename = os.path.join(item_path, items_target_path, encode(filename))
             if not os.path.exists(database_filename) and not os.path.exists(item_filename) and fstools.is_writeable(os.path.dirname(database_filename)) and fstools.is_writeable(os.path.dirname(item_filename)):
-                dbh = database_handler(database_filename, os.path.join(items_target_path, encode(filename)))
+                dbh = database_handler(database_filename, os.path.join(items_target_path, encode(filename)), False)
                 dbh._init_database_(self[self.KEY_FILES][filename])
                 self.logit_info(logger, 'Moving File %s to %s.', self.get_container_file_path(encode(filename)), item_filename)
                 os.rename(self.get_container_file_path(encode(filename)), item_filename)
@@ -398,12 +398,12 @@ class base_item(base_object, database_handler):
     LOG_PREFIX = 'BaseItem:'
     TYPE = TYPE_BASEITEM
 
-    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
+    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
         base_object.__init__(self, rel_path, base_path, slideshow, force_user)
         if db_path is not None:
-            database_handler.__init__(self, helpers.db_filename_by_relpath(db_path, rel_path), rel_path)
+            database_handler.__init__(self, helpers.db_filename_by_relpath(db_path, rel_path), rel_path, disable_whoosh)
         else:
-            database_handler.__init__(self, None, rel_path)
+            database_handler.__init__(self, None, rel_path, disable_whoosh)
         self._db_path = db_path
         self._cache_path = cache_path
 
@@ -460,7 +460,7 @@ class base_item(base_object, database_handler):
         return True
 
     def parent(self):
-        return self._get_item_by_path(os.path.dirname(self._rel_path), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
+        return self._get_item_by_path(os.path.dirname(self._rel_path), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user, self._disable_whoosh)
 
     def nxt(self):
         return self.parent().get_nxt(self)
@@ -495,11 +495,12 @@ class __itemlist__(base_object):
     LOG_PREFIX = 'Itemlist:'
     TYPE = TYPE_ITEMLIST
 
-    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
+    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
         base_object.__init__(self, rel_path, base_path, slideshow, force_user)
         self._db_path = db_path
         self._itemlist = None
         self._cache_path = cache_path
+        self._disable_whoosh = disable_whoosh
         self._sorted_itemlist = None
         self._thumb_item = None
 
@@ -514,7 +515,7 @@ class __itemlist__(base_object):
                 self.logit_info(logger, "Building itemlist with search text %s", search_txt)
                 isearch = indexed_search()
                 for rel_path in isearch.search(search_txt):
-                    item = self._get_item_by_path(rel_path, self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
+                    item = self._get_item_by_path(rel_path, self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user, self._disable_whoosh)
                     if item is not None and not item.is_itemlist() and item.exists() and item.user_may_view():  # entry is an supported item and access granted
                         self.logit_debug(logger, "%s matches the query - adding element", rel_path)
                         self._itemlist.append(item)
@@ -523,7 +524,7 @@ class __itemlist__(base_object):
                     self.logit_info(logger, 'Building itemlist from filestructure %s', self._rel_path)
                     for entry in os.listdir(self.raw_path()):
                         entry_rel_path = os.path.join(self._rel_path, entry)
-                        item = self._get_item_by_path(entry_rel_path, self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
+                        item = self._get_item_by_path(entry_rel_path, self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user, self._disable_whoosh)
                         if item is not None and len(item) > 0 and item.user_may_view():  # entry is an supported item and access granted
                             self._itemlist.append(item)
 
@@ -629,7 +630,7 @@ class __itemlist__(base_object):
 
     def thumb_item(self):
         if self._thumb_item is None:
-            self._thumb_item = self._get_item_by_path(self.thumb_item_rel_path(), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
+            self._thumb_item = self._get_item_by_path(self.thumb_item_rel_path(), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user, self._disable_whoosh)
         return self._thumb_item
 
     def thumbnail_x(self):
@@ -656,8 +657,8 @@ class __itemlist_prepared_cache__(__itemlist__):
     CACHE_KEYS = [CACHE_KEY_FILESIZE, CACHE_KEY_ITEM_COMPOSITION, CACHE_KEY_SORTED_ITEMLIST, CACHE_KEY_THUMB_ITEM_REL_PATH]
     VERS = 2
 
-    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
-        __itemlist__.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user)
+    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
+        __itemlist__.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
 
     def data_version(self):
         return self.VERS
@@ -703,12 +704,12 @@ class __itemlist_prepared_cache__(__itemlist__):
 
 
 class itemlist(__itemlist_prepared_cache__):
-    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user):
-        __itemlist_prepared_cache__.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user)
+    def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
+        __itemlist_prepared_cache__.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
         self._cache_path = cache_path
 
         user = session_data_handler().get_user() if force_user is None else force_user
-        self._cached_data = caching.property_cache_json(__itemlist_prepared_cache__(rel_path, base_path, slideshow, db_path, cache_path, force_user), self._prop_file(user), load_all_on_init=True)
+        self._cached_data = caching.property_cache_json(__itemlist_prepared_cache__(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh), self._prop_file(user), load_all_on_init=True)
 
     def __init_itemlist__(self):
         if self.is_a_searchresult():
@@ -719,7 +720,7 @@ class itemlist(__itemlist_prepared_cache__):
                 logger.info('Building itemlist from cache %s', self._rel_path)
                 self._itemlist = []
                 for itemname in sil:
-                    item = self._get_item_by_path(str(itemname), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user)
+                    item = self._get_item_by_path(str(itemname), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user, self._disable_whoosh)
                     if item.user_may_view():
                         self._itemlist.append(item)
 

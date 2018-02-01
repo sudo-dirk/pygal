@@ -34,7 +34,7 @@ import helpers
 def admin(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if not i.user_may_admin():
             return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=lang.error_permission_denied)
@@ -140,7 +140,7 @@ def admin(item_name):
 def info(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if i.user_may_view():
             return app_views.make_response(app_views.RESP_TYPE_INFO, i, tmc)
@@ -150,7 +150,7 @@ def info(item_name):
 @item.route(prefix_thumbnail + '/<itemname:item_name>')
 def thumbnail(item_name):
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         index = flask.request.args.get(helpers.STR_ARG_THUMB_INDEX, None)
         if index is not None:
@@ -171,7 +171,7 @@ def thumbnail(item_name):
 def userprofile(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if flask.request.method == 'GET':
             return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, i, tmc)
@@ -207,13 +207,13 @@ def userprofile(item_name):
 def upload(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if i.user_may_upload():
             if flask.request.method == 'GET':
                 return app_views.make_response(app_views.RESP_TYPE_UPLOAD, i, tmc)
             else:
-                db = items.database.database_handler(None, None)
+                db = items.database.database_handler(None, None, False)
                 db.add_data(db.KEY_UPLOAD_USERNAME, pygal_user.get_session_user())
                 db.add_data(db.KEY_UPLOAD_TIMESTAMP, time.time())
                 db.add_data(db.KEY_UPLOAD_SRC_IP, flask.request.environ['REMOTE_ADDR'])
@@ -245,7 +245,7 @@ def upload(item_name):
 @item.route(prefix_webnail + '/<itemname:item_name>')
 def webnail(item_name):
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         index = flask.request.args.get(helpers.STR_ARG_WEB_INDEX, None)
         if index is not None:
@@ -263,7 +263,7 @@ def webnail(item_name):
 @item.route(prefix_raw + '/<itemname:item_name>')
 def raw(item_name):
     item_name = helpers.encode(item_name)
-    item = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    item = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if item is not None:
         if item.user_may_download():
             raw_path = item.raw_path()
@@ -276,7 +276,7 @@ def raw(item_name):
 @item.route(prefix_download, defaults=dict(item_name=u''))
 def download(item_name):
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if i.user_may_download():
             raw_path = i.raw_path()
@@ -306,7 +306,7 @@ def download(item_name):
 def add_tag(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if i.exists() and not i.is_itemlist():
             if i.user_may_edit():
@@ -341,7 +341,7 @@ def add_tag(item_name):
 def delete(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if i.exists() and not i.is_itemlist():
             if i.user_may_delete():
@@ -376,7 +376,7 @@ def help_page(item_name):
 def item_view(item_name, slideshow=False):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, slideshow, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, slideshow, config.database_path, config.cache_path, None, False)
     if i is not None:
         if i.is_a_searchresult():
             hint = '<a href="%s">Here</a> you can find help on search.' % i.help_url('search')

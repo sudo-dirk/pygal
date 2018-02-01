@@ -28,7 +28,7 @@ def logout(item_name):
 def login(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if flask.request.method == 'GET':
             return app_views.make_response(app_views.RESP_TYPE_LOGIN, i, tmc, info=lang.info_login % (url_prefix + prefix_register + helpers.url_extention(item_name), url_prefix + prefix_lostpass + helpers.url_extention(item_name)))
@@ -54,7 +54,7 @@ def login(item_name):
 def register(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if flask.request.method == 'GET':
             return app_views.make_response(app_views.RESP_TYPE_REGISTER, i, tmc)
@@ -87,7 +87,7 @@ def register(item_name):
 def lostpass(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
-    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None)
+    i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
         if flask.request.method == 'GET':
             return app_views.make_response(app_views.RESP_TYPE_LOSTPASS, i, tmc, info=lang.info_lostpass)
