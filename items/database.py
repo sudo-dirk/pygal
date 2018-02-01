@@ -21,6 +21,7 @@ from whoosh.fields import Schema, ID, TEXT, DATETIME, NUMERIC
 from whoosh.qparser import MultifieldParser
 from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.index import EmptyIndexError
+from whoosh.writing import AsyncWriter
 
 
 logger = logging.getLogger('pygal.items.database')
@@ -494,7 +495,7 @@ class indexed_search(report.logit):
     def delete_document_by_rel_path(self, rel_path):
         if not self.UPDATE_STRATEGY_INCREMANTAL:
             self.logit_debug(logger, 'Deleting index document for %s', rel_path)
-            writer = self.ix.writer()
+            writer = AsyncWriter(self.ix)
             writer.delete_by_term("rel_path", rel_path)
             writer.commit()
 
@@ -508,7 +509,7 @@ class indexed_search(report.logit):
                 document = searcher.document(rel_path=rel_path)
             
             if document is None or db_uid != document.get('user_data_uid') or info_uid != document.get('item_data_uid'):
-                writer = self.ix.writer()
+                writer = AsyncWriter(self.ix)
                 self.logit_debug(logger, 'Updating index document for %s', rel_path)
                 self.wrap_data_and_call_method(rel_path, writer.update_document)
                 writer.commit()
