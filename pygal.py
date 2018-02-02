@@ -4,8 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: - Anzeige der Bilder in Staging Area geht nicht (icon wird gezeigt)
-#       - Bildgröße in Staging Area scheint zwischen Rahmen und Bild unterschiedlich zu sein (Rahmen default?) Anzeige des Namens
+# TODO: - Rechtethema für benutzereinstellungen (Flask funktioniert nicht mehr)
 #       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
 #       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
 #       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit

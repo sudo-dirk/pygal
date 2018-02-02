@@ -63,7 +63,7 @@ TYPE_NAMES = {
     }
 
 
-def supported_extentions():
+def multimedia_extentions():
     from .picture import picture
     from .video import video
     return picture.mime_types.keys() + video.mime_types.keys()
@@ -93,7 +93,7 @@ def get_staging_item_by_path(rel_path, base_path, slideshow, db_path, cache_path
     bil = staging_itemlist(rel_path, base_path, False, None)
     if bil.exists() and not rel_path:
         return bil
-    if os.path.splitext(rel_path)[1][1:] in supported_extentions():
+    if os.path.splitext(rel_path)[1][1:].lower() in multimedia_extentions():
         return staging_picviditem(rel_path, base_path, False, None, None, None, False)
     if config.multimedia_only:
         return None
@@ -139,8 +139,6 @@ class staging_container(report.logit, dict):
         if not os.path.exists(container_folder):
             os.mkdir(container_folder)
         if os.path.exists(filename) and self.is_allowed(filename):
-            print type(filename), filename
-            print type(os.path.basename(filename)), os.path.basename(filename)
             shutil.copyfile(filename, self.get_container_file_path(os.path.basename(filename)))
             self[self.KEY_FILES][os.path.basename(filename)] = database
             self.save()
@@ -763,7 +761,7 @@ class staging_itemlist(staging_container, base_object):
         self._get_item_by_path = get_staging_item_by_path
 
     def get_itemlist(self):
-        return [self._get_item_by_path(os.path.join(self.get_uuid(), filename), config.staging_path, None, None, None, None) for filename in self[self.KEY_FILES].keys()]
+        return [self._get_item_by_path(filename, os.path.join(config.staging_path, self.get_uuid()), None, None, None, None) for filename in self[self.KEY_FILES].keys()]
 
 class staging_baseitem(base_item):
     TYPE = TYPE_STAGING_BASEITEM

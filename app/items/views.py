@@ -218,7 +218,7 @@ def upload(item_name):
                 db.add_data(db.KEY_UPLOAD_TIMESTAMP, time.time())
                 db.add_data(db.KEY_UPLOAD_SRC_IP, flask.request.environ['REMOTE_ADDR'])
                 if config.multimedia_only:
-                    sc = items.staging_container(config.staging_path, None, flask.request.form.get('container_name'), items.supported_extentions())
+                    sc = items.staging_container(config.staging_path, None, flask.request.form.get('container_name'), items.multimedia_extentions())
                 else:
                     sc = items.staging_container(config.staging_path, None, flask.request.form.get('container_name'), None)
                 failed_files = []
