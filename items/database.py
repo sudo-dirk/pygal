@@ -3,8 +3,6 @@
 
 # TODO: - add exception handling for query_parser (e.g.: date:[-2y to now])
 #       - if create cache is executed, whoosh index will be created piece by piece (bad performance/ content expected?)
-# QUESTIONS TO ASK: dynamic data no index from scratch, only add_document, update_document and delete_by_term -> create from scratch from time to time?
-#                   saw exception somthing like writelock. What is a good strategy? wait and try again, queue?
 #See: http://whoosh.readthedocs.io/en/latest/indexing.html
 
 import datetime
@@ -41,6 +39,7 @@ class database_handler(dict, report.logit):
     KEY_UPLOAD_TIMESTAMP = 'upload_timestamp'
     KEY_UPLOAD_USERNAME = 'upload_user_name'
     KEY_UPLOAD_SRC_IP = 'upload_src_ip'
+    KEY_FAVOURITE_OF = '_favourite_of_'
     KEY_VERSION = '_db_version_'
     VERSION = 0.1
     
@@ -104,6 +103,23 @@ class database_handler(dict, report.logit):
             self[self.KEY_UPLOAD][key] = data
             self._save_()
 
+    def add_favourite_of(self, user):
+        fol = self.get_favourite_of_list()
+        if user not in fol:
+            fol.append(user)
+            self.set_favourite_of_list(fol)
+            self.add_data(self.KEY_FAVOURITE_OF, fol)
+            return True
+        return False
+
+    def remove_favourite_of(self, user):
+        fol = self.get_favourite_of_list()
+        if user in fol:
+            fol.remove(user)
+            self.set_favourite_of_list(fol)
+            return True
+        return False
+
     def add_tag_wn(self, tag, ident=None):
         self._init_database_()
         if ident is None:
@@ -148,6 +164,15 @@ class database_handler(dict, report.logit):
         rv = self.copy()
         del(rv[self.KEY_REL_PATH])
         return rv
+
+    def get_favourite_of_list(self):
+        self._init_database_()
+        return self.get(self.KEY_FAVOURITE_OF, [])
+
+    def set_favourite_of_list(self, favourite_list):
+        self._init_database_()
+        self[self.KEY_FAVOURITE_OF] = favourite_list
+        self._save_()
 
     def get_rel_path(self):
         self._init_database_()
@@ -275,7 +300,7 @@ class indexed_search(report.logit):
     # TODO: implement incremental init over all documents (update/ delete) and missing items (add) and check performance again
     LOG_PREFIX = 'WHOOSH:'
     #
-    DATA_VERS = 1.1
+    DATA_VERS = 2
     UPDATE_STRATEGY_INCREMANTAL = False
 
     def __init__(self, force_creation_from_scratch=False):
@@ -286,6 +311,7 @@ class indexed_search(report.logit):
             path=TEXT, 
             # user_data
             user_data_uid=TEXT(stored=True),
+            favourite_of=TEXT,
             tags=TEXT, 
             upload_user=TEXT, 
             upload_ip=TEXT, 
@@ -343,11 +369,13 @@ class indexed_search(report.logit):
                 db = database_handler(db_filename, None, True)
                 # User-Data
                 tags = u' '.join([helpers.decode(db.get_tag_text(tag_id)) for tag_id in db.get_tag_id_list()])
+                favourite_of = u' '.join([helpers.decode(user) for user in db.get_favourite_of_list()])
                 upload_user = helpers.decode(db.get_upload_user()) 
                 upload_ip = helpers.decode(db.get_upload_src_ip())
                 upload_date = datetime.datetime.fromtimestamp(db.get_upload_time()) if db.get_upload_time() is not None else None
             else:
                 tags = None
+                favourite_of = None
                 upload_user = None
                 upload_ip = None
                 upload_date = None
@@ -421,6 +449,7 @@ class indexed_search(report.logit):
                 path=helpers.decode(' '.join(os.path.splitext(rel_path)[0].split(os.path.sep)).strip()),
                 # User-Data
                 user_data_uid=helpers.decode(fstools.uid(db_filename)),
+                favourite_of=favourite_of,
                 tags=tags,
                 upload_user=upload_user, 
                 upload_ip=upload_ip,

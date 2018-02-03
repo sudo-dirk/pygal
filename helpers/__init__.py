@@ -22,6 +22,9 @@ STR_ARG_ADMIN_ISSUE_FOLDERS = 'folders'
 STR_ARG_ADMIN_NAME = 'name'
 STR_ARG_ADMIN_USER = 'username'
 STR_ARG_ADMIN_TARGET = 'target'
+STR_ARG_FAVOURITE = 'action'
+STR_ARG_FAVOURITE_ADD = 'add'
+STR_ARG_FAVOURITE_REMOVE = 'remove'
 
 def db_filename_by_relpath(db_path, rel_path):
     return os.path.join(db_path, rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json')

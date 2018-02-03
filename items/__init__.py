@@ -20,6 +20,7 @@ from prefixes import prefix_add_tag
 from prefixes import prefix_admin
 from prefixes import prefix_delete
 from prefixes import prefix_download
+from prefixes import prefix_favourite
 from prefixes import prefix_help
 from prefixes import prefix_info
 from prefixes import prefix_login
@@ -226,6 +227,9 @@ class gallery_urls(object):
     def download_url(self):
         return self._url(prefix_download)
 
+    def favourite_url(self, action=None):
+        return self._url(prefix_favourite) + strargs({} if action is None else {helpers.STR_ARG_FAVOURITE: action})
+
     def help_url(self, rel_path):
         return config.url_prefix + prefix_help + ('/' + rel_path if rel_path else '')
 
@@ -407,6 +411,10 @@ class base_item(base_object, database_handler):
 
     def actions(self):
         rv = base_object.actions(self)
+        if self.is_favourite():
+            rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_REMOVE), 'Remove Favourite', config.url_prefix + '/static/common/img/is_fav.png'))
+        else:
+            rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_ADD), 'Add Favourite', config.url_prefix + '/static/common/img/no_fav.png'))
         if self.user_may_edit():
             rv.append(piclink(self.add_tag_url(), 'Add Tag', config.url_prefix + '/static/common/img/edit.png'))
         if self.slideshow():
@@ -456,6 +464,9 @@ class base_item(base_object, database_handler):
 
     def has_cache_data(self):
         return True
+
+    def is_favourite(self):
+        return auth.pygal_user.get_session_user() in self.get_favourite_of_list()
 
     def parent(self):
         return self._get_item_by_path(os.path.dirname(self._rel_path), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user, self._disable_whoosh)
@@ -762,6 +773,7 @@ class staging_itemlist(staging_container, base_object):
 
     def get_itemlist(self):
         return [self._get_item_by_path(filename, os.path.join(config.staging_path, self.get_uuid()), None, None, None, None) for filename in self[self.KEY_FILES].keys()]
+
 
 class staging_baseitem(base_item):
     TYPE = TYPE_STAGING_BASEITEM

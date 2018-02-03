@@ -365,12 +365,14 @@ def delete(item_name):
 def slideshow(item_name):
     return item_view(item_name, slideshow=True)
 
+
 @item.route(prefix_help + '/<itemname:item_name>')
 def help_page(item_name):
     tmc = helpers.time_measurement()
     item_name = helpers.encode(item_name)
     i = help_object('', None, None, None, item_name)
     return app_views.make_response(app_views.RESP_TYPE_HELP, i, tmc)
+
 
 @item.route('/<itemname:item_name>', methods=['GET', 'POST'])
 def item_view(item_name, slideshow=False):

@@ -27,6 +27,7 @@ Without any special activity, the search will find your pattern in the path (ins
     <ul>
       <li>path (TEXT)</li>
       <li>tags (TEXT)</li>
+      <li>favourite_of (TEXT)</li>
       <li>type (TEXT)</li>
         <ul>
           <li>picture</li>
@@ -64,8 +65,10 @@ Without any special activity, the search will find your pattern in the path (ins
       <li><a href="%(search_example2)s">date:[-2y to now]</a> gives results with all item of the last two years</li>
       <li><a href="%(search_example3)s">path:2018</a> gives results with all item having 2018 in their path</li>
       <li><a href="%(search_example4)s">tags:Test</a> gives results with all item having Test in their tags</li>
+      <li><a href="%(search_example5)s">2018 AND favourite_of:*</a> gives results with all item having 2018 in their tags or path and are favourite of someone</li>
     </ul>
 """ % {'search_example1': self.item_url({'q': 'type:video AND date:2018'}),
        'search_example2': self.item_url({'q': 'date:[-2y to now]'}),
        'search_example3': self.item_url({'q': 'path:2018'}),
-       'search_example4': self.item_url({'q': 'tags:Test'}),}
+       'search_example4': self.item_url({'q': 'tags:Test'}),
+       'search_example5': self.item_url({'q': '2018 AND favourite_of:*'}),}

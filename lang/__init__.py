@@ -41,6 +41,7 @@ if LANGUAGE == 'DE':
     user = decode('Benutzer')
     userprofile = 'Benutzerprofil editieren...'
     user_in_admin_group = "Der Benutzer %s ist bereits in der Administrator Gruppe registriert. Zum Anlegen des Benutzerprofils kontaktieren Sie bitte einen Administrator."
+    view_fav = "Meine Favoriten"
 else:
     admin = 'Admin'
     email_desc = 'Your E-Mail adress'
@@ -77,3 +78,4 @@ else:
     user = 'User'
     userprofile = 'Edit Userprofile...'
     user_in_admin_group = "Unable to create user %s. User is already part of the Admin-Group. Please contact the Administrator of this page."
+    view_fav = "My Favorits"

@@ -57,6 +57,18 @@
           </div>
           
           <div class="col-md-4 col-sm-4 col-xs-4">
+            <div class="moin-navbar-collapse navbar-collapse collapse in">
+              <ul class="nav navbar-nav">
+                {% if pygal_user.chk_login() %}
+                  <li>
+                    <a href="{{ item.favourite_url() }}" title="{{ lang.view_fav }}" rel="nofollow">
+                      <span><img src="{{url_prefix}}/static/common/img/view_fav.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ lang.view_fav }}</span>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
           </div>
           <div class="col-md-8 col-sm-8 col-xs-8">
             <div class="moin-navbar-collapse navbar-collapse collapse in">
