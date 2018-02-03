@@ -482,7 +482,7 @@ class indexed_search(report.logit):
             
     def create_index_from_scratch(self):
         self.ix = index.create_in(config.whoosh_path, schema=self.schema)
-        writer = self.ix.writer()
+        writer = AsyncWriter(self.ix)
         #
         # iteration over all existing items
         for filename in fstools.filelist(config.item_path):
@@ -497,7 +497,7 @@ class indexed_search(report.logit):
             rel_paths.add(filename[len(config.item_path)+1:])
 
         # Update existing documents
-        writer = self.ix.writer()
+        writer = AsyncWriter(self.ix)
         with self.ix.searcher() as searcher:
             for document in searcher.all_stored_fields():
                 rel_path = document.get('rel_path')
