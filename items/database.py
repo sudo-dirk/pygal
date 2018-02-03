@@ -344,12 +344,11 @@ class indexed_search(report.logit):
                     self.logit_info(logger, 'Previous stored Index loaded and updated incrementally')
                 else:
                     index_version = None
-                    while index_version is None:
-                        with self.ix.searcher() as searcher:
-                            for field in searcher.all_stored_fields():
-                                index_version = field.get('index_vers')
-                                if index_version is not None:
-                                    break
+                    with self.ix.searcher() as searcher:
+                        for field in searcher.all_stored_fields():
+                            index_version = field.get('index_vers')
+                            if index_version is not None:
+                                break
                     if index_version != self.DATA_VERS:
                         self.logit_info(logger, 'Initialising index from scratch caused by new data version %d -> %d', index_version, self.DATA_VERS)
                         self.create_index_from_scratch()
