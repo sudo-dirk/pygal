@@ -47,7 +47,6 @@
     </div>
     <br>
 {% if item.is_picture() %}
-    Include item_...
     <div id="main" class="thumb_border" style="position:relative; width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
       <div class="thumb_image_bg" style="width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
         <img id="tag_img" src="{{ item.webnail_url() }}" style="margin: 6px 6px; border-radius: 3px;" alt="{{ item.name() }}">
