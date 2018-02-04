@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# TODO: - add exception handling for query_parser (e.g.: date:[-2y to now])
-#       - if create cache is executed, whoosh index will be created piece by piece (bad performance/ content expected?)
-#See: http://whoosh.readthedocs.io/en/latest/indexing.html
-
 import datetime
 import helpers
 import json
@@ -297,13 +293,13 @@ class database_handler(dict, report.logit):
 
 
 class indexed_search(report.logit):
-    # TODO: implement incremental init over all documents (update/ delete) and missing items (add) and check performance again
     LOG_PREFIX = 'WHOOSH:'
     #
     DATA_VERS = 2
-    UPDATE_STRATEGY_INCREMANTAL = False
 
     def __init__(self, force_creation_from_scratch=False):
+        if not os.path.exists(config.whoosh_path):
+            fstools.mkdir(config.whoosh_path)
         self.schema = Schema(
             rel_path=ID(unique=True, stored=True), 
             index_vers=NUMERIC(stored=True),
@@ -330,6 +326,7 @@ class indexed_search(report.logit):
             exposure_program=TEXT,
             iso=NUMERIC,
             duration=NUMERIC)
+            #TODO: implement gps data (picture) and possibly ratio (viseo) to index
         if force_creation_from_scratch:
             self.create_index_from_scratch()
         else:
@@ -339,21 +336,17 @@ class indexed_search(report.logit):
                 self.logit_info(logger, 'Initialising index from scratch caused by non existing index')
                 self.create_index_from_scratch()
             else:
-                if self.UPDATE_STRATEGY_INCREMANTAL:
-                    self.update_index_incremental()
-                    self.logit_info(logger, 'Previous stored Index loaded and updated incrementally')
+                index_version = None
+                with self.ix.searcher() as searcher:
+                    for field in searcher.all_stored_fields():
+                        index_version = field.get('index_vers')
+                        if index_version is not None:
+                            break
+                if index_version != self.DATA_VERS:
+                    self.logit_info(logger, 'Initialising index from scratch caused by new data version %d -> %d', index_version, self.DATA_VERS)
+                    self.create_index_from_scratch()
                 else:
-                    index_version = None
-                    with self.ix.searcher() as searcher:
-                        for field in searcher.all_stored_fields():
-                            index_version = field.get('index_vers')
-                            if index_version is not None:
-                                break
-                    if index_version != self.DATA_VERS:
-                        self.logit_info(logger, 'Initialising index from scratch caused by new data version %d -> %d', index_version, self.DATA_VERS)
-                        self.create_index_from_scratch()
-                    else:
-                        self.logit_info(logger, 'Previous stored Index loaded')
+                    self.logit_info(logger, 'Previous stored Index loaded')
 
     def load_index(self):
         self.ix = index.open_dir(config.whoosh_path)
@@ -361,125 +354,61 @@ class indexed_search(report.logit):
     def wrap_data_and_call_method(self, rel_path, method):
         from video import is_video
         from picture import is_picture
-        # database content
         db_filename = helpers.db_filename_by_relpath(config.database_path, rel_path)
         info_filename = helpers.info_filename_by_relpath(rel_path)
-        if os.path.isfile(db_filename) or (os.path.isfile(info_filename) and (is_picture(rel_path) or is_video(rel_path))):
+        index_data = {}
+        index_data['rel_path'] = helpers.decode(rel_path)
+        index_data['index_vers'] = self.DATA_VERS
+        index_data['type'] = u' '.join([u'video' if is_video(rel_path) else u'picture' if is_picture(rel_path) else '', helpers.decode(os.path.splitext(rel_path)[1][1:])]) 
+        index_data['path'] = helpers.decode(' '.join(os.path.splitext(rel_path)[0].split(os.path.sep)).strip())
+        index_data['user_data_uid'] = helpers.decode(fstools.uid(db_filename))
+        index_data['item_data_uid'] = helpers.decode(fstools.uid(info_filename))
+        # database content
+        if os.path.isfile(db_filename):
             self.logit_debug(logger, 'Adding/ Updating index document %s', rel_path)
             if os.path.isfile(db_filename):
                 db = database_handler(db_filename, None, True)
                 # User-Data
-                tags = u' '.join([helpers.decode(db.get_tag_text(tag_id)) for tag_id in db.get_tag_id_list()])
-                favourite_of = u' '.join([helpers.decode(user) for user in db.get_favourite_of_list()])
-                upload_user = helpers.decode(db.get_upload_user()) 
-                upload_ip = helpers.decode(db.get_upload_src_ip())
-                upload_date = datetime.datetime.fromtimestamp(db.get_upload_time()) if db.get_upload_time() is not None else None
-            else:
-                tags = None
-                favourite_of = None
-                upload_user = None
-                upload_ip = None
-                upload_date = None
-            # info content
-            if os.path.isfile(info_filename):
-                with open(info_filename, 'r') as fh:
-                    info = json.load(fh)
-                    # Item-Data
-                    if is_picture(rel_path):
-                        from pylibs.multimedia.picture import picture_info
-                        item_date = datetime.datetime.fromtimestamp(info.get(picture_info.TIME)) if info.get(picture_info.TIME) is not None else None
-                        item_height = info.get(picture_info.HEIGHT) if info.get(picture_info.HEIGHT) is not None else None
-                        item_width = info.get(picture_info.WIDTH) if info.get(picture_info.WIDTH) is not None else None
-                        item_camera = helpers.decode(info.get(picture_info.MANUFACTOR) or '') + u' ' + helpers.decode(info.get(picture_info.MODEL) or '')
-                        item_orientation = info.get(picture_info.ORIENTATION) if info.get(picture_info.ORIENTATION) is not None else None
-                        item_flash = helpers.decode(info.get(picture_info.FLASH)) if info.get(picture_info.FLASH) is not None else None
-                        try:
-                            item_aperture = float(info.get(picture_info.FNUMBER)[0]) / float(info.get(picture_info.FNUMBER)[0])
-                        except TypeError:
-                            item_aperture = None
-                        try:
-                            item_focal_length = float(info.get(picture_info.FOCAL_LENGTH)[0]) / float(info.get(picture_info.FOCAL_LENGTH)[0])
-                        except TypeError:
-                            item_focal_length = None
-                        try:
-                            item_exposure_time = float(info.get(picture_info.EXPOSURE_TIME)[0]) / float(info.get(picture_info.EXPOSURE_TIME)[0])
-                        except TypeError:
-                            item_exposure_time = None
-                        item_exposure_program = helpers.decode(info.get(picture_info.EXPOSURE_PROGRAM)) if info.get(picture_info.EXPOSURE_PROGRAM) is not None else None
-                        item_iso = info.get(picture_info.ISO) if info.get(picture_info.ISO) is not None else None
-                        # TODO: Add GPS info to whoosh index (Item-Data)
-                        """
-                            GPS_INFO = 'GPSInfo'
-                        """
-                        item_duration = None
-                    elif is_video(rel_path):
-                        from pylibs.multimedia.video import video_info
-                        item_date = datetime.datetime.fromtimestamp(info.get(video_info.TIME)) if info.get(video_info.TIME) is not None else None
-                        item_height = info.get(video_info.HEIGHT) if info.get(video_info.HEIGHT) is not None else None
-                        item_width = info.get(video_info.WIDTH) if info.get(video_info.WIDTH) is not None else None
-                        item_duration = info.get(video_info.DURATION) if info.get(video_info.DURATION) is not None else None
-                        # TODO: Add ratio to whoosh index (Item-Data)
-                        """
-                            RATIO = 'ratio'
-                        """
-                        item_camera = None
-                        item_orientation = None
-                        item_flash = None
-                        item_aperture = None
-                        item_focal_length = None
-                        item_exposure_time = None
-                        item_exposure_program = None
-                        item_iso = None
-            else:
-                item_date=None
-                item_height=None
-                item_width=None
-                item_camera=None
-                item_orientation=None
-                item_flash=None
-                item_aperture=None
-                item_focal_length=None
-                item_exposure_time=None
-                item_exposure_program=None
-                item_iso=None
-                item_duration=None
-            method(
-                rel_path=helpers.decode(rel_path),
-                index_vers=self.DATA_VERS,
-                type=u' '.join([u'video' if is_video(rel_path) else u'picture' if is_picture(rel_path) else '', helpers.decode(os.path.splitext(rel_path)[1][1:])]), 
-                path=helpers.decode(' '.join(os.path.splitext(rel_path)[0].split(os.path.sep)).strip()),
-                # User-Data
-                user_data_uid=helpers.decode(fstools.uid(db_filename)),
-                favourite_of=favourite_of,
-                tags=tags,
-                upload_user=upload_user, 
-                upload_ip=upload_ip,
-                upload_date=upload_date,
-                # Item-Data
-                item_data_uid=helpers.decode(fstools.uid(info_filename)),
-                date=item_date,
-                height=item_height,
-                width=item_width,
-                camera=item_camera,
-                orientation=item_orientation,
-                flash=item_flash,
-                aperture=item_aperture,
-                focal_length=item_focal_length,
-                exposure_time=item_exposure_time,
-                exposure_program=item_exposure_program,
-                iso=item_iso,
-                duration=item_duration)
-        else:
-            method(
-                rel_path=helpers.decode(rel_path),
-                index_vers=self.DATA_VERS,
-                type=u' '.join([u'video' if is_video(rel_path) else u'picture' if is_picture(rel_path) else '', helpers.decode(os.path.splitext(rel_path)[1][1:])]), 
-                path=helpers.decode(' '.join(os.path.splitext(rel_path)[0].split(os.path.sep)).strip()),
-                # User-Data
-                user_data_uid=helpers.decode(fstools.uid(db_filename)),
-                # Item-Data
-                item_data_uid=helpers.decode(fstools.uid(info_filename)))
-            
+                index_data['tags'] = u' '.join([helpers.decode(db.get_tag_text(tag_id)) for tag_id in db.get_tag_id_list()])
+                index_data['favourite_of'] = u' '.join([helpers.decode(user) for user in db.get_favourite_of_list()])
+                index_data['upload_user'] = helpers.decode(db.get_upload_user()) 
+                index_data['upload_ip'] = helpers.decode(db.get_upload_src_ip())
+                index_data['upload_date'] = datetime.datetime.fromtimestamp(db.get_upload_time()) if db.get_upload_time() is not None else None
+        # item content
+        if (os.path.isfile(info_filename) and (is_picture(rel_path) or is_video(rel_path))):
+            with open(info_filename, 'r') as fh:
+                info = json.load(fh)
+            # Item-Data
+            if is_picture(rel_path):
+                from pylibs.multimedia.picture import picture_info
+                index_data['date'] = datetime.datetime.fromtimestamp(info.get(picture_info.TIME)) if info.get(picture_info.TIME) is not None else None
+                index_data['height'] = info.get(picture_info.HEIGHT) if info.get(picture_info.HEIGHT) is not None else None
+                index_data['width'] = info.get(picture_info.WIDTH) if info.get(picture_info.WIDTH) is not None else None
+                index_data['camera'] = helpers.decode(info.get(picture_info.MANUFACTOR) or '') + u' ' + helpers.decode(info.get(picture_info.MODEL) or '')
+                index_data['orientation'] = info.get(picture_info.ORIENTATION) if info.get(picture_info.ORIENTATION) is not None else None
+                index_data['flash'] = helpers.decode(info.get(picture_info.FLASH)) if info.get(picture_info.FLASH) is not None else None
+                try:
+                    index_data['aperture'] = float(info.get(picture_info.FNUMBER)[0]) / float(info.get(picture_info.FNUMBER)[0])
+                except TypeError:
+                    pass
+                try:
+                    index_data['focal_length'] = float(info.get(picture_info.FOCAL_LENGTH)[0]) / float(info.get(picture_info.FOCAL_LENGTH)[0])
+                except TypeError:
+                    pass
+                try:
+                    index_data['exposure_time'] = float(info.get(picture_info.EXPOSURE_TIME)[0]) / float(info.get(picture_info.EXPOSURE_TIME)[0])
+                except TypeError:
+                    pass
+                index_data['exposure_program'] = helpers.decode(info.get(picture_info.EXPOSURE_PROGRAM)) if info.get(picture_info.EXPOSURE_PROGRAM) is not None else None
+                index_data['iso'] = info.get(picture_info.ISO) if info.get(picture_info.ISO) is not None else None
+            elif is_video(rel_path):
+                from pylibs.multimedia.video import video_info
+                index_data['date'] = datetime.datetime.fromtimestamp(info.get(video_info.TIME)) if info.get(video_info.TIME) is not None else None
+                index_data['height'] = info.get(video_info.HEIGHT) if info.get(video_info.HEIGHT) is not None else None
+                index_data['width'] = info.get(video_info.WIDTH) if info.get(video_info.WIDTH) is not None else None
+                index_data['duration'] = info.get(video_info.DURATION) if info.get(video_info.DURATION) is not None else None
+        method(**index_data)
+
     def create_index_from_scratch(self):
         self.ix = index.create_in(config.whoosh_path, schema=self.schema)
         writer = AsyncWriter(self.ix)
@@ -490,61 +419,28 @@ class indexed_search(report.logit):
             self.wrap_data_and_call_method(rel_path, writer.add_document)
         writer.commit()
 
-    def update_index_incremental(self):
-        # rel_path list for identification of missing documents in the index
-        rel_paths = set()
-        for filename in fstools.filelist(config.item_path):
-            rel_paths.add(filename[len(config.item_path)+1:])
-
-        # Update existing documents
-        writer = AsyncWriter(self.ix)
-        with self.ix.searcher() as searcher:
-            for document in searcher.all_stored_fields():
-                rel_path = document.get('rel_path')
-                db_filename = helpers.db_filename_by_relpath(config.database_path, rel_path)
-                db_uid = helpers.decode(fstools.uid(db_filename))
-                info_filename = helpers.info_filename_by_relpath(rel_path)
-                info_uid = helpers.decode(fstools.uid(info_filename))
-                index_version = document.get('index_vers')
-                if rel_path in rel_paths:
-                    rel_paths.remove(rel_path)
-                    if index_version != self.DATA_VERS:
-                        self.create_index_from_scratch()
-                        return
-                    elif db_uid != document.get('user_data_uid') or info_uid != document.get('item_data_uid'):
-                        self.wrap_data_and_call_method(rel_path, writer.update_document)
-                else:
-                    self.logit_debug(logger, 'Deleting index document for %s', rel_path)
-                    writer.delete_by_term("rel_path", rel_path)
-
-        # Add missing documents
-        for rel_path in rel_paths:
-            self.wrap_data_and_call_method(rel_path, writer.add_document)
-        writer.commit()
-            
     def delete_document_by_rel_path(self, rel_path):
-        if not self.UPDATE_STRATEGY_INCREMANTAL:
-            self.logit_debug(logger, 'Deleting index document for %s', rel_path)
-            writer = AsyncWriter(self.ix)
-            writer.delete_by_term("rel_path", rel_path)
-            writer.commit()
+        self.logit_debug(logger, 'Deleting index document for %s', rel_path)
+        writer = AsyncWriter(self.ix)
+        writer.delete_by_term("rel_path", rel_path)
+        writer.commit()
 
     def update_document_by_rel_path(self, rel_path):
-        if not self.UPDATE_STRATEGY_INCREMANTAL:
-            db_filename = helpers.db_filename_by_relpath(config.database_path, rel_path)
-            db_uid = helpers.decode(fstools.uid(db_filename))
-            info_filename = helpers.info_filename_by_relpath(rel_path)
-            info_uid = helpers.decode(fstools.uid(info_filename))
-            with self.ix.searcher() as searcher:
-                document = searcher.document(rel_path=rel_path)
-            
-            if document is None or db_uid != document.get('user_data_uid') or info_uid != document.get('item_data_uid'):
-                writer = AsyncWriter(self.ix)
-                self.logit_debug(logger, 'Updating index document for %s', rel_path)
-                self.wrap_data_and_call_method(rel_path, writer.update_document)
-                writer.commit()
+        db_filename = helpers.db_filename_by_relpath(config.database_path, rel_path)
+        db_uid = helpers.decode(fstools.uid(db_filename))
+        info_filename = helpers.info_filename_by_relpath(rel_path)
+        info_uid = helpers.decode(fstools.uid(info_filename))
+        with self.ix.searcher() as searcher:
+            document = searcher.document(rel_path=rel_path)
+        
+        if document is None or db_uid != document.get('user_data_uid') or info_uid != document.get('item_data_uid'):
+            writer = AsyncWriter(self.ix)
+            self.logit_debug(logger, 'Updating index document for %s', rel_path)
+            self.wrap_data_and_call_method(rel_path, writer.update_document)
+            writer.commit()
 
     def search(self, search_txt):
+        # TODO: - add exception handling for query_parser (e.g.: date:[-2y to now])
         qp = MultifieldParser(["tags", "path"], schema=self.ix.schema)
         qp.add_plugin(DateParserPlugin(free=True))
         q = qp.parse(search_txt)
