@@ -1,7 +1,23 @@
-<Directory /home/dirk/pygal>
-	Order allow,deny
-	allow from all
-        Require all granted
-</Directory>
+<VirtualHost *:443>
+    ServerName pygal.example.com
+    ServerAdmin webmaster@example.com
 
-WSGIScriptAlias /pygal /home/dirk/pygal/pygal.wsgi
+    SSLEngine on
+
+    WSGIDaemonProcess pygal
+    WSGIScriptAlias / /var/www/pygal/index.wsgi
+
+    <Directory /var/www/pygal/>
+        WSGIProcessGroup pygal
+        WSGIApplicationGroup %{GLOBAL}
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    <Location />
+        require all granted
+    </Location>
+
+    ErrorLog /var/www/pygal/error.log
+    CustomLog /var/www/pygal/access.log combined
+</VirtualHost>
