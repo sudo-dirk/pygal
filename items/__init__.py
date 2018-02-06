@@ -411,10 +411,11 @@ class base_item(base_object, database_handler):
 
     def actions(self):
         rv = base_object.actions(self)
-        if self.is_favourite():
-            rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_REMOVE), 'Remove Favourite', config.url_prefix + '/static/common/img/is_fav.png'))
-        else:
-            rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_ADD), 'Add Favourite', config.url_prefix + '/static/common/img/no_fav.png'))
+        if pygal_user.chk_login():
+            if self.is_favourite():
+                rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_REMOVE), 'Remove Favourite', config.url_prefix + '/static/common/img/is_fav.png'))
+            else:
+                rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_ADD), 'Add Favourite', config.url_prefix + '/static/common/img/no_fav.png'))
         if self.user_may_edit():
             rv.append(piclink(self.add_tag_url(), 'Add Tag', config.url_prefix + '/static/common/img/edit.png'))
         if self.slideshow():

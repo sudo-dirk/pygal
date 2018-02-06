@@ -23,17 +23,19 @@ def favourite(item_name):
     i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     info = None
     if i is not None:
-        if flask.request.method == 'GET':
-            if flask.request.args.get(helpers.STR_ARG_FAVOURITE) == helpers.STR_ARG_FAVOURITE_ADD:
-                if i.add_favourite_of(auth.pygal_user.get_session_user()):
-                    info = 'Item %s added to favourites' % item_name
-            elif flask.request.args.get(helpers.STR_ARG_FAVOURITE) == helpers.STR_ARG_FAVOURITE_REMOVE:
-                if i.remove_favourite_of(auth.pygal_user.get_session_user()):
-                    info = 'Item %s removed from favourites' % item_name
-            else:
-                return flask.redirect(config.url_prefix + helpers.strargs({'q': 'favourite_of:%s' % auth.pygal_user.get_session_user()}))
-        return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info=info)
-
+        if auth.pygal_user.chk_login():
+            if flask.request.method == 'GET':
+                if flask.request.args.get(helpers.STR_ARG_FAVOURITE) == helpers.STR_ARG_FAVOURITE_ADD:
+                    if i.add_favourite_of(auth.pygal_user.get_session_user()):
+                        info = 'Item %s added to favourites' % item_name
+                elif flask.request.args.get(helpers.STR_ARG_FAVOURITE) == helpers.STR_ARG_FAVOURITE_REMOVE:
+                    if i.remove_favourite_of(auth.pygal_user.get_session_user()):
+                        info = 'Item %s removed from favourites' % item_name
+                else:
+                    return flask.redirect(config.url_prefix + helpers.strargs({'q': 'favourite_of:%s' % auth.pygal_user.get_session_user()}))
+            return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info=info)
+        else:
+            return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=lang.error_permission_denied)
 
 @base_func.route(prefix_logout + '/<itemname:item_name>')
 @base_func.route(prefix_logout, defaults=dict(item_name=u''))
