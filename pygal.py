@@ -12,7 +12,6 @@
 #           - Nach Staging-Commit den Staging-Container beibehalten, wenn er noch existiert, sonst den ersten
 #           - Nach Container delete in stagin bleiben und delete ausgewählt halten
 #       - Bildgröße der Thumbs im Staging conainer ebenfalls mit der url übermitteln (s. thumb beim item - index=X)
-#       - Delete Tag-Button nur dann anzeigen, wenn ein Tag mit passender ID existiert.
 #       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
 #          - Admin - Folders: Tree eingeklappt darstellen
 #       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create

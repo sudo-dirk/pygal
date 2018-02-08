@@ -42,7 +42,9 @@
         </dl>
         <input type="hidden" name="tag_submit" value="1" class="" id="f_tag_submit" />
          <input type="submit" value="Submit Tag" class="button" name="action"/>
+{% if item.tag_id_exists(tag_id) %}
          <input type="submit" value="Delete Tag" class="button" name="action"/>
+{% endif %}
       </form>
     </div>
     <br>
