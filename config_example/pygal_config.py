@@ -1,12 +1,14 @@
 import os
 import urllib
 
-DEBUG = False
+DEBUG = True
 ip_to_serve_from = '127.0.0.1'
+sendmail_cmd = '/usr/sbin/sendmail'
+from_adr = 'pygal@127.0.0.1'
 # create this e.g. by the following command: binascii.hexlify(os.urandom(24))
 secret_key = 'This should be a real secret string including all kinds of characters'
 admin_group = []
-multimedia_only = True
+multimedia_only = True  # delete itemlist cache after changing this entry!
 #
 thumbnail_size_list = [137, 175, 225]
 thumbnail_size_default = 1

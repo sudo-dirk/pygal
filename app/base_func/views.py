@@ -101,6 +101,8 @@ def register(item_name):
                 udh.store_user()
                 sdh.set_user(fusername)
                 sdh.set_password(fpassword1)
+                em = helpers.mail.mail()
+                em.send(helpers.mail.to_adr_admins(), helpers.mail.content_new_user(fusername))
                 return flask.make_response(flask.redirect(url_prefix + helpers.url_extention(item_name)))
     flask.abort(404)
 

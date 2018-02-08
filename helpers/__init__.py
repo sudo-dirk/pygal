@@ -1,3 +1,5 @@
+import mail
+
 import flask
 import os
 import pygal_config as config
