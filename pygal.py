@@ -4,11 +4,18 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: - Rechtethema für benutzereinstellungen (Flask funktioniert nicht mehr)
+# TODO: - Email notification of rights changes to admins and changed user
+#       - Implement Lostpass functionality (send link to userprefs with temporary access key)
+#       - Kopieren der Public permissions bei Erstellung eines Accounts
+#       - Permission check of all pathes in pygal_config at startup to avoid runtime errors and data losses
+#       - Folgeseiten von Staging überarbeiten:
+#           - Nach Staging-Commit den Staging-Container beibehalten, wenn er noch existiert, sonst den ersten
+#           - Nach Container delete in stagin bleiben und delete ausgewählt halten
+#       - Bildgröße der Thumbs im Staging conainer ebenfalls mit der url übermitteln (s. thumb beim item - index=X)
+#       - Delete Tag-Button nur dann anzeigen, wenn ein Tag mit passender ID existiert.
 #       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
+#          - Admin - Folders: Tree eingeklappt darstellen
 #       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
-#       - Link zum Tag im Bild und in der Leiste nur dann, wenn user_may_edit
-#       - Der Bereich Admin, Upload, ... ist zu breit und der Anzeigename zu schmal. Prüfen des Verhaltens bei schmaler werdendem Fenster.
 #       - Nutze AJAX in flask für das Suchelement, Aufbau der Seite ohne neu zu laden
 #       - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
 #       - switch user implementieren
