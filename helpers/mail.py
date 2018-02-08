@@ -42,7 +42,10 @@ class content_new_user():
     def __init__(self, username):
         udh = auth.user_data_handler(username)
         self.subject = 'New Account created (%s at %s)' % (username, self.base_url())
-        self.message = """"A user created an account. Details:
+        self.message = """A user created an account.
+
+Details:
+--------
 - Page:  %s
 - User:  %s
 - Email: %s
