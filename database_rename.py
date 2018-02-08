@@ -1,12 +1,28 @@
-import pygal_config
-from pylibs import fstools
+'''
+Created on 08.02.2018
+
+@author: dirk
+'''
+
+from helpers import encode
 import json
 import os
+from pygal_config import database_path as db_path
+from pygal_config import item_path
+from pygal_config import temp_path as trash_path
+from pylibs import fstools
 
-for filename in fstools.filelist(pygal_config.database_path):
-    with open(filename, 'r') as fh:
-        db_dict = json.loads(fh.read())
 
-    old = filename
-    new = os.path.join(pygal_config.database_path, db_dict.get('_common_').get('rel_path').replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json')
-    os.rename(old, new)
+if __name__ == '__main__':
+    for db_file in fstools.filelist(db_path, '*.json'):
+        with open(db_file, 'r') as fh:
+            db = json.load(fh)
+        new_db_file = encode(os.path.join(db_path, db['_rel_path_'] + '.json'))
+        trash_db_file = encode(os.path.join(trash_path, db['_rel_path_'] + '.json'))
+        item_file = encode(os.path.join(item_path, db['_rel_path_']))
+        if not os.path.exists(item_file):
+            fstools.mkdir(os.path.dirname(trash_db_file))
+            os.rename(db_file, trash_db_file)
+        elif db_file != new_db_file:
+            fstools.mkdir(os.path.dirname(new_db_file))
+            os.rename(db_file, new_db_file)

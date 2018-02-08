@@ -27,7 +27,7 @@ STR_ARG_FAVOURITE_ADD = 'add'
 STR_ARG_FAVOURITE_REMOVE = 'remove'
 
 def db_filename_by_relpath(db_path, rel_path):
-    return os.path.join(db_path, rel_path.replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json')
+    return os.path.join(db_path, rel_path + '.json')
 
 def info_filename_by_relpath(rel_path):
     uid = fstools.uid(os.path.join(config.item_path, rel_path))

@@ -86,6 +86,7 @@ class database_handler(dict, report.logit):
 
     def _save_(self):
         if self._db_filename is not None and self._initialised:
+            fstools.mkdir(os.path.dirname(self._db_filename))
             with open(self._db_filename, 'w') as fh:
                 json.dump(self, fh, indent=4, sort_keys=True)
             self.logit_debug(logger, 'Item-Data changed => updating index for %s', self._item_rel_path)
