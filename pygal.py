@@ -4,9 +4,11 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: - Email notification of rights changes to admins and changed user
+# TODO: - switch user implementieren
+#       - Email notification of rights changes to admins and changed user
 #       - Implement Lostpass functionality (send link to userprefs with temporary access key)
 #       - Kopieren der Public permissions bei Erstellung eines Accounts
+#       - Check some pages with https://validator.w3.org/nu/?doc=https%3A%2F%2Fminefield.mount-mockery.de%2F
 #       - Permission check of all pathes in pygal_config at startup to avoid runtime errors and data losses
 #       - Folgeseiten von Staging überarbeiten:
 #           - Nach Staging-Commit den Staging-Container beibehalten, wenn er noch existiert, sonst den ersten
@@ -17,16 +19,12 @@
 #       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
 #       - Nutze AJAX in flask für das Suchelement, Aufbau der Seite ohne neu zu laden
 #       - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
-#       - switch user implementieren
 #       - restlichen str_args -> helpers (login, logout, register, lostpass, userprefs, ...?)
 #       - flask.redirect möglichst  eliminieren, vor allem neu eingebautes, da Meldungen hier nicht weitergereicht werden können.
 #       - Löschdialog für Ordner (Anzeige aller Elemente)
 #       - Staging Area und Delete-Page: Für delete und commit eine Auswahl ermöglichen (commit und delete aus Ordner)
 #       - logging ergänzen mit erben der classe report.logit (itemlist, picture, ...)
-#       - Sortierung einstellbar machen (Name, Zeit, ...) Änderung führt dazu, dass der Cache ungültig wird => Userdata und nicht Sessiondata
 #       - required attribut für js-tree in admin.staging
-#       - delete cache auf Seitenebene für Administratoren einführen
-#       - Problem mit png und mit Bild in Linde/orig (Ausrichtung) - Test mit originaldaten erforderlich
 #       - Zusätzlich Infos auf Info-Seite für itemlist (Datum, uid, ) siehe Bilder
 #       - Select all Button bei der Administration der Rechte hinzufügen
 #       - Beispieldaten einfügen
@@ -73,7 +71,7 @@ app.debug_log_format = """~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 File "%(pathname)s", line %(lineno)d, in %(funcName)s
 %(asctime)s: %(levelname)-7s - %(message)s'"""
 
-app.logger.setLevel(logging.INFO)
+app.logger.setLevel(logging.DEBUG)
 
 app.debug = DEBUG
 app.secret_key = secret_key
