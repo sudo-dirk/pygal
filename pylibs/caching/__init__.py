@@ -13,10 +13,9 @@ from pylibs import report
 import os
 import pickle
 
+__VERSION__ = '1.0.1'
 
 class property_cache_pickle(report.logit):
-    LOG_PREFIX = 'PickCache:'
-
     """
     Class to cache properties, which take longer on initialising than reading a file in pickle format.
 
@@ -163,6 +162,7 @@ class property_cache_pickle(report.logit):
         2015-01-11 17:42:45,162::DEBUG::__init__.py::75::Providing property for "__property_cache_uid_" from cache
         five
     """
+    LOG_PREFIX = 'PickCache:'
     DATA_VERSION_TAG = '_property_cache_data_version_'
     UID_TAG = '_property_cache_uid_'
 
@@ -181,16 +181,20 @@ class property_cache_pickle(report.logit):
         :param default: value to be returned, if key does not exists.
         :returns: value for a given key or default value.
         """
-        if self._cached_props is None:
-            self.__init_cache(logger=logger)
-        if self._key_filter(key) not in self._cached_props:
-            val = self._source_instance.get(key, None)
-            self.logit_debug(logger, 'Loading property for "%s" from source instance (%s)', key, repr(val))
-            self._cached_props[self._key_filter(key)] = val
-            self._save_cache(logger)
+        if key in self.keys():
+            if self._cached_props is None:
+                self._init_cache(logger=logger)
+            if self._key_filter(key) not in self._cached_props:
+                val = self._source_instance.get(key, None)
+                self.logit_debug(logger, "Loading property for '%s' from source instance (%s)", key, repr(val))
+                self._cached_props[self._key_filter(key)] = val
+                self._save_cache(logger)
+            else:
+                self.logit_debug(logger, "Providing property for '%s' from cache (%s)", key, repr(self._cached_props.get(self._key_filter(key), default)))
+            return self._cached_props.get(self._key_filter(key), default)
         else:
-            self.logit_debug(logger, 'Providing property for "%s" from cache (%s)', key, repr(self._cached_props.get(self._key_filter(key), default)))
-        return self._cached_props.get(self._key_filter(key), default)
+            self.logit_warning(logger, "Key '%s' is not in cached_keys. Uncached data will be returned.", key)
+            return self._source_instance.get(key, default)
 
     def keys(self):
         return self._source_instance.keys()
@@ -212,15 +216,14 @@ class property_cache_pickle(report.logit):
         else:
             return self._cached_props.get(self.DATA_VERSION_TAG, None)
 
-    def __init_cache(self, logger):
+    def _init_cache(self, logger):
         if not self._load_cache(logger=logger) or self._source_instance.uid() != self._uid() or self._source_instance.data_version() > self._data_version():
             if self._uid() is not None and self._source_instance.uid() != self._uid():
-                self.logit_debug(logger, "Source File changed, ignoring previous cache data")
+                self.logit_debug(logger, "Source uid changed, ignoring previous cache data")
             if self._data_version() is not None and self._source_instance.data_version() > self._data_version():
                 self.logit_debug(logger, "Data version increased, ignoring previous cache data")
             self._cached_props = dict()
             if self._load_all_on_init:
-                self.logit_debug(logger, "Loading all items from source...")
                 self._load_source(logger)
             self._cached_props[self.UID_TAG] = self._source_instance.uid()
             self._cached_props[self.DATA_VERSION_TAG] = self._source_instance.data_version()
@@ -247,7 +250,7 @@ class property_cache_pickle(report.logit):
         return key
 
     def _load_source(self, logger):
-        self.logit_debug(logger, 'Loading all properties from source - %s', repr(self._source_instance.keys()))
+        self.logit_debug(logger, 'Loading all data from source - %s', repr(self._source_instance.keys()))
         for key in self._source_instance.keys():
             val = self._source_instance.get(key)
             self._cached_props[self._key_filter(key)] = val
@@ -271,8 +274,6 @@ class property_cache_pickle(report.logit):
 
 
 class property_cache_json(property_cache_pickle):
-    LOG_PREFIX = 'JsonCache:'
-
     """
     Class to cache properties, which take longer on initialising than reading a file in json format. See also parent :py:class:`property_cache_pickle`
 
@@ -421,6 +422,8 @@ class property_cache_json(property_cache_pickle):
         2015-01-11 17:35:56,713::DEBUG::__init__.py::75::Providing property for "__property_cache_uid_" from cache
         five
     """
+    LOG_PREFIX = 'JsonCache:'
+
     def _load_cache(self, logger):
         if os.path.exists(self._cache_filename):
             try:
