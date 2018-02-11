@@ -6,8 +6,9 @@ from database import database_handler
 from database import indexed_search
 import flask
 import helpers
-from helpers import encode
+from helpers import db_filename_by_relpath
 from helpers import decode
+from helpers import encode
 from helpers import piclink
 from helpers import simple_info
 from helpers import strargs
@@ -187,13 +188,14 @@ class staging_container(report.logit, dict):
     def move(self, items_target_path, database_path, item_path):
         # iteration over files
         for filename in self[self.KEY_FILES].copy():
-            database_filename = os.path.join(database_path, os.path.join(items_target_path, encode(filename)).replace(os.path.sep, '_').replace(os.path.extsep, '_') + '.json')
-            item_filename = os.path.join(item_path, items_target_path, encode(filename))
-            if not os.path.exists(database_filename) and not os.path.exists(item_filename) and fstools.is_writeable(os.path.dirname(database_filename)) and fstools.is_writeable(os.path.dirname(item_filename)):
+            rel_path = os.path.join(items_target_path, filename)
+            database_filename = encode(db_filename_by_relpath(database_path, rel_path))
+            item_target_filename = encode(os.path.join(item_path, rel_path))
+            if not os.path.exists(item_target_filename):
                 dbh = database_handler(database_filename, os.path.join(items_target_path, encode(filename)), False)
                 dbh._init_database_(self[self.KEY_FILES][filename])
-                self.logit_info(logger, 'Moving File %s to %s.', self.get_container_file_path(encode(filename)), item_filename)
-                os.rename(self.get_container_file_path(encode(filename)), item_filename)
+                self.logit_info(logger, 'Moving File %s to %s.', self.get_container_file_path(encode(filename)), item_target_filename)
+                os.rename(self.get_container_file_path(encode(filename)), item_target_filename)
                 del self[self.KEY_FILES][filename]
         if self.is_empty():
             self.delete()
