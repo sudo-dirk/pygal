@@ -53,18 +53,12 @@
 
 {%- if error or info or hint %}
   {%- if hint %}
-    <div class="hintbar">
-      <p class="moin-flash moin-flash-hint">{{ hint|safe }}</p>
-    </div>
+    <p class="flash-hint">{{ hint|safe }}</p>
   {%- endif %}
   {%- if info %}
-    <div class="infobar">
-      <p class="moin-flash moin-flash-info">{{ info|safe }}</p>
-    </div>
+    <p class="flash-info">{{ info|safe }}</p>
   {%- endif %}
   {%- if error %}
-    <div class="errorbar">
-      <p class="moin-flash moin-flash-error">{{ error|safe }}</p>
-    </div>
+    <p class="flash-error">{{ error|safe }}</p>
   {%- endif %}
 {%- endif %}

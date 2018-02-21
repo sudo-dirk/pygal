@@ -242,3 +242,33 @@ li.imagebar a:hover:not(.active_menu) {
 	opacity:1;
 	color: #FFFFFF;
 }
+
+.flash-hint {
+	padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #ddffdd;
+    border-left: 6px solid #4CAF4C;
+    font-size: 16px;
+}
+
+.flash-info {
+	padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #daefff;
+    border-left: 6px solid #005ecc;
+    font-size: 16px;
+}
+
+.flash-error {
+	padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #ffe2e2;
+    border-left: 6px solid #dd0000;
+    font-size: 16px;
+}
