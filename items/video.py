@@ -7,6 +7,7 @@ from .picture import picture
 import json
 import logging
 import os
+import pygal_config as config
 from pylibs import fstools
 from pylibs.multimedia.picture import picture_edit
 from pylibs.multimedia.video import __version__
@@ -39,7 +40,7 @@ class video(picture):
             self._info = video_info_cached(self.raw_path(), self._info_filename, callback_on_data_storage=self._info_data_changed)
 
     def _create_citem(self, size, force=False, logger=None):
-        this_method_version = '0.1.1'
+        this_method_version = '0.1.2'
         if self._xnail_info is None:
             try:
                 with open(self._xnail_info_filename, 'r') as fh:
@@ -48,14 +49,14 @@ class video(picture):
                 self._xnail_info = dict()
         VERSION = '__module_version_citem_creation_%d__' % size
         WATERMARK = '__watermark_uid_citem_creation_%d__' % size
-        watermark_path = os.path.join(os.path.join(os.path.dirname(__file__), '..'), 'theme', 'static', 'overlay', 'movie.png')
+        watermark_path = os.path.join(config.theme_path, 'static', 'overlay', 'movie.png')
         if force or not os.path.exists(self.citem_filename(size)) or self._xnail_info.get(VERSION) != __version__ + this_method_version or self._xnail_info.get(WATERMARK) != fstools.uid(watermark_path):
             self.logit_info(logger, 'creating citem (%d) for %s', size, self.name())
             try:
                 p = video_picture_edit(self.raw_path())
                 p.resize(size, logger=logger)
                 movie_icon = picture_edit(watermark_path)
-                p.join(movie_icon, p.JOIN_TOP_RIGHT, 0.75, logger=logger)
+                p.join(movie_icon, p.JOIN_TOP_RIGHT, 0.85, logger=logger)
             except IOError:
                 self.logit_error(logger, 'error creating citem (%d) for %s', size, self.name())
             else:
