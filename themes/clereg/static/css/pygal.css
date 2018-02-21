@@ -243,32 +243,43 @@ li.imagebar a:hover:not(.active_menu) {
 	color: #FFFFFF;
 }
 
-.flash-hint {
+.flash{
 	padding-top: 16px;
     padding-bottom: 16px;
     padding-left: 10px;
     padding-right: 10px;
-    background-color: #ddffdd;
-    border-left: 6px solid #4CAF4C;
     font-size: 16px;
+}
+.flash > a {
+  font-weight: bold;
+  text-decoration: none;
+}
+.flash > a:hover {
+  text-decoration: underline;
+}
+.flash-hint {
+	color: #205b00;
+	background-color: #ddffdd;
+    border-left: 6px solid #205b00;
+}
+.flash-hint > a {
+	color: #205b00;
 }
 
 .flash-info {
-	padding-top: 16px;
-    padding-bottom: 16px;
-    padding-left: 10px;
-    padding-right: 10px;
-    background-color: #daefff;
-    border-left: 6px solid #005ecc;
-    font-size: 16px;
+	color: #204a87;
+	background-color: #daefff;
+    border-left: 6px solid #204a87;
+}
+.flash-info > a {
+	color: #204a87;
 }
 
 .flash-error {
-	padding-top: 16px;
-    padding-bottom: 16px;
-    padding-left: 10px;
-    padding-right: 10px;
-    background-color: #ffe2e2;
-    border-left: 6px solid #dd0000;
-    font-size: 16px;
+	color: #a40000;
+	background-color: #ffe2e2;
+    border-left: 6px solid #a40000;
+}
+.flash-error > a {
+	color: #a40000;
 }
