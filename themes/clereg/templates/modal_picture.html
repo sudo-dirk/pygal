@@ -1,0 +1,15 @@
+{% if item.user_may_admin() and item.has_cache_data() %}
+<div id="openModal" class="modalDialog">
+  <div>
+    <h2>{{ filename }}</h2>
+    <div id="{{ item.prv().name() }}" class="image">
+      <div>
+        <div class="image_bg" style="width: {{ x + 12}}px; height: {{ y + 12}}px;">
+          <img src="{{ url }}" style="margin: 6px 6px;" alt="{{ filename }}">
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#close" title="Close" class="close">X</a>
+</div>
+{% endif %}

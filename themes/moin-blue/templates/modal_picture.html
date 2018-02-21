@@ -1,0 +1,8 @@
+{% if item.user_may_admin() and item.has_cache_data() %}
+<div id="openModal" class="modalDialog">
+  <div>
+    <a href="#close" title="Close" class="close">X</a>
+{% include 'single_picture.html' %}
+  </div>
+</div>
+{% endif %}

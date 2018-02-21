@@ -13,7 +13,7 @@ from pylibs import report
 import os
 import pickle
 
-__VERSION__ = '1.0.1'
+__VERSION__ = '1.1.0'
 
 class property_cache_pickle(report.logit):
     """
@@ -199,17 +199,6 @@ class property_cache_pickle(report.logit):
     def keys(self):
         return self._source_instance.keys()
 
-    def set(self, key, value):
-        """
-        Method to set a property after intialisation. It will stored in the cache file if value is different to stored value or key does not exists in properties.
-
-        :param key: key for value to get.
-        :param value: value to be set.
-        """
-        if key not in self._cached_props or self._cached_props.get(key) != value:
-            self._cached_props[key] = value
-            self._save_cache()
-
     def _data_version(self):
         if self._cached_props is None:
             return None
@@ -231,14 +220,10 @@ class property_cache_pickle(report.logit):
 
     def _load_cache(self, logger):
         if os.path.exists(self._cache_filename):
-            try:
-                with open(self._cache_filename, 'r') as fh:
-                    self._cached_props = pickle.loads(fh.read())
-            except:
-                self.logit_warning(logger, 'Error while reading cache file (%s)', self._cache_filename)
-            else:
-                self.logit_info(logger, 'Loading properties from cache (%s)', self._cache_filename)
-                return True
+            with open(self._cache_filename, 'r') as fh:
+                self._cached_props = pickle.loads(fh.read())
+            self.logit_info(logger, 'Loading properties from cache (%s)', self._cache_filename)
+            return True
         else:
             self.logit_debug(logger, 'Cache file does not exists (yet).')
         return False
@@ -256,15 +241,11 @@ class property_cache_pickle(report.logit):
             self._cached_props[self._key_filter(key)] = val
 
     def _save_cache(self, logger):
-        try:
-            with open(self._cache_filename, 'w') as fh:
-                fh.write(pickle.dumps(self._cached_props))
-                self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
-        except IOError:
-            self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)
-        else:
-            if self._callback_on_data_storage is not None:
-                self._callback_on_data_storage()
+        with open(self._cache_filename, 'w') as fh:
+            fh.write(pickle.dumps(self._cached_props))
+            self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
+        if self._callback_on_data_storage is not None:
+            self._callback_on_data_storage()
 
     def _uid(self):
         if self._cached_props is None:
@@ -426,25 +407,17 @@ class property_cache_json(property_cache_pickle):
 
     def _load_cache(self, logger):
         if os.path.exists(self._cache_filename):
-            try:
-                with open(self._cache_filename, 'r') as fh:
-                    self._cached_props = json.loads(fh.read())
-            except:
-                self.logit_warning(logger, 'Error while reading cache file (%s)', self._cache_filename)
-            else:
-                self.logit_info(logger, 'Loading properties from cache (%s)', self._cache_filename)
-                return True
+            with open(self._cache_filename, 'r') as fh:
+                self._cached_props = json.loads(fh.read())
+            self.logit_info(logger, 'Loading properties from cache (%s)', self._cache_filename)
+            return True
         else:
             self.logit_debug(logger, 'Cache file does not exists (yet).')
         return False
 
     def _save_cache(self, logger):
-        try:
-            with open(self._cache_filename, 'w') as fh:
-                fh.write(json.dumps(self._cached_props, sort_keys=True, indent=4))
-                self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
-        except IOError:
-            self.logit_warning(logger, 'Error while writing cache file (%s)', self._cache_filename)
-        else:
-            if self._callback_on_data_storage is not None:
-                self._callback_on_data_storage()
+        with open(self._cache_filename, 'w') as fh:
+            fh.write(json.dumps(self._cached_props, sort_keys=True, indent=4))
+            self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
+        if self._callback_on_data_storage is not None:
+            self._callback_on_data_storage()

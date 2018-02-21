@@ -83,7 +83,7 @@ class picture(items.base_item, report.logit):
     def actions(self):
         rv = items.base_item.actions(self)
         if self.gps() is not None:
-            rv.append(piclink(osm.landmark_link(self.gps()), 'GPS', config.url_prefix + '/static/common/img/earth.png'))
+            rv.append(piclink(osm.landmark_link(self.gps()), 'GPS', 'gps'))
         return rv
 
     def aperture(self):

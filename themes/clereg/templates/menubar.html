@@ -1,0 +1,7 @@
+    <ul class="menubar">
+    {%- for key in ['favourite', 'login', 'userprefs', 'upload', 'admin'] %}
+      {%- if menu_bar[key] %}
+      <li class="menubar" {% if key != 'favourite'%}style="float:right"{% endif %}><a href="{{menu_bar[key].url}}" {% if menu_bar[key].active %}class="active_menu"{% endif%}>{% if menu_bar[key].icon %}<span><img src="{{ url_prefix }}/static/img/light_red/{{menu_bar[key].icon}}.png"></span> {% endif %}<span class="menu_hide">{{ menu_bar[key].name }}</span></a></li>
+      {%- endif %}
+    {%- endfor %}
+    </ul>

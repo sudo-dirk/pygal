@@ -1,0 +1,25 @@
+<div id="moin-page" lang="en" dir="ltr">
+  <div id="moin-content">
+    <div class="moin-form">
+      <h2>{{ lang.login }}</h2>
+      <form name="login" action="{{ item.login_url() }}" method="post">
+        <dl>
+          <dt>
+            <label class="required" for="f_login_username">Name</label>
+          </dt>
+          <dd>
+            <input type="text" name="login_username" value="" autofocus="autofocus" class="required" id="f_login_username" required="required" />
+          </dd>
+          <dt>
+            <label class="required" for="f_login_password">Password</label>
+          </dt>
+          <dd>
+            <input type="password" name="login_password" class="required" id="f_login_password" required="required" />
+          </dd>
+        </dl>
+        <input type="hidden" name="login_submit" value="1" class="" id="f_login_submit" />
+        <input type="submit" value="Log in" class="button" />
+      </form>
+    </div>
+  </div>
+</div>

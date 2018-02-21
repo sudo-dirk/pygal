@@ -291,9 +291,9 @@ class base_object(report.logit, gallery_urls):
 
     def actions(self):
         rv = list()
-        rv.append(piclink(self.info_url(), 'Info', config.url_prefix + '/static/common/img/info.png'))
+        rv.append(piclink(self.info_url(), 'Info', 'info'))
         if self.user_may_download():
-            rv.append(piclink(self.download_url(), 'Download', config.url_prefix + '/static/common/img/download.png'))
+            rv.append(piclink(self.download_url(), 'Download', 'download'))
         return rv
 
     def download_url(self):
@@ -415,17 +415,17 @@ class base_item(base_object, database_handler):
         rv = base_object.actions(self)
         if pygal_user.chk_login():
             if self.is_favourite():
-                rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_REMOVE), 'Remove Favourite', config.url_prefix + '/static/common/img/is_fav.png'))
+                rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_REMOVE), 'Remove Favourite', 'is_favourite'))
             else:
-                rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_ADD), 'Add Favourite', config.url_prefix + '/static/common/img/no_fav.png'))
+                rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_ADD), 'Add Favourite', 'favourite'))
         if self.user_may_edit():
-            rv.append(piclink(self.add_tag_url(), 'Add Tag', config.url_prefix + '/static/common/img/edit.png'))
+            rv.append(piclink(self.add_tag_url(), 'Add Tag', 'edit'))
         if self.slideshow():
-            rv.append(piclink(self.item_url(), 'Stop Slideshow', config.url_prefix + '/static/common/img/stop_slideshow.png'))
+            rv.append(piclink(self.item_url(), 'Stop Slideshow', 'stop'))
         else:
-            rv.append(piclink(self.slideshow_url(), 'Start Slideshow', config.url_prefix + '/static/common/img/start_slideshow.png'))
+            rv.append(piclink(self.slideshow_url(), 'Start Slideshow', 'play'))
         if self.user_may_delete():
-            rv.append(piclink(self.delete_url(), 'Delete', config.url_prefix + '/static/common/img/delete.png'))
+            rv.append(piclink(self.delete_url(), 'Delete', 'delete'))
         return rv
 
     def cache_data(self):
@@ -497,7 +497,7 @@ class base_item(base_object, database_handler):
             'flv': 'video-x-generic.png', '3gp': 'video-x-generic.png'            
             }
         ext = os.path.splitext(self._rel_path)[1][1:].lower()
-        return config.url_prefix + '/static/common/mimetype_icons/%s' % mapping_dict.get(ext, 'application-octet-stream.png')
+        return config.url_prefix + '/static/mimetype_icons/%s' % mapping_dict.get(ext, 'application-octet-stream.png')
 
     def webnail_url(self, i=None):
         return self.thumbnail_url(i)

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if slideshow %}
+      <meta http-equiv="refresh" content="{{ slideshow.stay_time }};url={{ slideshow.prv_url }}">
+    {% endif %}
+    <title>{{ title }}</title>
+    <link rel="shortcut icon" href="{{url_prefix}}/static/common/logos/favicon.ico" />
+    <link media="all" rel="stylesheet" href="{{url_prefix}}/static/common/css/theme.css" />
+    <link media="all" rel="stylesheet" href="{{url_prefix}}/static/common/css/pygal.css" />
+
+    <link href="{{ url_prefix }}/static/video-js/video-js.css" rel="stylesheet">
+    <script src="{{ url_prefix }}/static/video-js/video.js"></script>
+
+    <script type="text/javascript" src="{{url_prefix}}/static/jquery.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{{url_prefix}}/static/common/css/imgareaselect-default.css" />
+    <script type="text/javascript" src="{{url_prefix}}/static/imgareaselect-js/jquery.imgareaselect.pack.js"></script>
+
+    <link rel="stylesheet" href="{{url_prefix}}/static/tree-js/themes/default/style.min.css" />
+    <script type="text/javascript" src="{{url_prefix}}/static/tree-js/jstree.js"></script>
+
+    <link href="{{ url_prefix }}/static/renderjson-js/renderjson.css" rel="stylesheet">
+    <script type="text/javascript" src="{{url_prefix}}/static/renderjson-js/renderjson.js"></script>
+  </head>
+  <body lang="en" dir="ltr">
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <nav class="navbar moin-navbar-inverse">
+        <div class="row">
+          <div class="col-md-1 col-sm-1 col-xs-2">
+            <!div class="moin-logo">
+              <a href="{{ url_prefix }}/"><img src="{{ url_prefix }}/static/common/logos/pygal_logo.png" id="moin-img-logo" alt="Logo"></a>
+            <!/div>
+          </div>
+
+          <div class="col-md-8 col-sm-8 col-xs-6">
+            <div class="moin-navbar-header">
+              <div class="navbar-brand">{{ title }}</div>
+            </div>
+          </div>
+
+          
+          <div class="col-md-3 col-sm-3 col-xs-4">
+            <form class="moin-navbar-form" action="{{url_prefix or '/'}}" method="get" role="search">
+              <div class="input-group">
+                <input name='q' type="text" class="form-control" placeholder="{{ search }}...">
+                <div class="input-group-btn">
+                  <button class="btn btn-primary" type="submit">
+                    <img src="{{ url_prefix }}/static/common/img/search.png">
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          
+          <div class="col-md-4 col-sm-4 col-xs-4">
+            <div class="moin-navbar-collapse navbar-collapse collapse in">
+              <ul class="nav navbar-nav">
+                {% if menu_bar.favourite %}
+                  <li>
+                    <a href="{{ menu_bar.favourite.url }}" title="{{ menu_bar.favourite.name }}" rel="nofollow">
+                      <span><img src="{{url_prefix}}/static/common/img/light/{{menu_bar.favourite.icon}}.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ menu_bar.favourite.name }}</span>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-8 col-sm-8 col-xs-8">
+            <div class="moin-navbar-collapse navbar-collapse collapse in">
+              <ul class="nav navbar-nav moin-pull-right">
+                {% for key in ['admin', 'upload', 'userprefs', 'login'] %}
+                  <li>
+                    <a href="{{ menu_bar[key].url }}" title="{{ menu_bar[key].name }}" rel="nofollow">
+                      <span><img src="{{url_prefix}}/static/common/img/light/{{menu_bar[key].icon}}.png"></span>
+                      <span class="hidden-sm hidden-xs">{{ menu_bar[key].name }}</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          
+
+        </div>
+      </nav> 
+
+      <div class="moin-content">
+        <ul class="moin-breadcrumb">
+        {% for navi in navigation_list %}
+          <li>
+            <h4 class="moin-location-breadcrumb">
+              <small> / </small>
+              <a href="{{navi.url}}">{{navi.name}}</a>
+            </h4>
+          </li>
+        {% endfor %}
+        </ul> 
+
+        <ul class="moin-nav nav-tabs moin-shadow">
+        {% for action in action_bar %}
+          <li>
+            <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">
+              <span><img src="{{url_prefix}}/static/common/img/{{action.icon}}.png"></span>
+              <span class="hidden-sm hidden-xs">{{action.name}}</span>
+            </a>
+          </li>
+        {% endfor %}
+        </ul>
+
+        <div id="moin-flash">  
+{% if error or info or hint %}
+          {% if error %}<p class="moin-flash moin-flash-error">{{ error|safe }}</p>{% endif %}
+          {% if info %}<p class="moin-flash moin-flash-info">{{ info|safe }}</p>{% endif %}
+          {% if hint %}<p class="moin-flash moin-flash-hint">{{ hint|safe }}</p>{% endif %}
+{% endif %}
+        </div>
+        
+        <div id="moin-page" lang="en" dir="ltr">
+          <div id="moin-content">

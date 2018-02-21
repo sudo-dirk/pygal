@@ -1,0 +1,40 @@
+<div id="moin-page" lang="en" dir="ltr">
+  <div id="moin-content"{% if item.is_picture() or item.is_video() %}style="background-image:url({{ item.webnail_url() }}); background-repeat: no-repeat; min-height: {{ item.webnail_y() }}px; background-color: rgba(255,255,255,0.75); background-blend-mode: lighten;"{% endif %}>
+      <h2>{{ item.name() }}</h2>
+      <table>
+        <tbody>
+{% for entry in item.get_infos() %}
+          <tr>
+          <td>{{ entry.description }}</td>
+  {% if entry.info is string %}
+          <td style="text-align:right;">{{ entry.info }}</td>
+  {% else %}
+          <td style="text-align:right;"><a href="{{ entry.info.url }}">{{ entry.info.name }}</a></td>
+  {% endif %}
+          </tr>
+{% endfor %}
+{% if not item.is_itemlist() and item.get_tag_id_list()|length > 0 %}
+  {% for tag_id in item.get_tag_id_list() %}
+          <tr>
+          <td>{% if loop.index == 1 %}Tags:{% endif %}</td>
+          <td style="text-align:right;"><a  href="{{item.add_tag_url(tag_id)}}" title="{{item.get_tag_text(tag_id)}}" rel="nofollow">{{item.get_tag_text(tag_id)}}<img src="{{url_prefix}}/static/img/dark_grey/{{item.get_tag_icon(tag_id)}}.png"></a></td>
+          </tr>
+  {% endfor %}
+{% endif %}
+        </tbody>
+      </table>
+{% if item.user_may_admin() and item.has_cache_data() %}
+      <h2>Cachedata</h2>
+      <table>
+        <tbody>
+  {% for cachedata in item.cache_data() %}
+          <tr>
+            <td>{{ cachedata[0] }}</td>
+            <td style="text-align:right;"><a  href="{{ cachedata[2]+'#openModal' }}" rel="nofollow">{{ cachedata[1] }}</a></td>
+          </tr>
+  {% endfor %}
+        </tbody>
+      </table>
+{% endif %}
+  </div>
+</div>

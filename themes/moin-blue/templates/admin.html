@@ -1,0 +1,4 @@
+{% if admin_issue == arg_name.STR_ARG_ADMIN_ISSUE_PERMISSION %}{% include 'admin_permission.html' %}
+{% elif admin_issue == arg_name.STR_ARG_ADMIN_ISSUE_STAGING %}{% include 'admin_staging.html' %}
+{% elif admin_issue == arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS %}{% include 'admin_folders.html' %}
+{% endif %}

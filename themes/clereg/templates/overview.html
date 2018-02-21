@@ -1,0 +1,19 @@
+{% for item in itemlist.get_itemlist() %}
+    <div id="{{ item.name() }}" class="image">
+      <div style="height: {{item.thumbnail_xy_max() + 90}}px;">
+        <div class="itemname">{{ item.name() }}</div>
+        <div class="datetime">{{ item.strtime() }}</div>
+        <ul class="imagebar" style="width: {{item.thumbnail_x() + 12}}px;">
+      {%- for action in item.actions() %}
+          <li class="imagebar"><a href="{{ action.url }}"><img src="{{ url_prefix }}/static/img/light_red/{{action.icon}}.png"></a></li>
+      {%- endfor %}
+        </ul>
+        <a href="{{ item.item_url()|safe }}">
+          <div class="image_bg" style="width: {{item.thumbnail_x() + 12}}px; height: {{item.thumbnail_y() + 12}}px;">
+            <img src="{{ item.thumbnail_url() }}" style="margin: 6px 6px;" alt="{{ item.name() }}">
+          </div>
+        </a>
+      </div>
+    </div>
+{% endfor %}
+    <div class="clearfix"></div>

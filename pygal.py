@@ -4,10 +4,11 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: - switch user implementieren
-#       - Email notification of rights changes to admins and changed user
+# TODO: - Delete führt in der Übersicht zu dem vorherigen Element (#IMG...)
 #       - Implement Lostpass functionality (send link to userprefs with temporary access key)
+#       - Email notification of rights changes to admins and changed user
 #       - Kopieren der Public permissions bei Erstellung eines Accounts
+#       - switch user implementieren
 #       - Check some pages with https://validator.w3.org/nu/?doc=https%3A%2F%2Fminefield.mount-mockery.de%2F
 #       - Permission check of all pathes in pygal_config at startup to avoid runtime errors and data losses
 #       - Folgeseiten von Staging überarbeiten:
@@ -45,11 +46,12 @@ import os
 import logging
 from pygal_config import DEBUG
 from pygal_config import secret_key
+from pygal_config import theme_path
 from auth import user_data_handler
 from items.database import indexed_search
 
-static_folder = os.path.join('theme', 'static')
-template_folder = os.path.join('theme', 'templates')
+static_folder = os.path.join(theme_path, 'static')
+template_folder = os.path.join(theme_path, 'templates')
 
 if __name__ == "__main__":
     from pygal_config import url_prefix

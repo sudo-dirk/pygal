@@ -239,7 +239,7 @@ class database_handler(dict, report.logit):
 
     def get_tag_icon(self, tag_id):
         self._init_database_()
-        return config.url_prefix + '/static/common/img/%d.png' % (int(tag_id) % 10)
+        return '%d' % (int(tag_id) % 10)
 
     def get_upload_src_ip(self):
         self._init_database_()

@@ -48,7 +48,7 @@ class video(picture):
                 self._xnail_info = dict()
         VERSION = '__module_version_citem_creation_%d__' % size
         WATERMARK = '__watermark_uid_citem_creation_%d__' % size
-        watermark_path = os.path.join(os.path.join(os.path.dirname(__file__), '..'), 'theme', 'static', 'common', 'img', 'thumbnail_movie.png')
+        watermark_path = os.path.join(os.path.join(os.path.dirname(__file__), '..'), 'theme', 'static', 'overlay', 'movie.png')
         if force or not os.path.exists(self.citem_filename(size)) or self._xnail_info.get(VERSION) != __version__ + this_method_version or self._xnail_info.get(WATERMARK) != fstools.uid(watermark_path):
             self.logit_info(logger, 'creating citem (%d) for %s', size, self.name())
             try:

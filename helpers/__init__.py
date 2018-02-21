@@ -70,9 +70,9 @@ class link(object):
 
 
 class piclink(link):
-    def __init__(self, url, name, pic):
+    def __init__(self, url, name, icon):
         link.__init__(self, url, name)
-        self.pic = pic
+        self.icon = icon
 
 
 def strargs(args):
