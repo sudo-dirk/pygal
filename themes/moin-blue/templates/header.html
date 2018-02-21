@@ -73,13 +73,15 @@
           <div class="col-md-8 col-sm-8 col-xs-8">
             <div class="moin-navbar-collapse navbar-collapse collapse in">
               <ul class="nav navbar-nav moin-pull-right">
-                {% for key in ['admin', 'upload', 'userprefs', 'login'] %}
+                {%- for key in menu_bar['keys'] %}
+                  {%- if key != 'favourite' %}
                   <li>
                     <a href="{{ menu_bar[key].url }}" title="{{ menu_bar[key].name }}" rel="nofollow">
                       <span><img src="{{url_prefix}}/static/common/img/light/{{menu_bar[key].icon}}.png"></span>
                       <span class="hidden-sm hidden-xs">{{ menu_bar[key].name }}</span>
                     </a>
                   </li>
+                  {%- endif %}
                 {% endfor %}
               </ul>
             </div>

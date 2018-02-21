@@ -35,34 +35,43 @@ RESP_TYPE_USERPROFILE = 12
 
 def menu_bar(item, resp_type):
     mbar = {}
+    mbar['keys'] = []
     if item.user_may_admin():
+        mbar['keys'].append('admin')
         mbar['admin'] = {'name': lang.admin,
                          'active': resp_type == RESP_TYPE_ADMIN,
                          'url': item.admin_url(),
                          'icon': 'admin'}
     if item.user_may_upload():
+        mbar['keys'].append('upload')
         mbar['upload'] = {'name': lang.upload,
                           'active': resp_type == RESP_TYPE_UPLOAD,
                           'url': item.upload_url(),
                           'icon': 'upload'}
     if pygal_user.chk_login():
+        mbar['keys'].append('userprefs')
         mbar['userprefs'] = {'name': lang.user,
                              'active': resp_type == RESP_TYPE_USERPROFILE,
                              'url': item.userprofile_url(),
                              'icon': 'user'}
-        mbar['login'] = {'name': lang.logout,
+        mbar['keys'].append('logout')
+        mbar['logout'] = {'name': lang.logout,
                          'active': False,
                          'url': item.logout_url(),
                          'icon': 'logout'}
+        mbar['keys'].append('favourite')
         mbar['favourite'] = {'name': lang.view_fav,
                              'active': False,
                              'url': item.favourite_url(),
                              'icon': 'favourite'}
     else:
+        mbar['keys'].append('login')
         mbar['login'] = {'name': lang.login,
                          'active': resp_type == RESP_TYPE_LOGIN,
                          'url': item.login_url(),
                          'icon': 'login'}
+    mbar['reverse_keys'] = [key for key in mbar['keys']]
+    mbar['reverse_keys'].reverse()
     return mbar
 
 
