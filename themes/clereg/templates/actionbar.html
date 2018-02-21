@@ -1,5 +1,5 @@
     <ul class="menubar">
-    {%- for action in action_bar %}
-      <li class="menubar"><a href="{{action.url}}" {% if action.active %}class="active_menu"{% endif%}>{% if action.icon %}<span><img src="{{ url_prefix }}/static/img/light_red/{{action.icon}}.png"></span> {% endif %}<span class="menu_hide">{{ action.name }}</span></a></li>
+    {%- for key in action_bar['keys'] %}
+      <li class="menubar"><a href="{{action_bar[key].url}}" {% if action_bar[key].active %}class="active_menu"{% endif%}>{% if action_bar[key].icon %}<span><img src="{{ url_prefix }}/static/img/light_red/{{action_bar[key].icon}}.png"></span> {% endif %}<span class="menu_hide">{{ action_bar[key].name }}</span></a></li>
     {%- endfor %}
     </ul>

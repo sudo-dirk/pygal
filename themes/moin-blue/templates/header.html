@@ -104,11 +104,11 @@
         </ul> 
 
         <ul class="moin-nav nav-tabs moin-shadow">
-        {% for action in action_bar %}
+        {% for key in action_bar['keys'] %}
           <li>
-            <a  href="{{action.url}}" title="{{action.name}}" rel="nofollow">
-              <span><img src="{{url_prefix}}/static/common/img/{{action.icon}}.png"></span>
-              <span class="hidden-sm hidden-xs">{{action.name}}</span>
+            <a  href="{{action_bar[key].url}}" title="{{action_bar[key].name}}" rel="nofollow">
+              <span><img src="{{url_prefix}}/static/common/img/{{action_bar[key].icon}}.png"></span>
+              <span class="hidden-sm hidden-xs">{{action_bar[key].name}}</span>
             </a>
           </li>
         {% endfor %}

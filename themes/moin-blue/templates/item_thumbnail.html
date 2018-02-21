@@ -7,9 +7,11 @@
   {% endif %}
   {% if action_bar %}
     <ul id="pygal-actions" class="panel">
-      {% for action in item.actions() %}
-        <li class="pygal-action"><a href="{{ action.url }}"><img src="{{url_prefix}}/static/common/img/{{ action.icon }}.png" alt="{{ action.name }}"></a></li>
+      {% with action_bar = action_bar_fkt(item) %}
+      {% for key in action_bar['keys'] %}
+        <li class="pygal-action"><a href="{{ action_bar[key].url }}"><img src="{{url_prefix}}/static/common/img/{{ action_bar[key].icon }}.png" alt="{{ action_bar[key].name }}"></a></li>
       {% endfor %}
+      {% endwith %}
     </ul>
   {% endif %}
   <div class="thumb_image_bg" style="width: {{item.thumbnail_x() + 12}}px; height: {{item.thumbnail_y() + 12}}px; margin-top: 0px;">

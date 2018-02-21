@@ -9,7 +9,6 @@ import helpers
 from helpers import db_filename_by_relpath
 from helpers import decode
 from helpers import encode
-from helpers import piclink
 from helpers import simple_info
 from helpers import strargs
 import lang
@@ -290,11 +289,8 @@ class base_object(report.logit, gallery_urls):
         return 1 if self.exists() else 0
 
     def actions(self):
-        rv = list()
-        rv.append(piclink(self.info_url(), 'Info', 'info'))
-        if self.user_may_download():
-            rv.append(piclink(self.download_url(), 'Download', 'download'))
-        return rv
+        import app_views
+        return [app_views.ACTION_INFO, app_views.ACTION_DOWNLOAD]
 
     def download_url(self):
         return gallery_urls.download_url(self) + (strargs({'q': flask.request.args.get('q')}) if self.is_a_searchresult() else '')
@@ -412,20 +408,21 @@ class base_item(base_object, database_handler):
         self._cache_path = cache_path
 
     def actions(self):
+        import app_views
         rv = base_object.actions(self)
         if pygal_user.chk_login():
             if self.is_favourite():
-                rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_REMOVE), 'Remove Favourite', 'is_favourite'))
+                rv.append(app_views.ACTION_IS_FAVOURITE)
             else:
-                rv.append(piclink(self.favourite_url(helpers.STR_ARG_FAVOURITE_ADD), 'Add Favourite', 'favourite'))
+                rv.append(app_views.ACTION_FAVOURITE)
         if self.user_may_edit():
-            rv.append(piclink(self.add_tag_url(), 'Add Tag', 'edit'))
+            rv.append(app_views.ACTION_EDIT)
         if self.slideshow():
-            rv.append(piclink(self.item_url(), 'Stop Slideshow', 'stop'))
+            rv.append(app_views.ACTION_STOP)
         else:
-            rv.append(piclink(self.slideshow_url(), 'Start Slideshow', 'play'))
+            rv.append(app_views.ACTION_PLAY)
         if self.user_may_delete():
-            rv.append(piclink(self.delete_url(), 'Delete', 'delete'))
+            rv.append(app_views.ACTION_DELETE)
         return rv
 
     def cache_data(self):

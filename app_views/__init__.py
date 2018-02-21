@@ -15,6 +15,7 @@ import os
 import prefixes
 import pygal_config as config
 from pylibs import fstools
+from pylibs import osm
 import urllib
 from auth import pygal_user
 
@@ -32,6 +33,15 @@ RESP_TYPE_REGISTER = 10
 RESP_TYPE_UPLOAD = 11
 RESP_TYPE_USERPROFILE = 12
 
+ACTION_INFO = 'info'
+ACTION_DOWNLOAD = 'download'
+ACTION_IS_FAVOURITE = 'is_favourite'
+ACTION_FAVOURITE = 'favourite'
+ACTION_EDIT = 'edit'
+ACTION_PLAY = 'play'
+ACTION_STOP = 'stop'
+ACTION_DELETE = 'delete'
+ACTION_GPS = 'gps'
 
 def menu_bar(item, resp_type):
     mbar = {}
@@ -49,8 +59,8 @@ def menu_bar(item, resp_type):
                           'url': item.upload_url(),
                           'icon': 'upload'}
     if pygal_user.chk_login():
-        mbar['keys'].append('userprefs')
-        mbar['userprefs'] = {'name': lang.user,
+        mbar['keys'].append('user')
+        mbar['user'] = {'name': lang.user,
                              'active': resp_type == RESP_TYPE_USERPROFILE,
                              'url': item.userprofile_url(),
                              'icon': 'user'}
@@ -75,6 +85,60 @@ def menu_bar(item, resp_type):
     return mbar
 
 
+def action_bar(item, resp_type=None):
+    try:
+        gps_link = osm.landmark_link(item.gps())
+    except AttributeError:
+        gps_link = None
+    actions = {
+        ACTION_DELETE: {'name': 'Delete',
+                        'active': resp_type == RESP_TYPE_DELETE,
+                        'url': item.delete_url(),
+                        'icon': 'delete'},
+        ACTION_DOWNLOAD: {'name': 'Download',
+                          'active': False,
+                          'url': item.download_url(),
+                          'icon': 'download'},
+        ACTION_EDIT:{'name': 'Add Tag',
+                     'active': False,
+                     'url': item.add_tag_url(),
+                     'icon': 'edit'},
+        ACTION_FAVOURITE:{'name': 'Add Favourite',
+                          'active': False,
+                          'url': item.favourite_url(helpers.STR_ARG_FAVOURITE_ADD),
+                          'icon': 'favourite'},
+        ACTION_GPS:{'name': 'GPS',
+                    'active': False,
+                    'url': gps_link,
+                    'icon': 'gps'},
+        ACTION_INFO: {'name': 'Info',
+                      'active': resp_type == RESP_TYPE_INFO,
+                      'url': item.info_url(),
+                      'icon': 'info'},
+        ACTION_IS_FAVOURITE:{'name': 'Remove Favourite',
+                             'active': False,
+                             'url': item.favourite_url(helpers.STR_ARG_FAVOURITE_REMOVE),
+                             'icon': 'is_favourite'},
+        ACTION_PLAY:{'name': 'Start Slideshow',
+                     'active': False,
+                     'url': item.slideshow_url(),
+                     'icon': 'play'},
+        ACTION_STOP:{'name': 'Stop Slideshow',
+                     'active': False,
+                     'url': item.item_url(),
+                     'icon': 'stop'},
+        }
+    abar = {}
+    abar['keys'] = []
+    for key in item.actions():
+        if key in actions:
+            abar['keys'].append(key)
+            abar[key] = actions[key]
+    abar['reverse_keys'] = [key for key in abar['keys']]
+    abar['reverse_keys'].reverse()
+    return abar
+
+
 def navigation_list(item_name):
     rv = list()
     rel_url = decode(os.path.join(item_name))
@@ -88,20 +152,21 @@ def navigation_list(item_name):
 
 
 def admin_actions(item, current_issue):
-    actions = list()
-    actions.append({'name': 'Permissions',
-                    'active': helpers.STR_ARG_ADMIN_ISSUE_PERMISSION == current_issue,
-                    'url': item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_PERMISSION}),
-                    'icon': 'permission'})
-    actions.append({'name': 'Staging',
-                    'active': helpers.STR_ARG_ADMIN_ISSUE_STAGING == current_issue,
-                    'url': item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_STAGING}),
-                    'icon': 'staging'})
-    actions.append({'name': 'Folders',
-                    'active': helpers.STR_ARG_ADMIN_ISSUE_FOLDERS == current_issue,
-                    'url': item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_FOLDERS}),
-                    'icon': 'folder'})
-    return actions
+    return {'keys': ['permission', 'staging', 'folder'],
+            'reverse_keys': ['folder', 'staging', 'permission'],
+            'permission': {'name': 'Permissions',
+                           'active': helpers.STR_ARG_ADMIN_ISSUE_PERMISSION == current_issue,
+                           'url': item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_PERMISSION}),
+                           'icon': 'permission'},
+            'staging': {'name': 'Staging',
+                        'active': helpers.STR_ARG_ADMIN_ISSUE_STAGING == current_issue,
+                        'url': item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_STAGING}),
+                        'icon': 'staging'},
+            'folder': {'name': 'Folders',
+                       'active': helpers.STR_ARG_ADMIN_ISSUE_FOLDERS == current_issue,
+                       'url': item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_FOLDERS}),
+                       'icon': 'folder'}
+    }
 
 
 def get_form_user():
@@ -118,7 +183,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             search=lang.search,
             menu_bar=menu_bar(item, resp_type),
             navigation_list=navigation_list(item._rel_path), 
-            action_bar=item.actions(),
+            action_bar=action_bar(item, resp_type),
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('add_tag.html', item=item, tag_id=tag_id)
@@ -168,7 +233,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             search=lang.search,
             menu_bar=menu_bar(item, resp_type),
             navigation_list=navigation_list(item._rel_path),
-            action_bar=item.actions(),
+            action_bar=action_bar(item, resp_type),
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('delete.html', item=item)
@@ -220,7 +285,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             search=lang.search,
             menu_bar=menu_bar(item, resp_type),
             navigation_list=navigation_list(item._rel_path),
-            action_bar=item.actions(),
+            action_bar=action_bar(item, resp_type),
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         index = int(flask.request.args.get(helpers.STR_ARG_CACHEDATA_INDEX, -1))
@@ -261,11 +326,11 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             search=lang.search,
             menu_bar=menu_bar(item, resp_type),
             navigation_list=navigation_list(item._rel_path),
-            action_bar=item.actions(),
+            action_bar=action_bar(item, resp_type),
             url_prefix=config.url_prefix, 
             error=error, hint=hint, info=info,
             slideshow={'stay_time': item.stay_time(), 'prv_url': item.prv().slideshow_url()} if item.slideshow() else None)
-        rv += flask.render_template('item_view.html', item=item)
+        rv += flask.render_template('item_view.html', item=item, action_bar_fkt=action_bar)
         rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_LOGIN and item is not None:
