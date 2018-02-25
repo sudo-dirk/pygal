@@ -195,10 +195,24 @@ class database_handler(dict, report.logit):
         except:
             return ''
 
+    def get_tag_wn_x_perc(self, tag_id):
+        self._init_database_()
+        try:
+            return self[self.KEY_TAGS][tag_id]['x'] * 100.
+        except:
+            return 0.
+
     def get_tag_wn_y(self, tag_id):
         self._init_database_()
         try:
             return int(self[self.KEY_TAGS][tag_id]['y'] * self.webnail_y())
+        except:
+            return ''
+
+    def get_tag_wn_y_perc(self, tag_id):
+        self._init_database_()
+        try:
+            return self[self.KEY_TAGS][tag_id]['y'] * 100.
         except:
             return ''
 
@@ -209,10 +223,24 @@ class database_handler(dict, report.logit):
         except:
             return ''
 
+    def get_tag_wn_w_perc(self, tag_id):
+        self._init_database_()
+        try:
+            return self[self.KEY_TAGS][tag_id]['w'] * 100.
+        except:
+            return ''
+
     def get_tag_wn_h(self, tag_id):
         self._init_database_()
         try:
             return int(self[self.KEY_TAGS][tag_id]['h'] * self.webnail_y())
+        except:
+            return ''
+
+    def get_tag_wn_h_perc(self, tag_id):
+        self._init_database_()
+        try:
+            return self[self.KEY_TAGS][tag_id]['h'] * 100.
         except:
             return ''
 

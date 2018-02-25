@@ -31,7 +31,7 @@
               {%- if not item.slideshow() %}
                 {%- for tag_id in item.get_tag_id_list() %}
                   {%- if item.tag_has_coordinates(tag_id) %}
-              <a class="tag" title="{{item.get_tag_text(tag_id)}}" {% if item.user_may_edit() %}href="{{item.add_tag_url(tag_id)}}"{% endif %} style="width:{{item.get_tag_wn_w(tag_id)}}px; height:{{item.get_tag_wn_h(tag_id)}}px; left: {{item.get_tag_wn_x(tag_id)}}px; top: {{item.get_tag_wn_y(tag_id)}}px;"></a>
+              <a class="tag" title="{{item.get_tag_text(tag_id)}}" {% if item.user_may_edit() %}href="{{item.add_tag_url(tag_id)}}"{% endif %} style="width:{{item.get_tag_wn_w_perc(tag_id)}}%; height:{{item.get_tag_wn_h_perc(tag_id)}}%; left: {{item.get_tag_wn_x_perc(tag_id)}}%; top: {{item.get_tag_wn_y_perc(tag_id)}}%;"></a>
                   {%- endif %}
                 {%- endfor %}
               {%- endif %}
