@@ -354,8 +354,9 @@ def delete(item_name):
                         n += 1
                         sc = items.staging_container(config.staging_path, os.path.basename(i.raw_path()) + '-%d' % n, i.name() + '-%d' % n, None)
                     sc.append_file_delete(i.raw_path(), i.get_database_content())
+                    redirect_url = i.parent().item_url() + helpers.strargs({'info': lang.info_item_deleted % i.name(True)}) + '#%s' % i.prv().name() 
                     i.delete()
-                    return app_views.make_response(app_views.RESP_TYPE_ITEM, i.parent(), tmc, info=lang.info_item_deleted % i.name(True))
+                    return flask.redirect(redirect_url)
             else:
                 return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=lang.error_permission_denied)
     flask.abort(404)

@@ -211,7 +211,7 @@ class staging_container(report.logit, dict):
 
 class gallery_urls(object):
     def _url(self, prefix=''):
-            return config.url_prefix + prefix + ('/' + urllib.quote(self._rel_path) if self._rel_path else '')
+        return config.url_prefix + prefix + ('/' + urllib.quote(self._rel_path) if self._rel_path else '')
         
     def item_url(self):
         return self._url()

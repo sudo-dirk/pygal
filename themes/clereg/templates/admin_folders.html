@@ -36,50 +36,27 @@
 
 
 
-    <h2>Folders</h2>
-    <div class="moin-form">
-      <form action="{{ item.admin_url() }}" method="get">
-         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
-        <dl>
-          <div>
-            <dt>
-              <label class="required" for="{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
-            </dt>
-            <dd>
-              <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()"/>
-                {% for this_action in [arg_name.STR_ARG_ADMIN_ACTION_DELETE, arg_name.STR_ARG_ADMIN_ACTION_CREATE] %}
-                <option value="{{ this_action }}" {% if action == this_action %}selected{% endif %}>{{ this_action }}</option>
-                {% endfor %}
-              </select>
-            </dd>
-          </div>
-        </dl>
-      </form>
-    </div>
+    <h1>Folders</h1>
+    <form action="{{ item.admin_url() }}" class="form" method="get">
+       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
+       <label class="required" for="{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
+       <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()"/>
+         {%- for this_action in [arg_name.STR_ARG_ADMIN_ACTION_DELETE, arg_name.STR_ARG_ADMIN_ACTION_CREATE] %}
+         <option value="{{ this_action }}" {% if action == this_action %}selected{% endif %}>{{ this_action }}</option>
+         {%- endfor %}
+       </select>
+    </form>
   
-    <div class="moin-form">
-      <form name="choose_target" action="{{ item.admin_url() }}" method="post" onsubmit="submitRightTree()">
-         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
-         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" value="{{ action }}" />
-         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_TARGET }}" id="{{ arg_name.STR_ARG_ADMIN_TARGET }}" value="" />
-         <input type="submit" value="Make it so" class="button" name="button"/><br>
-           <div style="float: left;">
-{% if action == 'create' %}
-             <dt>
-               <label class="required" for="f_folder_name">Folder Name</label>
-             </dt>
-             <dd>
-               <input class="required" required="required" type="text" name="{{ arg_name.STR_ARG_ADMIN_NAME }}" id="f_folder_name" placeholder="Folder Name" />
-             </dd>
-{% endif %}
-             <dt>
-               <label class="required" for="target-tree">Choose Target:</label>
-             </dt>
-             <dd>
-               <div id="target-tree"></div>
-             </dd>
-           </div>
-         <br style="clear:both" />
-         <input type="submit" value="Make it so" class="button" name="button"/>
-      </form>
-    </div>
+    <form name="choose_target" action="{{ item.admin_url() }}" class="form" method="post" onsubmit="submitRightTree()">
+       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
+       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" value="{{ action }}" />
+       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_TARGET }}" id="{{ arg_name.STR_ARG_ADMIN_TARGET }}" value="" />
+       <input type="submit" value="Make it so" class="button" name="button"/>
+{%- if action == 'create' %}
+       <label class="required" for="f_folder_name">Folder Name</label>
+       <input class="required" required="required" type="text" name="{{ arg_name.STR_ARG_ADMIN_NAME }}" id="f_folder_name" placeholder="Folder Name" />
+{%- endif %}
+       <label class="required" for="target-tree">Choose Target:</label>
+       <div id="target-tree"></div>
+       <input type="submit" value="Make it so" class="button" name="button"/>
+    </form>

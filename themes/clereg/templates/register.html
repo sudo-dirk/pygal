@@ -1,0 +1,11 @@
+    <form name="register" action="{{ item.register_url() }}" class="form" method="post">
+      <label class="required" for="f_register_username">Username</label>
+      <input type="text" name="register_username" value="" class="required" id="f_register_username" placeholder="{{ lang.login_desc }}" required="required" />
+      <label class="required" for="f_register_password1">Password</label>
+      <input type="password" name="register_password1" class="required" id="f_register_password1" placeholder="{{ lang.password_desc }}" required="required" />
+      <label class="required" for="f_register_password2">Password</label>
+      <input type="password" name="register_password2" class="required" id="f_register_password2" placeholder="{{ lang.password2_desc }}" required="required" />
+      <label class="required" for="f_register_email">E-Mail</label>
+      <input type="email" name="register_email" value="" class="required" id="f_register_email" placeholder="{{ lang.email_desc }}" required="required" />
+      <input type="submit" value="Register" class="button" />
+    </form>

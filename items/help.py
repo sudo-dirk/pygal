@@ -17,13 +17,14 @@ class help_object(items.base_object):
             return "Help Information for %s is not yet implemented" % self.help_type
 
     def item_url(self, args=None):
-        return self._url() + (helpers.strargs(args) if args is not None else '')
+        return (self._url() or '/') + (helpers.strargs(args) if args is not None else '')
+
     def search(self):
         return """
-<h2> Search ... </h2>
+<h1> Search ... </h1>
 Without any special activity, the search will find your pattern in the path (inside pygal) and your tags. If you want to search in the tags or path only, see also the key definitions and examples.<br> You can use wildcards, ...
-<h2> Keys </h2>
-<h3> Common Keys </h3>
+<h1> Keys </h1>
+<h2> Common Keys </h2>
     <ul>
       <li>path (TEXT)</li>
       <li>tags (TEXT)</li>
@@ -38,7 +39,7 @@ Without any special activity, the search will find your pattern in the path (ins
       <li>upload_ip (TEXT)</li>
       <li>upload_date (DATETIME)</li>
     </ul>
-<h3> Keys for pictures </h3>
+<h2> Keys for pictures </h2>
     <ul>
       <li>date (DATETIME)</li>
       <li>height (NUMERIC)</li>
@@ -52,14 +53,14 @@ Without any special activity, the search will find your pattern in the path (ins
       <li>exposure_program (TEXT)</li>
       <li>iso (NUMERIC)</li>
     </ul>
-<h3> Keys for videos </h3>
+<h2> Keys for videos </h2>
     <ul>
       <li>date (DATETIME)</li>
       <li>height (NUMERIC)</li>
       <li>width (NUMERIC)</li>
       <li>duration (NUMERIC)</li>
     </ul>
-<h3> Examples </h3>
+<h1> Examples </h1>
     <ul>
       <li><a href="%(search_example1)s">type:video AND date:2018</a> gives results with all videos in year 2018</li>
       <li><a href="%(search_example2)s">date:[-2y to now]</a> gives results with all item of the last two years</li>

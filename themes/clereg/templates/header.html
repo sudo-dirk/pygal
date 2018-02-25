@@ -4,12 +4,10 @@
     <title>{{ title }}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="{{url_prefix}}/static/logos/favicon.ico" />
+    <link rel="shortcut icon" href="{{url_prefix}}/static/img/favicon.ico" />
     {% if slideshow %}
       <meta http-equiv="refresh" content="{{ slideshow.stay_time }};url={{ slideshow.prv_url }}">
     {% endif %}
-
-    <link media="all" rel="stylesheet" href="{{url_prefix}}/static/css/pygal.css" />
 
     <link href="{{ url_prefix }}/static/js/video-js/video-js.css" rel="stylesheet">
     <script src="{{ url_prefix }}/static/js/video-js/video.js"></script>
@@ -25,25 +23,18 @@
     <link href="{{ url_prefix }}/static/js/renderjson-js/renderjson.css" rel="stylesheet">
     <script type="text/javascript" src="{{url_prefix}}/static/js/renderjson-js/renderjson.js"></script>
 
-    <script>
-      /* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */
-      function myFunction() {
-        var x = document.getElementById("myTopnav");
-        if (x.className === "topnav") {
-          x.className += " responsive";
-        } else {
-          x.className = "topnav";
-        }
-      }
-    </script>
+    <style>
+{% include 'pygal.css' %}
+    </style>
 
   </head>
   <body lang="en" dir="ltr">
 
-    <ul class="titlebar">
-      <li class="titlebar">{{ title }}</li>
-      <li class="titlebar" style="float:right"><form action="/"><input type="text" placeholder="{{ search }}..." name="q"></form></li>
-    </ul>
+    <form class="titlebar container" action="/">
+      <div class="page-logo"><a href="{{url_prefix}}/"><img src="{{url_prefix}}/static/img/logo.png"></a></div>
+      {{ title }}
+      <input type="text" placeholder="{{ search }}..." name="q">
+    </form>
 
 {% include 'menubar.html' %}
 

@@ -4,8 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: - Delete führt in der Übersicht zu dem vorherigen Element (#IMG...)
-#       - Implement Lostpass functionality (send link to userprefs with temporary access key)
+# TODO: - Implement Lostpass functionality (send link to userprefs with temporary access key)
 #       - Email notification of rights changes to admins and changed user
 #       - Kopieren der Public permissions bei Erstellung eines Accounts
 #       - switch user implementieren

@@ -81,75 +81,41 @@
 </script>
 
 
-<h2>Permissions</h2>
-<div class="moin-form">
-  <form action="{{ item.admin_url() }}">
-    <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE}}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_PERMISSION }}" />
-    <dl>
-      <div>
-        <dt>
-          <label class="required" for="{{ arg_name.STR_ARG_ADMIN_USER }}">{{ lang.user }}:</label>
-        </dt>
-        <dd>
-          <select name="{{ arg_name.STR_ARG_ADMIN_USER }}" onchange="this.form.submit()"/>
-            <option value {% if not user_to_admin %}selected {%endif %}>public-permissions</option>
-            {% for user in pygal_user.users() %}
-            <option value="{{ user }}" {% if user == user_to_admin %}selected{% endif %}>{{ user }}</option>
-            {% endfor %}
-          </select>
-        </dd>
+    <h1>Permissions</h1>
+    <form action="{{ item.admin_url() }}" class="form">
+      <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE}}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_PERMISSION }}" />
+      <label class="required" for="{{ arg_name.STR_ARG_ADMIN_USER }}">{{ lang.user }}:</label>
+      <select name="{{ arg_name.STR_ARG_ADMIN_USER }}" onchange="this.form.submit()"/>
+        <option value {% if not user_to_admin %}selected {%endif %}>public-permissions</option>
+        {%- for user in pygal_user.users() %}
+        <option value="{{ user }}" {% if user == user_to_admin %}selected{% endif %}>{{ user }}</option>
+        {%- endfor %}
+      </select>
+    </form>
+
+    <form name="change_user_rights" action="{{ item.admin_url() }}" class="form" method="post" onsubmit="submitRightTree()">
+      <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_USER }}" id="{{ arg_name.STR_ARG_ADMIN_USER }}" value="{{ user_to_admin }}" />
+      <input type="hidden" name="view-rights" id="view-rights" value="" />
+      <input type="hidden" name="edit-rights" id="edit-rights" value="" />
+      <input type="hidden" name="delete-rights" id="delete-rights" value="" />
+      <input type="submit" value="Set permissions" class="button" name="action"/>
+      <label class="required" for="upload-right">Upload:</label>
+      <input type="checkbox" name="upload-right" value="true" id="download-right"  {% if pygal_user.admin_upload_right(user_to_admin) %}checked{% endif %}>
+      <label class="required" for="download-right">Download:</label>
+      <input type="checkbox" name="download-right" value="true" id="download-right"  {% if pygal_user.admin_download_right(user_to_admin) %}checked{% endif %}>
+      <br style="clear:both;">
+      <br style="clear:both;">
+      <div style="float: left;">
+        <label class="required" for="view-right-tree">View:</label>
+        <div id="view-right-tree"></div>
       </div>
-    </dl>
-  </form>
-</div>
-<div class="moin-form">
-  <form name="change_user_rights" action="{{ item.admin_url() }}" method="post" onsubmit="submitRightTree()">
-     <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_USER }}" id="{{ arg_name.STR_ARG_ADMIN_USER }}" value="{{ user_to_admin }}" />
-     <input type="hidden" name="view-rights" id="view-rights" value="" />
-     <input type="hidden" name="edit-rights" id="edit-rights" value="" />
-     <input type="hidden" name="delete-rights" id="delete-rights" value="" />
-     <input type="submit" value="Set permissions" class="button" name="action"/>
-     <dl>
-       <div>
-         <dt>
-           <label class="required" for="upload-right">Upload:</label>
-         </dt>
-         <dd>
-           <input type="checkbox" name="upload-right" value="true" id="download-right"  {% if pygal_user.admin_upload_right(user_to_admin) %}checked{% endif %}>
-         </dd>
-         <dt>
-           <label class="required" for="download-right">Download:</label>
-         </dt>
-         <dd>
-           <input type="checkbox" name="download-right" value="true" id="download-right"  {% if pygal_user.admin_download_right(user_to_admin) %}checked{% endif %}>
-         </dd>
-       </div>
-       <div  style="float: left;">
-         <dt>
-           <label class="required" for="view-right-tree">View:</label>
-         </dt>
-         <dd>
-           <div id="view-right-tree"></div>
-         </dd>
-       </div>
-       <div style="float: left;">
-         <dt>
-           <label class="required" for="edit-right-tree">Edit:</label>
-         </dt>
-         <dd>
-           <div id="edit-right-tree"></div>
-         </dd>
-       </div>
-       <div style="float: left;">
-         <dt>
-           <label class="required" for="delete-right-tree">Delete:</label>
-         </dt>
-         <dd>
-           <div id="delete-right-tree"></div>
-         </dd>
-       </div>
-     </dl>
-     <br style="clear:both" />
-     <input type="submit" value="Set permissions" class="button" name="action"/>
-  </form>
-</div>
+      <div style="float: left;">
+        <label class="required" for="edit-right-tree">Edit:</label>
+        <div id="edit-right-tree"></div>
+      </div>
+      <div style="float: left;">
+          <label class="required" for="delete-right-tree">Delete:</label>
+          <div id="delete-right-tree"></div>
+      </div>
+      <input type="submit" value="Set permissions" class="button" name="action"/>
+    </form>

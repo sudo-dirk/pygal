@@ -175,6 +175,9 @@ def get_form_user():
 
 
 def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
+    hint = hint or flask.request.args.get('hint')
+    info = info or flask.request.args.get('info')
+    error = error or flask.request.args.get('error')
     if resp_type is RESP_TYPE_ADD_TAG and item is not None:
         tag_id = flask.request.args.get(helpers.STR_ARG_TAG_INDEX)
         rv = flask.render_template(

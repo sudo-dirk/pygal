@@ -1,27 +1,9 @@
-<div id="moin-page" lang="en" dir="ltr">
-  <div id="moin-content">
-    <div class="moin-form">
-      <form name="upload" id="upload" action="{{ item.upload_url() }}" method="post" enctype="multipart/form-data">
-        <dt>
-          <label class="required" for="f_container_name">Container Name</label>
-        </dt>
-        <dd>
-          <input class="required" required="required" type="text" name="container_name" id="f_container_name" placeholder="Container Name" />
-        </dd>
-        <dt>
-          <label class="required" for="f_files">Choose Files</label>
-        </dt>
-        <dd>
-        <input  class="required" required="required" type="file" name="file[]" id="f_files" multiple>
-        </dd>
-        <dt>
-          <label for="f_submit"></label>
-        </dt>
-        <dd>
-        <input type="submit" value="Upload" class="button" id="f_submit" />
-        </dd>
-      </form>
-    </div>
-  </div>
-</div>
+    <form name="upload" id="upload" action="{{ item.upload_url() }}" class="form" method="post" enctype="multipart/form-data">
+      <label class="required" for="f_container_name">Container Name</label>
+      <input class="required" required="required" type="text" name="container_name" id="f_container_name" placeholder="Container Name" />
+      <label class="required" for="f_files">Choose Files</label>
+      <input  class="required" required="required" type="file" name="file[]" id="f_files" multiple>
+      <label for="f_submit"></label>
+      <input type="submit" value="Upload" class="button" id="f_submit" />
+    </form>
     
