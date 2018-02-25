@@ -1,16 +1,13 @@
     <div id="{{ item.prv().name() }}" class="image">
-      <div>
-        <a href="{{ item.prv().item_url()|safe }}">
-          <div class="image_bg" style="width: {{item.prv().thumbnail_x() + 12}}px; height: {{item.prv().thumbnail_y() + 12}}px;">
-            <img src="{{ item.prv().thumbnail_url() }}" style="margin: 6px 6px;" alt="{{ item.prv().name() }}">
-          </div>
-        </a>
-      </div>
+      <a href="{{ item.prv().item_url()|safe }}">
+        <div class="image_bg">
+          <img src="{{ item.prv().thumbnail_url() }}" alt="{{ item.prv().name() }}">
+        </div>
+      </a>
     </div>
 
 
     <div id="main" class="image">
-      <div>
 
         <ul class="imagebar">
         {%- for tag_id in item.get_tag_id_list() %}
@@ -28,13 +25,13 @@
         </ul>
 
         {% if item.user_may_download() %}<a href="{{ item.raw_url() }}">{% endif %}
-          <div class="image_bg" style="width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
+          <div class="image_bg">
             <div class="container">
-              <img src="{{ item.webnail_url() }}" style="margin: 6px 6px;" alt="{{ item.name() }}">
+              <img class="webnail" src="{{ item.webnail_url() }}" alt="{{ item.name() }}">
               {%- if not item.slideshow() %}
                 {%- for tag_id in item.get_tag_id_list() %}
                   {%- if item.tag_has_coordinates(tag_id) %}
-              <a class="tag" title="{{item.get_tag_text(tag_id)}}" {% if item.user_may_edit() %}href="{{item.add_tag_url(tag_id)}}"{% endif %} style="width:{{item.get_tag_wn_w(tag_id)}}px; height:{{item.get_tag_wn_h(tag_id)}}px; left: {{item.get_tag_wn_x(tag_id)+6}}px; top: {{item.get_tag_wn_y(tag_id)+6}}px;"></a>
+              <a class="tag" title="{{item.get_tag_text(tag_id)}}" {% if item.user_may_edit() %}href="{{item.add_tag_url(tag_id)}}"{% endif %} style="width:{{item.get_tag_wn_w(tag_id)}}px; height:{{item.get_tag_wn_h(tag_id)}}px; left: {{item.get_tag_wn_x(tag_id)}}px; top: {{item.get_tag_wn_y(tag_id)}}px;"></a>
                   {%- endif %}
                 {%- endfor %}
               {%- endif %}
@@ -42,18 +39,15 @@
           </div>
         {% if item.user_may_download() %}</a>{% endif %}
 
-      </div>
     </div>
 
 
     <div id="{{ item.nxt().name() }}" class="image">
-      <div>
-        <a href="{{ item.nxt().item_url()|safe }}">
-          <div class="image_bg" style="width: {{item.nxt().thumbnail_x() + 12}}px; height: {{item.nxt().thumbnail_y() + 12}}px;">
-            <img src="{{ item.nxt().thumbnail_url() }}" style="margin: 6px 6px;" alt="{{ item.nxt().name() }}">
-          </div>
-        </a>
-      </div>
+      <a href="{{ item.nxt().item_url()|safe }}">
+        <div class="image_bg">
+          <img src="{{ item.nxt().thumbnail_url() }}" alt="{{ item.nxt().name() }}">
+        </div>
+      </a>
     </div>
 
 

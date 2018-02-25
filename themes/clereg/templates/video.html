@@ -1,51 +1,44 @@
+
     <div id="{{ item.prv().name() }}" class="image">
-      <div>
-        <a href="{{ item.prv().item_url()|safe }}">
-          <div class="image_bg" style="width: {{item.prv().thumbnail_x() + 12}}px; height: {{item.prv().thumbnail_y() + 12}}px;">
-            <img src="{{ item.prv().thumbnail_url() }}" style="margin: 6px 6px;" alt="{{ item.prv().name() }}">
-          </div>
-        </a>
-      </div>
+      <a href="{{ item.prv().item_url()|safe }}">
+        <div class="image_bg">
+          <img src="{{ item.prv().thumbnail_url() }}" alt="{{ item.prv().name() }}">
+        </div>
+      </a>
     </div>
 
 
     <div id="main" class="image">
-      <div>
 
-        <ul class="imagebar">
-        {%- for tag_id in item.get_tag_id_list() %}
-          <li class="imagebar">
-            <a  {% if item.user_may_edit() %}href="{{item.add_tag_url(tag_id)}}"{% endif %} title="{{item.get_tag_text(tag_id)}}" rel="nofollow">
-              <span>
-                <img src="{{ url_prefix }}/static/img/light_red/{{item.get_tag_icon(tag_id)}}.png">
-              </span>
-              <span class="menu_hide">{{item.get_tag_text(tag_id)}}</span>
-            </a>
-          </li>
-        {%- endfor %}
-        </ul>
+      <ul class="imagebar">
+      {%- for tag_id in item.get_tag_id_list() %}
+        <li class="imagebar">
+          <a  {% if item.user_may_edit() %}href="{{item.add_tag_url(tag_id)}}"{% endif %} title="{{item.get_tag_text(tag_id)}}" rel="nofollow">
+            <span>
+              <img src="{{ url_prefix }}/static/img/light_red/{{item.get_tag_icon(tag_id)}}.png">
+            </span>
+            <span class="menu_hide">{{item.get_tag_text(tag_id)}}</span>
+          </a>
+        </li>
+      {%- endfor %}
+      </ul>
 
-        <div class="image_bg container" style="width: {{item.webnail_x() + 12}}px; height: {{item.webnail_y() + 12}}px;">
-          <div  style="left: 6px; top: 6px; position:absolute;">
-            <video id="MY_VIDEO_1" class="video-js vjs-default-skin" controls poster="{{item.webnail_url()}}" preload="auto" width="{{ item.webnail_x() }}" height="{{ item.webnail_y() }}" {% if item.slideshow() %}autoplay="true"{% endif %} data-setup="{}">
-              <source src="{{ item.raw_url() }}" type='{{ item.mime_type() }}'>
-              <p class="vjs-no-js">To view {{item.name()}} please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
-            </video>
-          </div>
-        </div>
-
+      <div class="image_bg container" >
+        <video id="MY_VIDEO_1" class="video-js vjs-default-skin webnail" controls poster="{{item.webnail_url()}}" preload="auto" width="{{ item.webnail_x() }}" height="{{ item.webnail_y() }}" {% if item.slideshow() %}autoplay="true"{% endif %} data-setup="{}">
+          <source src="{{ item.raw_url() }}" type='{{ item.mime_type() }}'>
+          <p class="vjs-no-js">To view {{item.name()}} please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+        </video>
       </div>
+
     </div>
 
 
     <div id="{{ item.nxt().name() }}" class="image">
-      <div>
-        <a href="{{ item.nxt().item_url()|safe }}">
-          <div class="image_bg" style="width: {{item.nxt().thumbnail_x() + 12}}px; height: {{item.nxt().thumbnail_y() + 12}}px;">
-            <img src="{{ item.nxt().thumbnail_url() }}" style="margin: 6px 6px;" alt="{{ item.nxt().name() }}">
-          </div>
-        </a>
-      </div>
+      <a href="{{ item.nxt().item_url()|safe }}">
+        <div class="image_bg">
+          <img src="{{ item.nxt().thumbnail_url() }}" alt="{{ item.nxt().name() }}">
+        </div>
+      </a>
     </div>
 
 

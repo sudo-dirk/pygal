@@ -363,20 +363,27 @@ position: relative;
 	background-color: transparent; 
 }
 .image { 
-    padding: 6px 6px; 
     float: left; 
+    margin: 6px;
 } 
 
 .image_bg { 
-background: #333; 
+    background: #333;
+    padding: 6px;
 } 
 
 .image_bg:hover { 
-background: #dd0000; 
+    background: #dd0000; 
 } 
 
+.webnail {
+	max-width: 90vw;
+	max-height: 90vh;
+}
+
+
 ul.imagebar { 
-min-width: 140px; 
+    min-width: 140px; 
     list-style-type: none; 
     margin: 0; 
     padding: 0; 
@@ -386,12 +393,12 @@ min-width: 140px;
 
 li.imagebar { 
     color: #ffe2e2; 
-float: left; 
+    float: left; 
     font-size: 18px; 
 } 
 
 li.imagebar a { 
-display: block; 
+    display: block; 
     color: #ffe2e2; 
     text-align: center; 
     padding: 2px 2px; 
