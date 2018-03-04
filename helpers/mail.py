@@ -11,7 +11,7 @@ logger = logging.getLogger('pygal.items')
 
 
 def to_adr_admins():
-    return '; '.join([auth.user_data_handler(user).get_email() for user in config.admin_group])
+    return ', '.join([auth.user_data_handler(user).get_email() for user in config.admin_group])
 
 
 class mail(report.logit):
