@@ -5,10 +5,11 @@ basepath = os.path.abspath(os.path.dirname(__file__))
 #
 DEBUG = True
 ip_to_serve_from = '127.0.0.1'
-sendmail_cmd = '/usr/sbin/sendmail'
-from_adr = 'pygal@127.0.0.1'
+sendmail_cmd = None # '/usr/sbin/sendmail'
+from_adr = None # 'pygal@127.0.0.1'
 # create this e.g. by the following command: binascii.hexlify(os.urandom(24))
 secret_key = 'This should be a real secret string including all kinds of characters'
+token_valid_time = 60 * 60 * 1    # 1 hour
 admin_group = []
 multimedia_only = True  # delete itemlist cache after changing this entry!
 #

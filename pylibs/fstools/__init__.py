@@ -8,6 +8,7 @@ Filesystem Tools
 **Author:** Dirk Alders <d.alders@arcor.de>
 """
 
+import fcntl
 import glob
 import hashlib
 import hmac
@@ -17,8 +18,12 @@ import time
 from pylibs import report
 
 
+__VERSION__ = "1.0.0"
+
+
 class fstools_logit(report.logit):
     LOG_PREFIX = 'fstools:'
+
 
 def uid(pathname, max_staleness=3600):
     """
@@ -94,6 +99,7 @@ def uid(pathname, max_staleness=3600):
     secret = ''
     return hmac.new(secret, repr(uid), hashlib.sha1).hexdigest()
 
+
 def filelist(path='.', expression='*', rekursive=True, logger=None):
     """
     Function returning a list of files below a given path.
@@ -127,6 +133,7 @@ def filelist(path='.', expression='*', rekursive=True, logger=None):
         logit.logit_info(logger, 'path (%s) does not exist - empty filelist will be returned', path)
     return l
 
+
 def dirlist(path='.', rekursive=True, logger=None):
     """
     Function returning a list of directories below a given path.
@@ -158,6 +165,7 @@ def dirlist(path='.', rekursive=True, logger=None):
         logit.logit_info(logger, 'path (%s) does not exist - empty filelist will be returned', path)
     return l
 
+
 def is_writeable(path):
     """.. warning:: Needs to be documented
     """
@@ -168,6 +176,7 @@ def is_writeable(path):
         # path is not writeable whatever it is, file or directory
         return False
 
+
 def mkdir(path):
     """.. warning:: Needs to be documented
     """
@@ -177,3 +186,11 @@ def mkdir(path):
     if not os.path.exists(path):
         os.mkdir(path)
     return os.path.isdir(path)
+
+
+def open_locked(*args, **kwargs):
+    """.. warning:: Needs to be documented (acquire exclusive lock file access)
+    """
+    locked_file_descriptor = open(*args, **kwargs)
+    fcntl.lockf(locked_file_descriptor, fcntl.LOCK_EX)
+    return locked_file_descriptor

@@ -75,7 +75,7 @@ class picture(items.base_item, report.logit):
                 else:
                     self._xnail_info[VERSION] = __version__ + this_method_version
                     try:
-                        with open(self._xnail_info_filename, 'w') as fh:
+                        with fstools.open_locked(self._xnail_info_filename, 'w') as fh:
                             fh.write(json.dumps(self._xnail_info, sort_keys=True, indent=4))
                     except IOError:
                         self.logit_warning(logger, 'Error while writing cache file (%s)', self._xnail_info_filename)

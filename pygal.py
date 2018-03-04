@@ -4,7 +4,9 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: - Implement Lostpass functionality (send link to userprefs with temporary access key)
+# TODO: - Implement e-mail unique test while .set_email() before setting new email-address
+#       - Implement open_locked for all file  write access (cached itemlists are missing)
+#       - Bug-Fix (login, logo@thumbsactionlist), if url_prefix != '')
 #       - Email notification of rights changes to admins and changed user
 #       - Kopieren der Public permissions bei Erstellung eines Accounts
 #       - switch user implementieren

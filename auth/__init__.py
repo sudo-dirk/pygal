@@ -1,3 +1,4 @@
+import binascii
 import flask
 import hashlib
 from helpers import decode
@@ -6,8 +7,98 @@ import os
 from prefixes import prefix_userprofile
 import pygal_config as config
 from pylibs import fstools
+import time
 
 basepath = os.path.abspath(os.path.dirname(__file__))
+
+
+class time_limited_token(dict):
+    """
+    Account erstellung erzeugt nur token.
+    Tokenbestaetigung erzeugt user.
+    Login mit Tokenbestaetigung (password erforderlich bei Bestaetigung)
+    daten fuer useraccount: Jeweils ip, time bei accounterstellung und emailbestaetigung
+    email ueber template mit token als parameter
+    """
+
+    TOKEN_STRENGTH = 64
+    KEY_EXCEED_TIME = 'exceed_time'
+    KEY_TOKEN = 'token'
+    KEY_DATA = 'data'
+    
+    def __init__(self, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
+
+    def create(self, valid_time, **kwargs):        
+        self[self.KEY_EXCEED_TIME] = time.mktime(time.gmtime()) + valid_time
+        self[self.KEY_TOKEN]= binascii.hexlify(os.urandom(self.TOKEN_STRENGTH))
+        self[self.KEY_DATA] = {}
+        for key in kwargs:
+            self[self.KEY_DATA][key] = kwargs[key]
+
+    def __str__(self, *args, **kwargs):
+        return json.dumps(self, indent=4, sort_keys=True)
+
+    def not_exceeded(self):
+        return self[self.KEY_EXCEED_TIME] > time.mktime(time.gmtime())
+
+
+class token_list(dict):
+    TYPE_PW_RECOVERY = 'password_recovery'
+    TYPE_ACCOUNT_CREATION = 'account_creation'
+    TYPE_EMAIL_CONFIRMATION = 'email_confirmation'
+
+    def __init__(self):
+        dict.__init__(self)
+        self.__tokenlist_filename = os.path.join(basepath, 'tokenlist.json')
+        self.__tokenlog_filename = os.path.join(basepath, 'tokenlog')
+        self.load()
+
+    def clean(self):
+        for token in self.keys():
+            if not self[token].not_exceeded():
+                self.delete(token)
+
+    def delete(self, token, log_that_action):
+        if log_that_action:
+            with fstools.open_locked(self.__tokenlog_filename, 'a') as fh:
+                token_type = self[token]['data'].get('type')
+                if token_type == self.TYPE_PW_RECOVERY:
+                    fh.write('%s: Password Recovery for "%s" from %s with token-id %s\n' % (time.asctime(), self[token]['data']['user'], self[token]['data']['ip'], token))
+                elif token_type == self.TYPE_ACCOUNT_CREATION:
+                    fh.write('%s: User Account created for "%s" and E-Mail confirmation for "%s" from %s with token-id %s\n' % (time.asctime(), self[token]['data']['user'], self[token]['data']['email'], self[token]['data']['ip'], token))
+                elif token_type == self.TYPE_EMAIL_CONFIRMATION:
+                    fh.write('%s: E-Mail confirmation for "%s" and email address "%s" confirmed from %s with token-id %s\n' % (time.asctime(), self[token]['data']['user'], self[token]['data']['email'], self[token]['data']['ip'], token))
+                else:
+                    fh.write('%s: token %s with unknown type (%s) used\n' % (time.asctime(), self[token], token_type))
+        del self[token]
+
+    def load(self):
+        try:
+            with open(self.__tokenlist_filename, 'r') as fh:
+                try:
+                    tl = json.load(fh)
+                except ValueError:
+                    return
+        except IOError:
+            return
+        for t in tl:
+            tlt = time_limited_token(tl[t])
+            self[tlt[tlt.KEY_TOKEN]] = tlt
+    
+    def save(self):
+        with fstools.open_locked(self.__tokenlist_filename, 'w') as fh:
+            fh.write(str(self))
+
+    def create_new_token(self, valid_time, **kwargs):
+        t = time_limited_token()
+        t.create(valid_time, **kwargs)
+        self[t[t.KEY_TOKEN]] = t
+        self.save()
+        return t
+
+    def __str__(self, *args, **kwargs):
+        return json.dumps(self, indent=4, sort_keys=True)
 
 
 def password_salt_and_hash(password):
@@ -177,7 +268,7 @@ class user_data_handler(dict):
 
     def store_user(self):
         if self.load_store_condition(self._user):
-            with open(self.data_filename(self._user), 'w') as fh:
+            with fstools.open_locked(self.data_filename(self._user), 'w') as fh:
                 fh.write(json.dumps(self, indent=4, sort_keys=True))
 
     def users(self):

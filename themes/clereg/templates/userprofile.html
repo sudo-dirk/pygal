@@ -1,5 +1,5 @@
       <form name="userprofile" id="userprofile" action="{{ item.userprofile_url() }}" method="post" class="form">
-        <h2>Picture Size</h2>
+        <h1>Picture Size</h1>
         <label class="required" for="f_select_thumbnail_size">Thumbnail size</label>
         <select name="select_thumbnail_size" form="userprofile" />
           {%- for thumbnail_size in config.thumbnail_size_list %}
@@ -13,7 +13,7 @@
           {%- endfor %}
           </select>
 
-        <h2>User Profile data</h2>
+        <h1>User Profile data</h1>
         <label for="f_userprofile_password_current">Current Password</label>
         <input type="password" name="userprofile_password_current" id="f_userprofile_password_current" placeholder="{{ lang.password_desc }}" />
         <label for="f_userprofile_password1">New Password</label>

@@ -29,9 +29,10 @@ RESP_TYPE_INFO = 6
 RESP_TYPE_ITEM = 7
 RESP_TYPE_LOGIN = 8
 RESP_TYPE_LOSTPASS = 9
-RESP_TYPE_REGISTER = 10
-RESP_TYPE_UPLOAD = 11
-RESP_TYPE_USERPROFILE = 12
+RESP_TYPE_PASSWORD_RECOVERY = 10
+RESP_TYPE_REGISTER = 11
+RESP_TYPE_UPLOAD = 12
+RESP_TYPE_USERPROFILE = 13
 
 ACTION_INFO = 'info'
 ACTION_DOWNLOAD = 'download'
@@ -360,6 +361,19 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('lostpass.html', item=item, lang=lang, url_prefix=config.url_prefix)
+        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
+        return rv
+    elif resp_type is RESP_TYPE_PASSWORD_RECOVERY and item is not None:
+        rv = flask.render_template(
+            'header.html',
+            title=lang.password_recovery,
+            search=lang.search,
+            menu_bar=menu_bar(item, resp_type),
+            navigation_list=navigation_list(item._rel_path),
+            action_bar=[],
+            url_prefix=config.url_prefix,
+            error=error, hint=hint, info=info)
+        rv += flask.render_template('password_recovery.html', lang=lang)
         rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix)
         return rv
     elif resp_type is RESP_TYPE_REGISTER and item is not None:

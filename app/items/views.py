@@ -186,19 +186,30 @@ def userprofile(item_name):
             udh = auth.user_data_handler(sdh.get_user())
             sdh.set_thumbnail_size_index(thumbnail_size_index)
             sdh.set_webnail_size_index(webnail_size_index)
-            udh.set_email(email)
+            if email != udh.get_email():
+                info = 'E-Mail confirmation token send out.'
+                tl = auth.token_list()
+                t = tl.create_new_token(config.token_valid_time, 
+                                        type=tl.TYPE_EMAIL_CONFIRMATION,
+                                        user=sdh.get_user(),
+                                        email=email,
+                                        ip=flask.request.remote_addr,
+                                        url=flask.request.url_root[:-1] + config.url_prefix)
+                helpers.mail.mail().send(email, helpers.mail.content_email_confirmation(t))
+            else:
+                info = None
             if flask.request.form.get('userprofile_password_current') != u'':
                 if not udh.chk_password(password_current) or not password_current == sdh.get_password():
-                    return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, i, tmc, error=lang.error_password_wrong_userprofile)
+                    return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, i, tmc, info=info, error=lang.error_password_wrong_userprofile)
                 elif password1 != password2:
-                    return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, i, tmc, error=lang.error_passwords_not_equal_userprofile)
+                    return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, i, tmc, info=info, error=lang.error_passwords_not_equal_userprofile)
                 elif password1 == u'':
-                    return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, i, tmc, error=lang.error_password_empty_userprofile)
+                    return app_views.make_response(app_views.RESP_TYPE_USERPROFILE, i, tmc, info=info, error=lang.error_password_empty_userprofile)
                 else:
                     sdh.set_password(auth.password_salt_and_hash(password1))
                     udh.set_password(auth.password_salt_and_hash(password1))
             udh.store_user()
-            return flask.redirect(config.url_prefix + helpers.url_extention(item_name))
+            return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info=info)
     flask.abort(404)
 
 

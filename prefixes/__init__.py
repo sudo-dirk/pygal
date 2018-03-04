@@ -12,6 +12,7 @@ prefix_raw = '/+raw'                                # items
 prefix_register = '/+register'                      # base_func
 prefix_slideshow = '/+slideshow'                    # items
 prefix_thumbnail = '/+thumbnail'                    # items
+prefix_token = '/+token'                            # base_func
 prefix_upload = '/+upload'                          # items
 prefix_userprofile = '/+userprofile'                # base_func
 prefix_webnail = '/+webnail'                        # items

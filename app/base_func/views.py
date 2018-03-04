@@ -10,6 +10,7 @@ from prefixes import prefix_login
 from prefixes import prefix_logout
 from prefixes import prefix_lostpass
 from prefixes import prefix_register
+from prefixes import prefix_token
 import pygal_config as config
 from pygal_config import url_prefix
 from pygal_config import admin_group
@@ -82,28 +83,27 @@ def register(item_name):
         if flask.request.method == 'GET':
             return app_views.make_response(app_views.RESP_TYPE_REGISTER, i, tmc)
         else:
-            fusername = flask.request.form.get('register_username')
-            udh = auth.user_data_handler(fusername)
-            sdh = auth.session_data_handler()
-            fpassword1 = auth.password_salt_and_hash(flask.request.form.get('register_password1'))
-            fpassword2 = auth.password_salt_and_hash(flask.request.form.get('register_password2'))
-            femail = flask.request.form.get('register_email')
-            if fusername in admin_group:
+            username = flask.request.form.get('register_username')
+            password1 = auth.password_salt_and_hash(flask.request.form.get('register_password1'))
+            password2 = auth.password_salt_and_hash(flask.request.form.get('register_password2'))
+            email = flask.request.form.get('register_email')
+            if username in admin_group:
                 return app_views.make_response(app_views.RESP_TYPE_REGISTER, i, tmc, error=lang.error_user_already_in_admin_group)
-            elif udh.user_exists(fusername):
+            elif auth.user_data_handler().user_exists(username):
                 return app_views.make_response(app_views.RESP_TYPE_REGISTER, i, tmc, error=lang.error_user_already_exists % (url_prefix + prefix_lostpass + helpers.url_extention(item_name)))
-            elif fpassword1 != fpassword2:
+            elif password1 != password2:
                 return app_views.make_response(app_views.RESP_TYPE_REGISTER, i, tmc, error=lang.error_passwords_not_equal_register)
             else:
-                udh = auth.user_data_handler(fusername)
-                udh.set_email(femail)
-                udh.set_password(fpassword1)
-                udh.store_user()
-                sdh.set_user(fusername)
-                sdh.set_password(fpassword1)
-                em = helpers.mail.mail()
-                em.send(helpers.mail.to_adr_admins(), helpers.mail.content_new_user(fusername))
-                return flask.make_response(flask.redirect(url_prefix + helpers.url_extention(item_name)))
+                tl = auth.token_list()
+                t = tl.create_new_token(config.token_valid_time, 
+                                        type=tl.TYPE_ACCOUNT_CREATION,
+                                        user=username,
+                                        email=email,
+                                        password=password1,
+                                        ip=flask.request.remote_addr,
+                                        url=flask.request.url_root[:-1] + config.url_prefix)
+                helpers.mail.mail().send(email, helpers.mail.content_account_creation(t))
+                return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info='Token for email confirmation send out')
     flask.abort(404)
 
 
@@ -117,5 +117,93 @@ def lostpass(item_name):
         if flask.request.method == 'GET':
             return app_views.make_response(app_views.RESP_TYPE_LOSTPASS, i, tmc, info=lang.info_lostpass)
         else:
-            return app_views.make_response(app_views.RESP_TYPE_FORM_DATA, i, tmc, info='lostpass not yet implemented')
+            username = flask.request.form.get('lostpass_username')
+            email = flask.request.form.get('lostpass_email')
+            if auth.user_data_handler().user_exists(username):
+                user = auth.user_data_handler(username)
+            else:
+                for username in auth.user_data_handler().users():
+                    user = auth.user_data_handler(username)
+                    if user.get_email() == email:
+                        break
+                    else:
+                        user = None
+            if user != None:
+                tl = auth.token_list()
+                t = tl.create_new_token(config.token_valid_time, 
+                                        type=tl.TYPE_PW_RECOVERY,
+                                        user=user._user,
+                                        email=user.get_email(),
+                                        ip=flask.request.remote_addr,
+                                        url=flask.request.url_root[:-1] + config.url_prefix)
+                helpers.mail.mail().send(user.get_email(), helpers.mail.content_pw_recovery(t))
+            return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info='Recovery token send out, if user exists')
     flask.abort(404)
+
+
+@base_func.route(prefix_token + '/<itemname:token_id>', methods=['GET', 'POST'])
+@base_func.route(prefix_token, defaults=dict(item_name=u''), methods=['GET', 'POST'])
+def token(token_id):
+    tmc = helpers.time_measurement()
+    token_id = helpers.encode(token_id)
+    i = items.get_item_by_path('', config.item_path, False, config.database_path, config.cache_path, None, False)
+    if i is not None:
+        tl = auth.token_list()
+        if token_id in tl.keys():
+            token = tl[token_id]
+            if token.not_exceeded():
+                if token['data'].get('type') == tl.TYPE_PW_RECOVERY:
+                    if flask.request.method == 'GET':
+                        return app_views.make_response(app_views.RESP_TYPE_PASSWORD_RECOVERY, i, tmc)
+                    else:
+                        password1 = flask.request.form.get('password1')
+                        password2 = flask.request.form.get('password2')
+                        if password1 != password2:
+                            return app_views.make_response(app_views.RESP_TYPE_PASSWORD_RECOVERY, i, tmc, error=lang.error_passwords_not_equal_userprofile)
+                        elif password1 == u'':
+                            return app_views.make_response(app_views.RESP_TYPE_PASSWORD_RECOVERY, i, tmc, error=lang.error_password_empty_userprofile)
+                        else:
+                            udh = auth.user_data_handler(token['data'].get('user'))
+                            udh.set_password(auth.password_salt_and_hash(password1))
+                            udh.store_user()
+                            tl.delete(token_id, True)
+                            tl.clean()
+                            tl.save()
+                            return app_views.make_response(app_views.RESP_TYPE_LOGIN, i, tmc, info=lang.password_recovery_finished)
+                elif token['data'].get('type') == tl.TYPE_ACCOUNT_CREATION:
+                    username = token['data'].get('user')
+                    password = token['data'].get('password')
+                    email = token['data'].get('email')
+                    # create useraccount
+                    udh = auth.user_data_handler(username)
+                    udh.set_email(email)
+                    udh.set_password(password)
+                    udh.store_user()
+                    # send email to administrators
+                    em = helpers.mail.mail()
+                    em.send(helpers.mail.to_adr_admins(), helpers.mail.content_new_user(username))
+                    # delete token and log action
+                    tl.delete(token_id, True)
+                    tl.clean()
+                    tl.save()
+                    return app_views.make_response(app_views.RESP_TYPE_LOGIN, i, tmc, info='User-Account had been created. Login and wait for Admin to grand access.')
+                elif token['data'].get('type') == tl.TYPE_EMAIL_CONFIRMATION:
+                    username = token['data'].get('user')
+                    email = token['data'].get('email')
+                    # change e-mail address
+                    udh = auth.user_data_handler(username)
+                    udh.set_email(email)
+                    udh.store_user()
+                    # delete token and log action
+                    tl.delete(token_id, True)
+                    tl.clean()
+                    tl.save()
+                    return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info='Your E-Mailaddress had been changed.')
+                else:
+                    return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, info='Recovery token handling not yet implemented')
+            else:
+                tl.clean()
+                tl.save()
+                return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error='Recovery token exceeded.')
+        else:
+            return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error='Recovery token does not exist.')

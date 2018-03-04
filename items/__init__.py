@@ -205,7 +205,7 @@ class staging_container(report.logit, dict):
         cif = self.get_container_info_file_by_uuid(self.get(self.KEY_UUID))
         if cif is not None and len(self) > 0:
             # generate container_info_file
-            with open(cif, 'w') as fh:
+            with fstools.open_locked(cif, 'w') as fh:
                 fh.write(json.dumps(self, indent=4, sort_keys=True))
 
 

@@ -5,6 +5,7 @@ import pygal_config as config
 from pylibs import report
 from subprocess import Popen, PIPE
 import flask
+from prefixes import prefix_token
 
 logger = logging.getLogger('pygal.items')
 
@@ -57,4 +58,43 @@ Have a nice day,
 your pygal""" % (self.base_url(), username, udh.get_email())
 
     def base_url(self):
-        return flask.request.url[:-len(flask.request.path)]
+        return flask.request.url_root[:-1] + config.url_prefix
+
+
+class content_pw_recovery(content_new_user):
+    def __init__(self, token):
+        self.subject = 'Password Recovery at %s' % self.base_url()
+        self.message = """A password recovery had been triggered. If you did not trigger the recovery, use the password token or ignore it and it will be invalid in %.1f hours or
+
+follow you token url %s to set your password.
+
+
+Have a nice day,
+
+your pygal""" % (config.token_valid_time / 3600., self.base_url() + prefix_token + '/' + token.get(token.KEY_TOKEN))
+
+
+class content_account_creation(content_new_user):
+    def __init__(self, token):
+        self.subject = 'E-Mail-Confirmation for User-Account-Creation at %s' % self.base_url()
+        self.message = """A User-Account-Creation had been requested. If you did not request the user account, ignore that email or
+
+follow you token url %s to activate the account.
+
+
+Have a nice day,
+
+your pygal""" % (self.base_url() + prefix_token + '/' + token.get(token.KEY_TOKEN))
+
+
+class content_email_confirmation(content_new_user):
+    def __init__(self, token):
+        self.subject = 'E-Mail-Confirmation for addresschange at %s' % self.base_url()
+        self.message = """An E-Mail-Confirmation is needed to change the stored E-Mail-Address. If you did not trigger the address change, ignore that email or
+
+follow you token url %s to change your E-Mailaddress.
+
+
+Have a nice day,
+
+your pygal""" % (self.base_url() + prefix_token + '/' + token.get(token.KEY_TOKEN))

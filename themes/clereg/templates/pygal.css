@@ -48,13 +48,28 @@ ul {
 } 
 
 a { 
-color: #dd0000; 
+    color: #dd0000; 
 } 
 
 a:hover { 
-background: #ffe2e2; 
+    background: #ffe2e2; 
 } 
 
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
 /* 
 * Forms 
 */ 

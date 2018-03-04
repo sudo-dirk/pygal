@@ -31,6 +31,8 @@ if LANGUAGE == 'DE':
     lostpass = 'Zugangsdaten vergessen'
     password_desc = 'Das "Login" - Passwort'
     password2_desc = 'Passwort Wiederholung'
+    password_recovery = decode('Passwort Zurücksetzen')
+    password_recovery_finished = decode('Das Passwort wurde erfolgreich zurückgesetzt. Loggen Sie sich mit dem neuen Password ein.')
     permission_denied = 'Zugriff verweigert!'
     public_rights = decode('Rechte ohne Anmeldung setzen')
     register = 'Benutzerregistrierung'
@@ -68,6 +70,8 @@ else:
     lostpass = 'Account data forgotten'
     password_desc = 'The login password'
     password2_desc = 'Repeat the same password'
+    password_recovery = 'Password Recovery'
+    password_recovery_finished = 'The password recovery was successfull. Login with the new password.'
     permission_denied = 'Permission denied!'
     public_rights = decode('Set public rights')
     register = 'Register'
