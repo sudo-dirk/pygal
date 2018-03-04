@@ -309,7 +309,10 @@ class session_data_handler(object):
         return flask.session.get(self.KEY_WEBNAIL_SIZE_INDEX, config.webnail_size_default)
 
     def get_user(self):
-        return flask.session.get(self.KEY_USERNAME, '')
+        if self.chk_login():
+            return flask.session.get(self.KEY_USERNAME, '')
+        else:
+            return ''
 
     def set_password(self, password):
         if password is None:
