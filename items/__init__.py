@@ -376,22 +376,22 @@ class base_object(report.logit, gallery_urls):
         return os.path.getctime(self.raw_path())
 
     def user_may_admin(self):
-        return pygal_user.may_admin(self)
+        return auth.pygal_user.chk_login() and pygal_user.may_admin(self)
 
     def user_may_delete(self):
-        return pygal_user.may_delete(self)
+        return auth.pygal_user.chk_login() and pygal_user.may_delete(self)
 
     def user_may_download(self):
-        return pygal_user.may_download(self)
+        return auth.pygal_user.chk_login() and pygal_user.may_download(self)
 
     def user_may_edit(self):
-        return pygal_user.may_edit(self)
+        return auth.pygal_user.chk_login() and pygal_user.may_edit(self)
 
     def user_may_upload(self):
-        return pygal_user.may_upload(self)
+        return auth.pygal_user.chk_login() and pygal_user.may_upload(self)
 
     def user_may_view(self):
-        return pygal_user.may_view(self)
+        return auth.pygal_user.chk_login() and pygal_user.may_view(self)
 
 
 class base_item(base_object, database_handler):
