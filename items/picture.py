@@ -3,6 +3,7 @@
 #
 import app_views
 import auth
+import fractions
 from helpers import decode
 from helpers import info_filename_by_relpath
 from helpers import link
@@ -153,9 +154,10 @@ class picture(items.base_item, report.logit):
     def exposure_time(self):
         et = self._info.get(self._info.EXPOSURE_TIME, None, logger=logger)
         if et is None:
-            return None
+            return ''
         else:
-            return '%d/%d' % (et[0], et[1])
+            f = fractions.Fraction(float(et[0])/et[1]).limit_denominator(1000)
+            return '%d/%d s' % (f.numerator, f.denominator)
 
     def flash(self):
         return self._info.get(self._info.FLASH, None, logger=logger)
