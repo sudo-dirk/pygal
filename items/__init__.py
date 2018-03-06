@@ -290,7 +290,10 @@ class base_object(report.logit, gallery_urls):
 
     def actions(self):
         import app_views
-        return [app_views.ACTION_INFO, app_views.ACTION_DOWNLOAD]
+        rv = [app_views.ACTION_INFO]
+        if self.user_may_download():
+            rv.append(app_views.ACTION_DOWNLOAD)
+        return rv
 
     def download_url(self):
         return gallery_urls.download_url(self) + (strargs({'q': flask.request.args.get('q')}) if self.is_a_searchresult() else '')
