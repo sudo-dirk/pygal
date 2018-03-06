@@ -24,16 +24,16 @@ def favourite(item_name):
     i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     info = None
     if i is not None:
-        if auth.pygal_user.get_approved_session_user() in auth.pygal_user.users():
+        if auth.pygal_user.get_approved_session_user(i) in auth.pygal_user.users():
             if flask.request.method == 'GET':
                 if flask.request.args.get(helpers.STR_ARG_FAVOURITE) == helpers.STR_ARG_FAVOURITE_ADD:
-                    if i.add_favourite_of(auth.pygal_user.get_approved_session_user()):
+                    if i.add_favourite_of(auth.pygal_user.get_approved_session_user(i)):
                         info = 'Item %s added to favourites' % item_name
                 elif flask.request.args.get(helpers.STR_ARG_FAVOURITE) == helpers.STR_ARG_FAVOURITE_REMOVE:
-                    if i.remove_favourite_of(auth.pygal_user.get_approved_session_user()):
+                    if i.remove_favourite_of(auth.pygal_user.get_approved_session_user(i)):
                         info = 'Item %s removed from favourites' % item_name
                 else:
-                    return flask.redirect(config.url_prefix + helpers.strargs({'q': 'favourite_of:%s' % auth.pygal_user.get_approved_session_user()}))
+                    return flask.redirect(config.url_prefix + helpers.strargs({'q': 'favourite_of:%s' % auth.pygal_user.get_approved_session_user(i)}))
             return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info=info)
         else:
             return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=lang.error_permission_denied)

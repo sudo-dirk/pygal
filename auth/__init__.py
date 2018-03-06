@@ -430,9 +430,6 @@ class pygal_auth(object):
         except (AttributeError, TypeError):
             return False
 
-    def get_my_email(self):
-        return user_data_handler(self.get_approved_session_user()).get_email()
-
     def get_approved_session_user(self, item):
         try:
             if self.may_admin(item) and item._force_user:
