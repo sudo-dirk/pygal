@@ -308,9 +308,12 @@ class session_data_handler(object):
     def get_webnail_index(self):
         return flask.session.get(self.KEY_WEBNAIL_SIZE_INDEX, config.webnail_size_default)
 
-    def get_user(self):
-        if self.chk_login():
-            return flask.session.get(self.KEY_USERNAME, '')
+    def get_approved_user(self):
+        username = flask.session.get(self.KEY_USERNAME, '')
+        password = self.get_password()
+        user_exists = username in user_data_handler().users()
+        if user_exists and user_data_handler(username).chk_password(password):
+            return username
         else:
             return ''
 
@@ -341,12 +344,6 @@ class session_data_handler(object):
         else:
             flask.session.permanent = True
             flask.session[self.KEY_USERNAME] = username
-
-    def chk_login(self):
-        username = self.get_user()
-        password = self.get_password()
-        user_exists = username in user_data_handler().users()
-        return user_exists and user_data_handler(username).chk_password(password)
 
 
 class folder_list(list):
@@ -433,14 +430,18 @@ class pygal_auth(object):
         except (AttributeError, TypeError):
             return False
 
-    def chk_login(self):
-        return session_data_handler().chk_login()
-
     def get_my_email(self):
         return user_data_handler(self.get_session_user()).get_email()
 
-    def get_session_user(self):
-        return session_data_handler().get_user()
+    def get_approved_session_user(self, item):
+        try:
+            if self.may_admin(item) and item._force_user:
+                return item._force_user
+            else:
+                return session_data_handler().get_approved_user()
+        except RuntimeError:
+            # seems to be cache generation
+            return item._force_user
 
     def get_thumbnail_size(self):
         thumbnail_size_index = session_data_handler().get_thumbnail_index()
@@ -458,14 +459,10 @@ class pygal_auth(object):
         return user_data_handler().users()
 
     def may_admin(self, item):
-        if item._force_user is None:
-            sdh = session_data_handler()
-            return sdh.chk_login() and sdh.get_user() in config.admin_group
-        else:
-            return item._force_user in config.admin_group
+        return session_data_handler().get_approved_user() in config.admin_group
 
     def may_delete(self, item):
-        user = session_data_handler().get_user() if item._force_user is None else item._force_user
+        user = self.get_approved_session_user(item)
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
@@ -476,7 +473,7 @@ class pygal_auth(object):
             return user_data_handler(user).chk_rights_delete(path)
 
     def may_download(self, item):
-        user = session_data_handler().get_user() if item._force_user is None else item._force_user
+        user = self.get_approved_session_user(item)
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
@@ -487,7 +484,7 @@ class pygal_auth(object):
             return user_data_handler(user).chk_rights_download(path)
 
     def may_edit(self, item):
-        user = session_data_handler().get_user() if item._force_user is None else item._force_user
+        user = self.get_approved_session_user(item)
         if not item.is_itemlist():
             path = decode(os.path.dirname(item._rel_path))
         else:
@@ -498,7 +495,7 @@ class pygal_auth(object):
             return user_data_handler(user).chk_rights_edit(path)
 
     def may_upload(self, item):
-        user = session_data_handler().get_user() if item._force_user is None else item._force_user
+        user = self.get_approved_session_user(item)
         if user is '':
             return public_data_handler().chk_rights_upload()
         else:
@@ -506,7 +503,7 @@ class pygal_auth(object):
             
 
     def may_view(self, item):
-        user = session_data_handler().get_user() if item._force_user is None else item._force_user
+        user = self.get_approved_session_user(item)
         if len(item._rel_path) == 0:
             return True
         if not item.is_itemlist():

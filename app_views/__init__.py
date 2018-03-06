@@ -59,7 +59,7 @@ def menu_bar(item, resp_type):
                           'active': resp_type == RESP_TYPE_UPLOAD,
                           'url': item.upload_url(),
                           'icon': 'upload'}
-    if pygal_user.chk_login():
+    if pygal_user.get_approved_session_user(item) in pygal_user.users():
         mbar['keys'].append('user')
         mbar['user'] = {'name': lang.user,
                              'active': resp_type == RESP_TYPE_USERPROFILE,

@@ -376,22 +376,22 @@ class base_object(report.logit, gallery_urls):
         return os.path.getctime(self.raw_path())
 
     def user_may_admin(self):
-        return auth.pygal_user.chk_login() and pygal_user.may_admin(self)
+        return pygal_user.may_admin(self)
 
     def user_may_delete(self):
-        return auth.pygal_user.chk_login() and pygal_user.may_delete(self)
+        return pygal_user.may_delete(self)
 
     def user_may_download(self):
-        return auth.pygal_user.chk_login() and pygal_user.may_download(self)
+        return pygal_user.may_download(self)
 
     def user_may_edit(self):
-        return auth.pygal_user.chk_login() and pygal_user.may_edit(self)
+        return pygal_user.may_edit(self)
 
     def user_may_upload(self):
-        return auth.pygal_user.chk_login() and pygal_user.may_upload(self)
+        return pygal_user.may_upload(self)
 
     def user_may_view(self):
-        return auth.pygal_user.chk_login() and pygal_user.may_view(self)
+        return pygal_user.may_view(self)
 
 
 class base_item(base_object, database_handler):
@@ -410,7 +410,7 @@ class base_item(base_object, database_handler):
     def actions(self):
         import app_views
         rv = base_object.actions(self)
-        if pygal_user.chk_login():
+        if pygal_user.get_approved_session_user(self) in pygal_user.users():
             if self.is_favourite():
                 rv.append(app_views.ACTION_IS_FAVOURITE)
             else:
@@ -466,7 +466,7 @@ class base_item(base_object, database_handler):
         return True
 
     def is_favourite(self):
-        return auth.pygal_user.get_session_user() in self.get_favourite_of_list()
+        return auth.pygal_user.get_approved_session_user(self) in self.get_favourite_of_list()
 
     def parent(self):
         return self._get_item_by_path(os.path.dirname(self._rel_path), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user, self._disable_whoosh)
@@ -709,7 +709,7 @@ class __itemlist_prepared_cache__(__itemlist__):
         return rv
 
     def uid(self):
-        return fstools.uid(self.raw_path()) + '_' + rights_uid(pygal_user.get_session_user() if self._force_user is None else self._force_user)
+        return fstools.uid(self.raw_path()) + '_' + rights_uid(pygal_user.get_approved_session_user(self))
 
 
 class itemlist(__itemlist_prepared_cache__):
@@ -717,7 +717,7 @@ class itemlist(__itemlist_prepared_cache__):
         __itemlist_prepared_cache__.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
         self._cache_path = cache_path
 
-        user = session_data_handler().get_user() if force_user is None else force_user
+        user = pygal_user.get_approved_session_user(self)
         self._cached_data = caching.property_cache_json(__itemlist_prepared_cache__(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh), self._prop_file(user), load_all_on_init=True)
 
     def __init_itemlist__(self):

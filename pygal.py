@@ -4,9 +4,9 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: - Implement e-mail unique test while .set_email() before setting new email-address
-#       - Implement open_locked for all file  write access (cached itemlists are missing)
-#       - Bug-Fix (login, logo@thumbsactionlist), if url_prefix != '')
+# TODO: - Implement e-mail unique test while .set_email() before sending email confirmation token
+#       - Implement open_locked for all file  write access (cached itemlists are missing - inside pylibs?)
+#       - Bug-Fix (login, logo@thumbactionlist), if url_prefix != '')
 #       - Email notification of rights changes to admins and changed user
 #       - Kopieren der Public permissions bei Erstellung eines Accounts
 #       - switch user implementieren
@@ -136,6 +136,7 @@ if __name__ == "__main__":
                     else:
                         item._save_()
         for user in [''] + user_data_handler().users():
-            db_update_cleanup(itemlist("", config.item_path, False, config.database_path, config.cache_path, user))
+            db_update_cleanup(itemlist("", config.item_path, False, config.database_path, config.cache_path, user, False))
+
     if not options.cache and not options.index and not options.database:
         app.run(config.ip_to_serve_from, 5000)
