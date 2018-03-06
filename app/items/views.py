@@ -225,7 +225,7 @@ def upload(item_name):
                 return app_views.make_response(app_views.RESP_TYPE_UPLOAD, i, tmc)
             else:
                 db = items.database.database_handler(None, None, False)
-                db.add_data(db.KEY_UPLOAD_USERNAME, pygal_user.get_session_user())
+                db.add_data(db.KEY_UPLOAD_USERNAME, pygal_user.get_approved_session_user())
                 db.add_data(db.KEY_UPLOAD_TIMESTAMP, time.time())
                 db.add_data(db.KEY_UPLOAD_SRC_IP, flask.request.environ['REMOTE_ADDR'])
                 if config.multimedia_only:

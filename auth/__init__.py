@@ -431,7 +431,7 @@ class pygal_auth(object):
             return False
 
     def get_my_email(self):
-        return user_data_handler(self.get_session_user()).get_email()
+        return user_data_handler(self.get_approved_session_user()).get_email()
 
     def get_approved_session_user(self, item):
         try:
