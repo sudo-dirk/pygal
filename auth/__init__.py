@@ -440,6 +440,9 @@ class pygal_auth(object):
             # seems to be cache generation
             return item._force_user
 
+    def get_my_email(self):
+        return user_data_handler(session_data_handler().get_approved_user()).get_email()
+
     def get_thumbnail_size(self):
         thumbnail_size_index = session_data_handler().get_thumbnail_index()
         if thumbnail_size_index is None:

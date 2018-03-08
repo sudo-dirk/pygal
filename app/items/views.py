@@ -183,7 +183,7 @@ def userprofile(item_name):
             password2 = flask.request.form.get('userprofile_password2')
             email = flask.request.form.get('userprofile_email')
             sdh = auth.session_data_handler()
-            udh = auth.user_data_handler(sdh.get_user())
+            udh = auth.user_data_handler(sdh.get_approved_user())
             sdh.set_thumbnail_size_index(thumbnail_size_index)
             sdh.set_webnail_size_index(webnail_size_index)
             if email != udh.get_email():
@@ -191,7 +191,7 @@ def userprofile(item_name):
                 tl = auth.token_list()
                 t = tl.create_new_token(config.token_valid_time, 
                                         type=tl.TYPE_EMAIL_CONFIRMATION,
-                                        user=sdh.get_user(),
+                                        user=sdh.get_approved_user(),
                                         email=email,
                                         ip=flask.request.remote_addr,
                                         url=flask.request.url_root[:-1] + config.url_prefix)
