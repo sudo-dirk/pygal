@@ -4,14 +4,7 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: - Implement e-mail unique test while .set_email() before sending email confirmation token
-#       - Implement open_locked for all file  write access (cached itemlists are missing - inside pylibs?)
-#       - Bug-Fix (login, logo@thumbactionlist), if url_prefix != '')
-#       - Email notification of rights changes to admins and changed user
-#       - Kopieren der Public permissions bei Erstellung eines Accounts
-#       - switch user implementieren
-#       - Check some pages with https://validator.w3.org/nu/?doc=https%3A%2F%2Fminefield.mount-mockery.de%2F
-#       - Permission check of all pathes in pygal_config at startup to avoid runtime errors and data losses
+# TODO: - Permission check of all pathes in pygal_config at startup to avoid runtime errors and data losses
 #       - Folgeseiten von Staging überarbeiten:
 #           - Nach Staging-Commit den Staging-Container beibehalten, wenn er noch existiert, sonst den ersten
 #           - Nach Container delete in stagin bleiben und delete ausgewählt halten
@@ -22,17 +15,13 @@
 #       - Nutze AJAX in flask für das Suchelement, Aufbau der Seite ohne neu zu laden
 #       - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
 #       - restlichen str_args -> helpers (login, logout, register, lostpass, userprefs, ...?)
-#       - flask.redirect möglichst  eliminieren, vor allem neu eingebautes, da Meldungen hier nicht weitergereicht werden können.
 #       - Löschdialog für Ordner (Anzeige aller Elemente)
 #       - Staging Area und Delete-Page: Für delete und commit eine Auswahl ermöglichen (commit und delete aus Ordner)
 #       - logging ergänzen mit erben der classe report.logit (itemlist, picture, ...)
 #       - required attribut für js-tree in admin.staging
 #       - Zusätzlich Infos auf Info-Seite für itemlist (Datum, uid, ) siehe Bilder
 #       - Select all Button bei der Administration der Rechte hinzufügen
-#       - Beispieldaten einfügen
-#       - Erweiterte Suche einbauen. Zugang über flash-Bereich analog login.
 #       - Nach texten auf der Oberfläche suchen, die in das Modul lang gehören (z.B.: Button- und Labeltexte)
-#       - E-Mailbenachrichtigung bei neuem Benutzer und Passwortrücksetzung, Upload, ...
 ###############################################################################################################
 #       - Session nur für die jeweilige Unterseite anlegen (Test ob tiefere Seiten okay)
 #       - Kurze Namen (Anfa...nde) (laenge aus pygal_config), onMouseover: Voller Name anzeigen
@@ -136,7 +125,7 @@ if __name__ == "__main__":
                     else:
                         item._save_()
         for user in [''] + user_data_handler().users():
-            db_update_cleanup(itemlist("", config.item_path, False, config.database_path, config.cache_path, user, False))
+            db_update_cleanup(itemlist("", config.item_path, False, config.database_path, config.cache_path, user, True))
 
     if not options.cache and not options.index and not options.database:
         app.run(config.ip_to_serve_from, 5000)
