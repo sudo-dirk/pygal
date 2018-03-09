@@ -76,7 +76,7 @@ class piclink(link):
 
 
 def strargs(args):
-    return '' if len(args) == 0 else '?' + '&'.join(['%s=%s' % (key, args[key]) for key in args.keys()])
+    return '' if len(args) == 0 else '?' + '&'.join(['%s=%s' % (key, urllib.quote(str(args[key]))) for key in args.keys()])
 
 
 class time_measurement(object):
