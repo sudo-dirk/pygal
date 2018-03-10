@@ -28,6 +28,9 @@ STR_ARG_FAVOURITE = 'action'
 STR_ARG_FAVOURITE_ADD = 'add'
 STR_ARG_FAVOURITE_REMOVE = 'remove'
 
+def full_url():
+    return flask.request.url
+
 def db_filename_by_relpath(db_path, rel_path):
     return os.path.join(db_path, rel_path + '.json')
 
