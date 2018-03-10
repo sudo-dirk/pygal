@@ -1,13 +1,15 @@
 import auth
 from email.mime.text import MIMEText
+import helpers
 import logging
 import pygal_config as config
 from pylibs import report
 from subprocess import Popen, PIPE
 import flask
 from prefixes import prefix_token
+from prefixes import prefix_admin 
 
-logger = logging.getLogger('pygal.items')
+logger = logging.getLogger('pygal.helpers.mail')
 
 
 def to_adr_admins():
@@ -98,3 +100,14 @@ follow you token url %s to change your E-Mailaddress.
 Have a nice day,
 
 your pygal""" % (self.base_url() + prefix_token + '/' + token.get(token.KEY_TOKEN))
+
+
+class content_upload(content_new_user):
+    def __init__(self):
+        self.subject = 'Data had been uploaded at %s' % self.base_url()
+        self.message = """A User uploaded new items. Go to the staging area %s to commit items to your gallery.
+
+
+Have a nice day,
+
+your pygal""" % (self.base_url() + prefix_admin + helpers.strargs({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_STAGING}))

@@ -239,6 +239,7 @@ def upload(item_name):
                     if not success:
                         failed_files.append(f.filename)
                 if len(failed_files) == 0:
+                    helpers.mail.mail().send(helpers.mail.to_adr_admins(), helpers.mail.content_upload())
                     hint = 'Successfully uploaded all files to Container %s.' % sc.get(sc.KEY_UUID)
                     error = None
                 else:
