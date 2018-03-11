@@ -101,7 +101,7 @@ def action_bar(item, resp_type=None):
                           'url': item.download_url(),
                           'icon': 'download'},
         ACTION_EDIT:{'name': 'Add Tag',
-                     'active': False,
+                     'active': resp_type == RESP_TYPE_ADD_TAG,
                      'url': item.add_tag_url(),
                      'icon': 'edit'},
         ACTION_FAVOURITE:{'name': 'Add Favourite',
