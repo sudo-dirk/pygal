@@ -30,11 +30,13 @@ Without any special activity, the search will find your pattern in the path (ins
       <li>tags (TEXT)</li>
       <li>favourite_of (TEXT)</li>
       <li>type (TEXT)</li>
+      <li style="list-style-type:none">
         <ul>
           <li>picture</li>
           <li>video</li>
           <li>all kind of extentions, if not picture or video</li>
         </ul>
+      </li>
       <li>upload_user (TEXT)</li>
       <li>upload_ip (TEXT)</li>
       <li>upload_date (DATETIME)</li>

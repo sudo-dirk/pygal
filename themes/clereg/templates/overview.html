@@ -1,11 +1,11 @@
 {% for item in itemlist.get_itemlist() %}
-    <div id="{{ item.name() }}" style="height: {{item.thumbnail_xy_max() + 90}}px; float: left; margin: 6px">
+    <div id="{{ item.id() }}" style="height: {{item.thumbnail_xy_max() + 90}}px; float: left; margin: 6px">
       <div class="itemname">{{ item.name() }}</div>
       <div class="datetime">{{ item.strtime() }}</div>
       <ul class="imagebar">
       {%- with action_bar = action_bar_fkt(item) %}
       {%- for key in action_bar['keys'] %}
-        <li class="imagebar"><a href="{{ action_bar[key].url }}"><img src="{{ url_prefix }}/static/img/light_red/{{ action_bar[key].icon }}.png"></a></li>
+        <li class="imagebar"><a href="{{ action_bar[key].url }}"><img src="{{ url_prefix }}/static/img/light_red/{{ action_bar[key].icon }}.png" alt="{{ key }}"></a></li>
       {%- endfor %}
       {%- endwith %}
       </ul>

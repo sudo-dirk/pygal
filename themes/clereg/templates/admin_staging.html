@@ -41,8 +41,8 @@
     <form action="{{ item.admin_url() }}" class="form" method="get">
       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_STAGING }}" />
       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" value="{{ action }}" />
-      <label class="required" for="{{ arg_name.STR_ARG_ADMIN_CONTAINER }}">Choose a Staging-Container:</label>
-      <select name="{{ arg_name.STR_ARG_ADMIN_CONTAINER }}" onchange="this.form.submit()"/>
+      <label class="required" for="f_{{ arg_name.STR_ARG_ADMIN_CONTAINER }}">Choose a Staging-Container:</label>
+      <select name="{{ arg_name.STR_ARG_ADMIN_CONTAINER }}" id="f_{{ arg_name.STR_ARG_ADMIN_CONTAINER }}" onchange="this.form.submit()">
       {%- for container in containers.values() %}
         <option value="{{ container.get_uuid() }}" {% if container.get_uuid() == container_uuid %}selected{% endif %}>{{ container.get_container_name() }}</option>
       {%- endfor %}
@@ -53,8 +53,8 @@
     <form action="{{ item.admin_url() }}" method="get" class="form">
       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_STAGING }}" />
       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_CONTAINER }}" value="{{ container_uuid }}" />
-      <label class="required" for="{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
-      <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()"/>
+      <label class="required" for="f_{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
+      <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" id="f_{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()">
       {%- for this_action in [arg_name.STR_ARG_ADMIN_ACTION_DELETE, arg_name.STR_ARG_ADMIN_ACTION_COMMIT] %}
         <option value="{{ this_action }}" {% if action == this_action %}selected{% endif %}>{{ this_action }}</option>
       {%- endfor %}
@@ -69,7 +69,7 @@
 {%- if action == arg_name.STR_ARG_ADMIN_ACTION_COMMIT %}
       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_TARGET }}" id="{{ arg_name.STR_ARG_ADMIN_TARGET }}" value="" />
       <input type="submit" value="Make it so" class="button" name="button"/><br>
-      <label class="required" for="target-tree">Choose Target:</label>
+      <label class="required">Choose Target:</label>
       <div id="target-tree"></div>
 {%- endif %}
       <input type="submit" value="Make it so" class="button" name="button"/>
@@ -78,7 +78,7 @@
     <h2>Content:</h2>
 {%- with itemlist=containers[container_uuid], legend=True %}
   {%- for item in itemlist.get_itemlist() %}
-    <div id="{{ item.name() }}" class="image">
+    <div id="{{ item.id() }}" class="image">
       <div style="height: {{item.thumbnail_xy_max() + 90}}px;">
         <div class="itemname">{{ item.name() }}</div>
         <div class="datetime">{{ item.strtime() }}</div>

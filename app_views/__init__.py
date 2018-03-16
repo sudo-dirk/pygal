@@ -142,7 +142,7 @@ def action_bar(item, resp_type=None):
 
 def navigation_list(item_name):
     rv = list()
-    rel_url = decode(os.path.join(item_name))
+    rel_url = decode(item_name)
     while os.path.basename(rel_url):
         rv.insert(0, link(os.path.join(config.url_prefix or '/', rel_url), os.path.basename(rel_url)))
         rel_url = os.path.dirname(rel_url)
@@ -373,7 +373,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             action_bar=[],
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
-        rv += flask.render_template('password_recovery.html', lang=lang)
+        rv += flask.render_template('password_recovery.html', lang=lang, target_url=config.url_prefix or '/')
         rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_REGISTER and item is not None:

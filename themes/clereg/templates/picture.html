@@ -1,4 +1,4 @@
-    <div id="{{ item.prv().name() }}" class="image">
+    <div class="image">
       <a href="{{ item.prv().item_url()|safe }}">
         <div class="image_bg">
           <img src="{{ item.prv().thumbnail_url() }}" alt="{{ item.prv().name() }}">
@@ -15,7 +15,7 @@
           <li class="imagebar">
             <a  {% if item.user_may_edit() %}href="{{item.add_tag_url(tag_id)}}"{% endif %} title="{{item.get_tag_text(tag_id)}}" rel="nofollow">
               <span>
-                <img src="{{ url_prefix }}/static/img/light_red/{{item.get_tag_icon(tag_id)}}.png">
+                <img src="{{ url_prefix }}/static/img/light_red/{{item.get_tag_icon(tag_id)}}.png" alt="{{ tag_id }}">
               </span>
               <span class="menu_hide">{{item.get_tag_text(tag_id)}}</span>
             </a>
@@ -24,10 +24,9 @@
         {%- endfor %}
         </ul>
 
-        {% if item.user_may_download() %}<a href="{{ item.raw_url() }}">{% endif %}
           <div class="image_bg">
             <div class="container">
-              <img class="webnail" src="{{ item.webnail_url() }}" alt="{{ item.name() }}">
+              {% if item.user_may_download() %}<a href="{{ item.raw_url() }}">{% endif %}<img class="webnail" src="{{ item.webnail_url() }}" alt="{{ item.name() }}">{% if item.user_may_download() %}</a>{% endif %}
               {%- if not item.slideshow() %}
                 {%- for tag_id in item.get_tag_id_list() %}
                   {%- if item.tag_has_coordinates(tag_id) %}
@@ -37,12 +36,11 @@
               {%- endif %}
             </div>
           </div>
-        {% if item.user_may_download() %}</a>{% endif %}
 
     </div>
 
 
-    <div id="{{ item.nxt().name() }}" class="image">
+    <div class="image">
       <a href="{{ item.nxt().item_url()|safe }}">
         <div class="image_bg">
           <img src="{{ item.nxt().thumbnail_url() }}" alt="{{ item.nxt().name() }}">

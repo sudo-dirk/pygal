@@ -366,7 +366,7 @@ def delete(item_name):
                         n += 1
                         sc = items.staging_container(config.staging_path, os.path.basename(i.raw_path()) + '-%d' % n, i.name() + '-%d' % n, None)
                     sc.append_file_delete(i.raw_path(), i.get_database_content())
-                    redirect_url = i.parent().item_url() + helpers.strargs({'info': lang.info_item_deleted % i.name(True)}) + '#%s' % i.prv().name() 
+                    redirect_url = i.parent().item_url() + helpers.strargs({'info': lang.info_item_deleted % i.name(True)}) + '#%s' % i.prv().id() 
                     i.delete()
                     return flask.redirect(redirect_url)
             else:

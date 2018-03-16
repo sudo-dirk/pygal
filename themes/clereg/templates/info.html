@@ -16,7 +16,7 @@
   {% for tag_id in item.get_tag_id_list() %}
           <tr>
           <td>{% if loop.index == 1 %}Tags:{% endif %}</td>
-          <td style="text-align:right;"><a  href="{{item.add_tag_url(tag_id)}}" title="{{item.get_tag_text(tag_id)}}" rel="nofollow">{{item.get_tag_text(tag_id)}}<img src="{{url_prefix}}/static/img/dark_grey/{{item.get_tag_icon(tag_id)}}.png"></a></td>
+          <td style="text-align:right;"><a  href="{{item.add_tag_url(tag_id)}}" title="{{item.get_tag_text(tag_id)}}" rel="nofollow">{{item.get_tag_text(tag_id)}}<img src="{{url_prefix}}/static/img/dark_grey/{{item.get_tag_icon(tag_id)}}.png" alt="{{ tag_id }}"></a></td>
           </tr>
   {% endfor %}
 {% endif %}

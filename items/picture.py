@@ -275,11 +275,11 @@ class picture(items.base_item, report.logit):
         return items.base_object.webnail_url(self, i=i)
 
     def webnail_x(self):
-        return self.webnail_xy_max() * self.ratio_x()
+        return int(self.webnail_xy_max() * self.ratio_x())
 
     def webnail_xy_max(self):
         sdh = auth.session_data_handler()
         return config.webnail_size_list[sdh.get_webnail_index()]
 
     def webnail_y(self):
-        return self.webnail_xy_max() * self.ratio_y()
+        return int(self.webnail_xy_max() * self.ratio_y())

@@ -168,7 +168,8 @@ input[type=submit]:hover {
 }
 
 .titlebar input[type=text] {
-  color: none;
+  color: #4285f4;
+  font-weight: bold;
   float: right;
   width: 34px;
   height: 34px;
@@ -325,7 +326,7 @@ div.itemname {
 }
 
 div.datetime {
-  font-weight: italic;
+  font-style: italic;
   padding: 2px;
   font-size: 12px;
   text-align: center;

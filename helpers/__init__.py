@@ -29,7 +29,7 @@ STR_ARG_FAVOURITE_ADD = 'add'
 STR_ARG_FAVOURITE_REMOVE = 'remove'
 
 def full_url():
-    return flask.request.url
+    return urllib.quote(flask.request.url)
 
 def db_filename_by_relpath(db_path, rel_path):
     return os.path.join(db_path, rel_path + '.json')
@@ -68,7 +68,7 @@ class simple_info(object):
 
 class link(object):
     def __init__(self, url, name):
-        self.url = url
+        self.url = urllib.quote(url) if url is not None else None
         self.name = name
 
 

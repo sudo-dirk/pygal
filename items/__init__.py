@@ -310,6 +310,9 @@ class base_object(report.logit, gallery_urls):
     def has_cache_data(self):
         return False
 
+    def id(self):
+        return self.name().replace(' ', '_')
+
     def is_a_searchresult(self):
         try:
             return 'q' in flask.request.args
@@ -618,6 +621,9 @@ class __itemlist__(base_object):
             return self.get_itemlist()[len(rpl) - 1]
         else:
             return self.get_itemlist()[index - 1]
+
+    def id(self):
+        return self.name().replace(' ', '_')
 
     def item_composition(self):
         return self.count()

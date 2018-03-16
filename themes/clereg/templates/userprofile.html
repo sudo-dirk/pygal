@@ -1,13 +1,13 @@
       <form name="userprofile" id="userprofile" action="{{ item.userprofile_url() }}" method="post" class="form">
         <h1>Picture Size</h1>
         <label class="required" for="f_select_thumbnail_size">Thumbnail size</label>
-        <select name="select_thumbnail_size" form="userprofile" />
+        <select name="select_thumbnail_size" id="f_select_thumbnail_size" form="userprofile">
           {%- for thumbnail_size in config.thumbnail_size_list %}
           <option value="{{ loop.index-1 }}"{% if pygal_user.get_thumbnail_size() == thumbnail_size %} selected{% endif %}>{{ thumbnail_size }}</option>
           {%- endfor %}
             </select>
           <label class="required" for="f_select_webnail_size">Webnail size</label>
-          <select name="select_webnail_size" form="userprofile" />
+          <select name="select_webnail_size" id="f_select_webnail_size" form="userprofile">
           {%- for webnail_size in config.webnail_size_list %}
             <option value="{{ loop.index-1 }}"{% if pygal_user.get_webnail_size() == webnail_size %} selected{% endif %}>{{ webnail_size }}</option>
           {%- endfor %}

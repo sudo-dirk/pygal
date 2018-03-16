@@ -39,8 +39,8 @@
     <h1>Folders</h1>
     <form action="{{ item.admin_url() }}" class="form" method="get">
        <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
-       <label class="required" for="{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
-       <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()"/>
+       <label class="required" for="f_{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
+       <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" id="f_{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()">
          {%- for this_action in [arg_name.STR_ARG_ADMIN_ACTION_DELETE, arg_name.STR_ARG_ADMIN_ACTION_CREATE] %}
          <option value="{{ this_action }}" {% if action == this_action %}selected{% endif %}>{{ this_action }}</option>
          {%- endfor %}
@@ -56,7 +56,7 @@
        <label class="required" for="f_folder_name">Folder Name</label>
        <input class="required" required="required" type="text" name="{{ arg_name.STR_ARG_ADMIN_NAME }}" id="f_folder_name" placeholder="Folder Name" />
 {%- endif %}
-       <label class="required" for="target-tree">Choose Target:</label>
+       <label class="required">Choose Target:</label>
        <div id="target-tree"></div>
        <input type="submit" value="Make it so" class="button" name="button"/>
     </form>

@@ -1,5 +1,5 @@
 {% if item.is_picture() %}
-<script type="text/javascript">
+<script>
   function preview(img, selection) {}
     $(function () {
       $('#tag_img').imgAreaSelect({
@@ -26,7 +26,7 @@
         <input type="hidden" name="y1" value="{{item.get_tag_wn_y(tag_id)}}" />
         <input type="hidden" name="x2" value="{{item.get_tag_wn_x2(tag_id)}}" />
         <input type="hidden" name="y2" value="{{item.get_tag_wn_y2(tag_id)}}" />
-        <label class="required" for="f_login_username">Tag</label>
+        <label class="required" for="f_add_tag">Tag</label>
         <input type="text" name="tag_text" value="{{item.get_tag_text(tag_id)}}" autofocus="autofocus" class="required" id="f_add_tag" required="required" />
         <input type="hidden" name="tag_submit" value="1" class="" id="f_tag_submit" />
         <input type="submit" value="Submit Tag" class="button" name="action"/>
