@@ -116,7 +116,8 @@ class picture_edit(report.logit):
         self.logit_debug(logger, 'Saving original file %s to %s', self._filename(), os.path.basename(filename))
         if self._im is not None:
             with open(filename, 'w') as fh:
-                self._im.save(fh, 'JPEG')
+                im = self._im.convert('RGB')
+                im.save(fh, 'JPEG')
 
     def join(self, picture, joint_pos=JOIN_TOP_RIGHT, opacity=0.7, logger=None):
         """
