@@ -303,10 +303,18 @@ class session_data_handler(object):
         return flask.session.get(self.KEY_PASSWORD)
 
     def get_thumbnail_index(self):
-        return flask.session.get(self.KEY_THUMBNAIL_SIZE_INDEX, config.thumbnail_size_default)
+        index = flask.session.get(self.KEY_THUMBNAIL_SIZE_INDEX, config.thumbnail_size_default)
+        if len(config.thumbnail_size_list) <= index:
+            return config.thumbnail_size_default
+        else:
+            return index 
 
     def get_webnail_index(self):
-        return flask.session.get(self.KEY_WEBNAIL_SIZE_INDEX, config.webnail_size_default)
+        index = flask.session.get(self.KEY_WEBNAIL_SIZE_INDEX, config.webnail_size_default)
+        if len(config.webnail_size_list) <= index:
+            return config.webnail_size_default
+        else:
+            return index 
 
     def get_approved_user(self):
         username = flask.session.get(self.KEY_USERNAME, '')
