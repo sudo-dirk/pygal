@@ -30,7 +30,7 @@ STR_ARG_FAVOURITE_REMOVE = 'remove'
 STR_ARG_REDIRECT_PARENT = 'parent'
 
 def full_url():
-    return urllib.quote(flask.request.url)
+    return urllib.quote(encode(flask.request.url))
 
 def db_filename_by_relpath(db_path, rel_path):
     return os.path.join(db_path, rel_path + '.json')
@@ -69,7 +69,7 @@ class simple_info(object):
 
 class link(object):
     def __init__(self, url, name):
-        self.url = urllib.quote(url) if url is not None else None
+        self.url = urllib.quote(encode(url)) if url is not None else None
         self.name = name
 
 
@@ -93,6 +93,6 @@ class time_measurement(object):
 
 def url_extention(item_name):
     if item_name:
-        return '/' + urllib.quote(item_name)
+        return '/' + urllib.quote(encode(item_name))
     else:
         return ''
