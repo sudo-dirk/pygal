@@ -383,12 +383,13 @@ class indexed_search(report.logit):
     def wrap_data_and_call_method(self, rel_path, method):
         from video import is_video
         from picture import is_picture
+        from audio import is_audio
         db_filename = helpers.db_filename_by_relpath(config.database_path, rel_path)
         info_filename = helpers.info_filename_by_relpath(rel_path)
         index_data = {}
         index_data['rel_path'] = helpers.decode(rel_path)
         index_data['index_vers'] = self.DATA_VERS
-        index_data['type'] = u' '.join([u'video' if is_video(rel_path) else u'picture' if is_picture(rel_path) else '', helpers.decode(os.path.splitext(rel_path)[1][1:])]) 
+        index_data['type'] = u' '.join([u'video' if is_video(rel_path) else u'picture' if is_picture(rel_path) else u'audio' if is_audio(rel_path) else '', helpers.decode(os.path.splitext(rel_path)[1][1:])]) 
         index_data['path'] = helpers.decode(' '.join(os.path.splitext(rel_path)[0].split(os.path.sep)).strip())
         index_data['user_data_uid'] = helpers.decode(fstools.uid(db_filename))
         index_data['item_data_uid'] = helpers.decode(fstools.uid(info_filename))

@@ -1,0 +1,30 @@
+
+    <div class="image">
+      <a href="{{ item.prv().item_url()|safe }}">
+        <div class="image_bg">
+          <img src="{{ item.prv().thumbnail_url() }}" alt="{{ item.prv().name() }}">
+        </div>
+      </a>
+    </div>
+
+
+    <div id="main" class="image">
+
+<audio controls autoplay>
+  <source src="{{ item.raw_url() }}" type="{{ item.mime_type() }}">
+Your browser does not support the audio element.
+</audio>
+
+    </div>
+
+
+    <div class="image">
+      <a href="{{ item.nxt().item_url()|safe }}">
+        <div class="image_bg">
+          <img src="{{ item.nxt().thumbnail_url() }}" alt="{{ item.nxt().name() }}">
+        </div>
+      </a>
+    </div>
+
+
+    <div class="clearfix"></div>

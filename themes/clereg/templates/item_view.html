@@ -11,5 +11,7 @@
 {% include 'video.html' %}
 {% elif item.is_video() %}
 {% include 'picture.html' %}
+{% elif item.is_audio() %}
+{% include 'audio.html' %}
 {% endif %}
 

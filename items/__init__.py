@@ -54,13 +54,15 @@ TYPE_STAGING_BASEITEM = 3
 TYPE_STAGING_PICVID = 4
 TYPE_STAGING_ITEMLIST = 5
 TYPE_VIDEO = 6
+TYPE_AUDIO = 7
 
 
 TYPE_NAMES = {
     TYPE_ITEMLIST: 'Galerries',
     TYPE_BASEITEM: 'Other Files',
     TYPE_PICTURE: 'Pictures',
-    TYPE_VIDEO: 'Videos'
+    TYPE_VIDEO: 'Videos',
+    TYPE_AUDIO: 'Audio'
     }
 
 
@@ -73,13 +75,14 @@ def multimedia_extentions():
 def get_item_by_path(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
     from .picture import picture
     from .video import video
+    from .audio import audio
 
     path = os.path.join(base_path, rel_path)
     ext = os.path.splitext(path)[1][1:].lower()
     bil = itemlist(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
     if bil.exists():
         return bil
-    possible_item_classes = [picture, video]
+    possible_item_classes = [picture, video, audio]
     for class_for_file in possible_item_classes:
         if ext in class_for_file.mime_types.keys():
             return class_for_file(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)

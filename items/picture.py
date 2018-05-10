@@ -223,6 +223,8 @@ class picture(items.base_item, report.logit):
     def ratio_x(self):
         w = self._info.get(self._info.WIDTH, logger)
         h = self._info.get(self._info.HEIGHT, logger)
+        if w is None or h is None:
+            return 1.
         if self.orientation() in [6, 8]:
             return float(h) / max(w, h)  # rotation 90 or 270
         return float(w) / max(w, h)
@@ -230,6 +232,8 @@ class picture(items.base_item, report.logit):
     def ratio_y(self):
         w = self._info.get(self._info.WIDTH, logger)
         h = self._info.get(self._info.HEIGHT, logger)
+        if w is None or h is None:
+            return 1.
         if self.orientation() in [6, 8]:
             return float(w) / max(w, h)
         return float(h) / max(w, h)

@@ -3,6 +3,10 @@
 #
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
+# TODO: Add Inverse right management
+# TODO: Add sort order to config-file and function
+# TODO: Change config strategy (multimedia_only -> picture, video, audio, other)
+# TODO: Add id3 information for audio element, improve "def stay_time" and show info in view/ info section
 # TODO: Favoritenentfernung aus der Favouritenansicht vervollständigen
 # TODO: X beim flash hinzu. Click setzt hide.
 # TODO: Useranlegen ohne E-Mailbestätigung ermöglichen
