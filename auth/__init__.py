@@ -119,6 +119,9 @@ class user_data_handler(dict):
     USER_FILE_PREFIX = 'user_'
     USER_FILE_EXTENTION = 'json'
     KEY_EMAIL = 'email'
+    KEY_INVERSE_DELETE = 'inverse_delete'
+    KEY_INVERSE_EDIT = 'inverse_edit'
+    KEY_INVERSE_VIEW = 'inverse_view'
     KEY_PASSWORD = 'password'
     KEY_RIGHTS = 'rights'
     KEY_RIGHTS_DELETE = 'delete'
@@ -171,6 +174,27 @@ class user_data_handler(dict):
             return self[self.KEY_EMAIL]
         except KeyError:
             return None
+
+    def get_inverse_delete(self, user=None):
+        self.load_user(user)
+        try:
+            return self[self.KEY_INVERSE_DELETE]
+        except KeyError:
+            return False
+
+    def get_inverse_edit(self, user=None):
+        self.load_user(user)
+        try:
+            return self[self.KEY_INVERSE_EDIT]
+        except KeyError:
+            return False
+
+    def get_inverse_view(self, user=None):
+        self.load_user(user)
+        try:
+            return self[self.KEY_INVERSE_VIEW]
+        except KeyError:
+            return False
 
     def get_password(self, user=None):
         self.load_user(user)
@@ -231,6 +255,18 @@ class user_data_handler(dict):
     def set_email(self, email, user=None):
         self.load_user(user)
         self[self.KEY_EMAIL] = email
+
+    def set_inverse_delete(self, inverse_delete, user=None):
+        self.load_user(user)
+        self[self.KEY_INVERSE_DELETE] = inverse_delete
+
+    def set_inverse_edit(self, inverse_edit, user=None):
+        self.load_user(user)
+        self[self.KEY_INVERSE_EDIT] = inverse_edit
+
+    def set_inverse_view(self, inverse_view, user=None):
+        self.load_user(user)
+        self[self.KEY_INVERSE_VIEW] = inverse_view
 
     def set_password(self, password, user=None):
         self.load_user(user)
@@ -463,6 +499,24 @@ class pygal_auth(object):
             webnail_size_index = config.webnail_size_default
         return config.webnail_size_list[webnail_size_index]
 
+    def inverse_right_delete(self, user):
+        if user == '':
+            return False
+        udh = user_data_handler(user)
+        return udh.get_inverse_delete(user)
+
+    def inverse_right_view(self, user):
+        if user == '':
+            return False
+        udh = user_data_handler(user)
+        return udh.get_inverse_view(user)
+
+    def inverse_right_edit(self, user):
+        if user == '':
+            return False
+        udh = user_data_handler(user)
+        return udh.get_inverse_edit()
+
     def users(self):
         return user_data_handler().users()
 
@@ -476,9 +530,13 @@ class pygal_auth(object):
         else:
             path = decode(item._rel_path)
         if user is '':
-            return public_data_handler().chk_rights_delete(path)
+            rv = public_data_handler().chk_rights_delete(path)
         else:
-            return user_data_handler(user).chk_rights_delete(path)
+            rv = user_data_handler(user).chk_rights_delete(path)
+        if self.inverse_right_delete(user):
+            return not rv
+        else:
+            return rv
 
     def may_download(self, item):
         user = self.get_approved_session_user(item)
@@ -498,9 +556,13 @@ class pygal_auth(object):
         else:
             path = decode(item._rel_path)
         if user is '':
-            return public_data_handler().chk_rights_edit(path)
+            rv = public_data_handler().chk_rights_edit(path)
         else:
-            return user_data_handler(user).chk_rights_edit(path)
+            rv = user_data_handler(user).chk_rights_edit(path)
+        if self.inverse_right_edit(user):
+            return not rv
+        else:
+            return rv
 
     def may_upload(self, item):
         user = self.get_approved_session_user(item)
@@ -519,9 +581,13 @@ class pygal_auth(object):
         else:
             path = decode(item._rel_path)
         if user is '':
-            return public_data_handler().chk_rights_view(path)
+            rv = public_data_handler().chk_rights_view(path)
         else:
-            return user_data_handler(user).chk_rights_view(path)
+            rv = user_data_handler(user).chk_rights_view(path)
+        if self.inverse_right_view(user):
+            return not rv
+        else:
+            return rv
 
 
 pygal_user = pygal_auth()

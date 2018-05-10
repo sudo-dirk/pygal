@@ -79,10 +79,13 @@ def admin(item_name):
                 if admin_issue == helpers.STR_ARG_ADMIN_ISSUE_PERMISSION:
                     user = app_views.get_form_user()
                     # TODO: Add args to helpers, upload and download for public not working
+                    inverse_delete = flask.request.form.get('inverse-right-delete') == 'true'
                     delete_rights = flask.request.form.get('delete-rights').split(',')
                     upload_right = flask.request.form.get('upload-right') == 'true'
                     download_right = flask.request.form.get('download-right') == 'true'
+                    inverse_edit = flask.request.form.get('inverse-right-edit') == 'true'
                     edit_rights = flask.request.form.get('edit-rights').split(',')
+                    inverse_view = flask.request.form.get('inverse-right-view') == 'true'
                     view_rights = flask.request.form.get('view-rights').split(',')
                     if user == '':
                         pdh = auth.public_data_handler()
@@ -95,10 +98,13 @@ def admin(item_name):
                         info = "Public rights were changed. Check rights for safety reasons."
                     else:
                         udh = auth.user_data_handler(user)
+                        udh.set_inverse_delete(inverse_delete)
                         udh.set_rights_delete(delete_rights)
                         udh.set_rights_upload(upload_right)
                         udh.set_rights_download(download_right)
+                        udh.set_inverse_edit(inverse_edit)
                         udh.set_rights_edit(edit_rights)
+                        udh.set_inverse_view(inverse_view)
                         udh.set_rights_view(view_rights)
                         udh.store_user()
                         info = "Rights for User '%s' changed. Check rights for safety reasons." % user

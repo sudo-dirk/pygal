@@ -107,14 +107,26 @@
       <br style="clear:both;">
       <div style="float: left;">
         <label class="required">View:</label>
+        {%- if user_to_admin != '' %}
+        <br style="clear:both;">
+        <input type="checkbox" name="inverse-right-view" value="true" id="f_inverse_right_view"  {% if pygal_user.inverse_right_view(user_to_admin) %}checked{% endif %}> Inverse viewrights (be carefull: automatic access to new items)
+        {%- endif %}
         <div id="view-right-tree"></div>
       </div>
       <div style="float: left;">
         <label class="required">Edit:</label>
+        {%- if user_to_admin != '' %}
+        <br style="clear:both;">
+        <input type="checkbox" name="inverse-right-edit" value="true" id="f_inverse_right_edit"  {% if pygal_user.inverse_right_edit(user_to_admin) %}checked{% endif %}> Inverse editrights (be carefull: automatic access to new items)
+        {%- endif %}
         <div id="edit-right-tree"></div>
       </div>
       <div style="float: left;">
           <label class="required">Delete:</label>
+        {%- if user_to_admin != '' %}
+        <br style="clear:both;">
+        <input type="checkbox" name="inverse-right-delete" value="true" id="f_inverse_right_delete"  {% if pygal_user.inverse_right_delete(user_to_admin) %}checked{% endif %}> Inverse deleterights (be carefull: automatic access to new items)
+        {%- endif %}
           <div id="delete-right-tree"></div>
       </div>
       <input type="submit" value="Set permissions" class="button" name="action"/>
