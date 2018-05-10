@@ -3,6 +3,7 @@
 #
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
+
 # TODO: Add sort order to config-file and new sort order to pygal
 # TODO: Change config strategy (multimedia_only -> picture, video, audio, other)
 # TODO: Add Flat-Download (all files in the root folder of the zip file)

@@ -461,7 +461,7 @@ class indexed_search(report.logit):
         info_filename = helpers.info_filename_by_relpath(rel_path)
         info_uid = helpers.decode(fstools.uid(info_filename))
         with self.ix.searcher() as searcher:
-            document = searcher.document(rel_path=rel_path)
+            document = searcher.document(rel_path=helpers.decode(rel_path))
         
         if document is None or db_uid != document.get('user_data_uid') or info_uid != document.get('item_data_uid'):
             writer = AsyncWriter(self.ix)

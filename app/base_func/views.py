@@ -28,10 +28,10 @@ def favourite(item_name):
             if flask.request.method == 'GET':
                 if flask.request.args.get(helpers.STR_ARG_FAVOURITE) == helpers.STR_ARG_FAVOURITE_ADD:
                     if i.add_favourite_of(auth.pygal_user.get_approved_session_user(i)):
-                        info = 'Item %s added to favourites' % item_name
+                        info = 'Item %s added to favourites' % i.name()
                 elif flask.request.args.get(helpers.STR_ARG_FAVOURITE) == helpers.STR_ARG_FAVOURITE_REMOVE:
                     if i.remove_favourite_of(auth.pygal_user.get_approved_session_user(i)):
-                        info = 'Item %s removed from favourites' % item_name
+                        info = 'Item %s removed from favourites' % i.name()
                 else:
                     return flask.redirect(config.url_prefix + helpers.strargs({'q': 'favourite_of:%s' % auth.pygal_user.get_approved_session_user(i)}))
             if  flask.request.args.get(helpers.STR_ARG_REDIRECT_PARENT, None) is None:
