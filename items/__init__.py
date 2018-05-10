@@ -228,8 +228,15 @@ class gallery_urls(object):
     def download_url(self):
         return self._url(prefix_download)
 
-    def favourite_url(self, action=None):
-        return self._url(prefix_favourite) + strargs({} if action is None else {helpers.STR_ARG_FAVOURITE: action})
+    def favourite_url(self, action=None, itemlist=False):
+        args = {}
+        if self.is_a_searchresult():
+            args['q'] = flask.request.args.get('q', '')
+        if action:
+            args[helpers.STR_ARG_FAVOURITE] = action
+        if itemlist:
+            args[helpers.STR_ARG_REDIRECT_PARENT] = ''
+        return self._url(prefix_favourite) + strargs(args)
 
     def help_url(self, rel_path):
         return config.url_prefix + prefix_help + ('/' + rel_path if rel_path else '')
@@ -319,6 +326,9 @@ class base_object(report.logit, gallery_urls):
         except RuntimeError:
             # it seems to be the cache generation from command line
             return False
+
+    def is_audio(self):
+        return self.TYPE == TYPE_AUDIO
 
     def is_baseitem(self):
         return self.TYPE == TYPE_BASEITEM
@@ -490,7 +500,7 @@ class base_item(base_object, database_handler):
             'pdf': 'application-pdf.png', 'doc': 'application-msword.png', 'docx': 'application-msword.png', 'xls': 'application-vnd.ms-excel.png',
             'xlsx': 'application-vnd.ms-excel.png', 'ppt': 'application-vnd.ms-powerpoint.png', 'pptx': 'application-vnd.ms-powerpoint.png',
             'tar': 'application-x-tar.png', 'tgz': 'application-x-compressed-tar.png', 'gz': 'application-x-gzip.png', 'zip': 'application-zip.png', '7z': 'application-x-7z-compressed.png',
-            'mp3': 'audio-x-generic.png',
+            'mp3': 'audio-x-generic.png', 'ogg': 'audio-x-generic.png', 'wav': 'audio-x-generic.png',
             'exe': 'application-x-executable.png',
             'ics': 'x-office-calendar.png', ' adr?': 'x-office-address-book.png',
             'jpg': 'application-x-egon.png', 'jpe': 'application-x-egon.png', 'jpeg': 'application-x-egon.png', 'tif': 'application-x-egon.png','tiff': 'application-x-egon.png',            

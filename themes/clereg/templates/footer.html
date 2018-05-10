@@ -10,6 +10,42 @@
 {%- endif %}
     </ul>
 
+{%- if (error or info or hint) and not slideshow %}
+    <div class="hidden fixed" id="fixed" onclick="myHideFunction()">
+    {%- if hint %}
+      <p class="flash flash-hint">{{ hint|safe }}</p>
+    {%- endif %}
+    {%- if info %}
+      <p class="flash flash-info">{{ info|safe }}</p>
+    {%- endif %}
+    {%- if error %}
+      <p class="flash flash-error">{{ error|safe }}</p>
+    {%- endif %}
+    </div>
+
+    <script>
+    window.onscroll = function() {myScrollFunction()};
+
+    var flash = document.getElementById("flash");
+    var fixed_ = document.getElementById("fixed");
+    var flash_pos = flash.offsetTop;
+    var enabled = true;
+
+    function myScrollFunction() {
+        if (window.pageYOffset >= flash_pos && enabled){
+            fixed_.classList.remove("hidden");
+        } else {
+            fixed_.classList.add("hidden");
+            }
+    }
+
+    function myHideFunction() {
+        fixed.classList.add("hidden");
+        enabled = false;
+    }
+    </script>
+{%- endif %}
+
   </body>
 </html>
 

@@ -27,6 +27,7 @@ STR_ARG_ADMIN_TARGET = 'target'
 STR_ARG_FAVOURITE = 'action'
 STR_ARG_FAVOURITE_ADD = 'add'
 STR_ARG_FAVOURITE_REMOVE = 'remove'
+STR_ARG_REDIRECT_PARENT = 'parent'
 
 def full_url():
     return urllib.quote(flask.request.url)
@@ -79,7 +80,7 @@ class piclink(link):
 
 
 def strargs(args):
-    return '' if len(args) == 0 else '?' + '&'.join(['%s=%s' % (key, urllib.quote(str(args[key]))) for key in args.keys()])
+    return '' if len(args) == 0 else '?' + '&'.join([('%s=%s' if args[key] != ''  else '%s%s') % (key, urllib.quote(str(args[key]))) for key in args.keys()])
 
 
 class time_measurement(object):

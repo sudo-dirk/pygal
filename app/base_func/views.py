@@ -34,7 +34,14 @@ def favourite(item_name):
                         info = 'Item %s removed from favourites' % item_name
                 else:
                     return flask.redirect(config.url_prefix + helpers.strargs({'q': 'favourite_of:%s' % auth.pygal_user.get_approved_session_user(i)}))
-            return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info=info)
+            if  flask.request.args.get(helpers.STR_ARG_REDIRECT_PARENT, None) is None:
+                return app_views.make_response(app_views.RESP_TYPE_ITEM, i, tmc, info=info)
+            else:
+                if i.is_a_searchresult():
+                    raise "Vorheriges Element in der Suchuebersicht ist zu ermitteln, hier ist aber nur das Element selbst bekannt => Erzeugung der Suchliste und arbeiten in dieser Liste"
+                    return flask.redirect(flask.request.url_root + helpers.strargs({'q': flask.request.args.get('q'), 'info': info}) + '#%s' % i.prv().id())
+                else:
+                    return flask.redirect(i.parent().item_url() + helpers.strargs({'info': info}) + '#%s' % i.id())
         else:
             return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=lang.error_permission_denied)
 

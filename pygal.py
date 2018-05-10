@@ -3,6 +3,10 @@
 #
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
+# TODO: Favoritenentfernung aus der Favouritenansicht vervollständigen
+# TODO: X beim flash hinzu. Click setzt hide.
+# TODO: Useranlegen ohne E-Mailbestätigung ermöglichen
+# TODO: Intiale Inbetriebnahme erleichtern
 
 # TODO: - Permission check of all pathes in pygal_config at startup to avoid runtime errors and data losses
 #       - Folgeseiten von Staging überarbeiten:
@@ -63,7 +67,7 @@ app.debug_log_format = """~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 File "%(pathname)s", line %(lineno)d, in %(funcName)s
 %(asctime)s: %(levelname)-7s - %(message)s'"""
 
-app.logger.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.INFO)
 
 app.debug = DEBUG
 app.secret_key = secret_key

@@ -266,7 +266,20 @@ li.navigationbar a:hover {
 /*
 * Flash (Hint, Info, Error)
 */
+.hidden {
+  display: none;
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
+  width: 100%;   /* so wie flash */
+  padding-right:15px;
+}
+
 .flash{
+  margin: 0px;
+  display: block;
   padding-top: 16px;
   padding-bottom: 16px;
   padding-left: 10px;

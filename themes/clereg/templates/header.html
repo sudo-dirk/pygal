@@ -42,14 +42,16 @@
 
 {% include 'actionbar.html' %}
 
-{%- if error or info or hint %}
-  {%- if hint %}
-    <p class="flash flash-hint">{{ hint|safe }}</p>
-  {%- endif %}
-  {%- if info %}
-    <p class="flash flash-info">{{ info|safe }}</p>
-  {%- endif %}
-  {%- if error %}
-    <p class="flash flash-error">{{ error|safe }}</p>
-  {%- endif %}
+{%- if (error or info or hint) and not slideshow %}
+    <div id="flash">
+    {%- if hint %}
+      <p class="flash flash-hint">{{ hint|safe }}</p>
+    {%- endif %}
+    {%- if info %}
+      <p class="flash flash-info">{{ info|safe }}</p>
+    {%- endif %}
+    {%- if error %}
+      <p class="flash flash-error">{{ error|safe }}</p>
+    {%- endif %}
+    </div>
 {%- endif %}

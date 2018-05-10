@@ -3,7 +3,7 @@
       <div class="itemname">{{ item.name() }}</div>
       <div class="datetime">{{ item.strtime() }}</div>
       <ul class="imagebar">
-      {%- with action_bar = action_bar_fkt(item) %}
+      {%- with action_bar = action_bar_fkt(item, None, True) %}
       {%- for key in action_bar['keys'] %}
         <li class="imagebar"><a href="{{ action_bar[key].url }}"><img src="{{ url_prefix }}/static/img/light_red/{{ action_bar[key].icon }}.png" alt="{{ key }}"></a></li>
       {%- endfor %}
