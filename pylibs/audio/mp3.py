@@ -77,13 +77,19 @@ class audio_info(pylibs.multimedia.base_info):
 
     def _get_info(self, logger=None):
         TAG_TRANSLATION = {'TAG:album': self.ALBUM,
+                           'album': self.ALBUM,
                            'TAG:artist': self.ARTIST,
+                           'artist': self.ARTIST,
                            'bit_rate': self.BITRATE,
                            'duration': self.DURATION,
                            'TAG:genre': self.GENRE,
+                           'genre': self.GENRE,
                            'TAG:title': self.TITLE,
+                           'title': self.TITLE,
                            'TAG:track': self.TRACK,
-                           'TAG:date': self.YEAR}
+                           'track': self.TRACK,
+                           'TAG:date': self.YEAR,
+                           'date': self.YEAR}
         self._info = dict()
         try:
             try:
