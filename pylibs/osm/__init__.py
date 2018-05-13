@@ -10,14 +10,17 @@ Open Streetmap
 
 import math
 
-MAP_MAPNIK = 'M'
-"""MAP definition for Mapnik"""
-MAP_OSMARENDER = 'O'
-"""MAP definition for Osmarender"""
-MAP_CYCLEMAP = '0'
+__VERSION__ = '0.1.2'
+
+
+MAP_STANDARD = 'N'
+"""MAP definition for Standard Map"""
+MAP_LOCAL_TRAFIC = 'TN'
+"""MAP definition for Local Trafic Map"""
+MAP_CYCLEMAP = 'CN'
 """MAP definition for Cyclemap"""
-MAP_NONAME = 'N'
-"""MAP definition for Noname"""
+MAP_HUMANITARIAN = 'HN'
+"""MAP definition for Humanitarian Map"""
 
 
 class coordinates(dict):
@@ -29,6 +32,9 @@ class coordinates(dict):
     """
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
+
+    def __unicode__(self):
+        return unicode(self.__str__())
 
     def __str__(self):
         def to_string(lon_or_lat, plus_minus=('N', 'S')):
@@ -44,18 +50,13 @@ class coordinates(dict):
         return to_string(lat) + ' ' + to_string(lon, ['E', 'W'])
 
 
-def landmark_link(coordinates, zoom_level=13, map_code=MAP_MAPNIK):
+def landmark_link(coordinates, zoom_level=13, map_code=MAP_STANDARD):
     """This generates an url for marking a position in a map.
 
     .. warning:: Documentation
     """
-    link = 'http://www.openstreetmap.org/?mlat=%(' + coordinates.LATITUDE + ')f&mlon=%(' + coordinates.LONGITUDE + ')f&zoom=%(zoom)d&layers=%(map)s'
-    return link % {'lat': coordinates['lat'],
-                   'lon': coordinates['lon'],
+    link = 'http://www.openstreetmap.org?mlat=%(' + coordinates.LATITUDE + ')f&mlon=%(' + coordinates.LONGITUDE + ')f&zoom=%(zoom)d&layers=%(map)s'
+    return link % {coordinates.LATITUDE: coordinates[coordinates.LATITUDE],
+                   coordinates.LONGITUDE: coordinates[coordinates.LONGITUDE],
                    'zoom': zoom_level,
                    'map': map_code}
-
-if __name__ == '__main__':
-    c = coordinates((('lat', -14.128044), ('lon', 22.500000)))
-    print c.__str__().encode('utf-8')
-    print landmark_link(c)

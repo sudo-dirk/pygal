@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="{{url_prefix}}/static/img/favicon.ico" />
     {% if slideshow %}
-      <meta http-equiv="refresh" content="{{ slideshow.stay_time }}; url={{ slideshow.prv_url }}">
+      <meta http-equiv="refresh" content="{{ slideshow.stay_time }}; url={{ slideshow.next_url }}">
     {% endif %}
 
     <link href="{{ url_prefix }}/static/js/video-js/video-js.css" rel="stylesheet">

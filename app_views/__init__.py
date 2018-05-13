@@ -331,10 +331,11 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
         rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_ITEM and item is not None:
-        if config.inverse_sorting:
-            next_item_url = item.nxt().slideshow_url()
-        else:
-            next_item_url = item.prv().slideshow_url()
+        if item.slideshow():
+            if config.inverse_sorting:
+                next_item_url = item.nxt().slideshow_url()
+            else:
+                next_item_url = item.prv().slideshow_url()
         rv = flask.render_template(
             'header.html',
             title=item.name(),
@@ -344,7 +345,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             action_bar=action_bar(item, resp_type),
             url_prefix=config.url_prefix, 
             error=error, hint=hint, info=info,
-            slideshow={'stay_time': item.stay_time(), 'prv_url': next_item_url} if item.slideshow() else None)
+            slideshow={'stay_time': item.stay_time(), 'next_url': next_item_url} if item.slideshow() else None)
         rv += flask.render_template('item_view.html', item=item, action_bar_fkt=action_bar)
         rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv

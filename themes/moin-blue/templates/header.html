@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% if slideshow %}
-      <meta http-equiv="refresh" content="{{ slideshow.stay_time }};url={{ slideshow.prv_url }}">
+      <meta http-equiv="refresh" content="{{ slideshow.stay_time }};url={{ slideshow.next_url }}">
     {% endif %}
     <title>{{ title }}</title>
     <link rel="shortcut icon" href="{{url_prefix}}/static/common/logos/favicon.ico" />

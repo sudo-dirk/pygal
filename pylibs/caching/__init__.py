@@ -221,7 +221,7 @@ class property_cache_pickle(report.logit):
     def _load_cache(self, logger):
         if os.path.exists(self._cache_filename):
             with open(self._cache_filename, 'r') as fh:
-                self._cached_props = pickle.loads(fh.read())
+                self._cached_props = pickle.load(fh)
             self.logit_info(logger, 'Loading properties from cache (%s)', self._cache_filename)
             return True
         else:
@@ -242,7 +242,7 @@ class property_cache_pickle(report.logit):
 
     def _save_cache(self, logger):
         with open(self._cache_filename, 'w') as fh:
-            fh.write(pickle.dumps(self._cached_props))
+            pickle.dump(self._cached_props, fh)
             self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
         if self._callback_on_data_storage is not None:
             self._callback_on_data_storage()
@@ -408,7 +408,7 @@ class property_cache_json(property_cache_pickle):
     def _load_cache(self, logger):
         if os.path.exists(self._cache_filename):
             with open(self._cache_filename, 'r') as fh:
-                self._cached_props = json.loads(fh.read())
+                self._cached_props = json.load(fh)
             self.logit_info(logger, 'Loading properties from cache (%s)', self._cache_filename)
             return True
         else:
@@ -417,7 +417,7 @@ class property_cache_json(property_cache_pickle):
 
     def _save_cache(self, logger):
         with open(self._cache_filename, 'w') as fh:
-            fh.write(json.dumps(self._cached_props, sort_keys=True, indent=4))
+            json.dump(self._cached_props, fh, sort_keys=True, indent=4)
             self.logit_info(logger, 'cache-file stored (%s)', self._cache_filename)
         if self._callback_on_data_storage is not None:
             self._callback_on_data_storage()

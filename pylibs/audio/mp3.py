@@ -3,7 +3,6 @@ from pylibs import caching
 from pylibs import fstools
 import os
 import pylibs.multimedia
-from subprocess import CalledProcessError
 
 
 class audio_info(pylibs.multimedia.base_info):
@@ -91,7 +90,7 @@ class audio_info(pylibs.multimedia.base_info):
                 ffprobe_txt = subprocess.check_output(self._avprobe_command())
             except OSError:
                 ffprobe_txt = subprocess.check_output(self._ffprobe_command())
-        except CalledProcessError:
+        except subprocess.CalledProcessError:
             self.logit_error(logger, "Error processing %s", self.filename)
             ffprobe_txt = ''
         for line in ffprobe_txt.splitlines():
