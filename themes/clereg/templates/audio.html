@@ -9,12 +9,27 @@
 
 
     <div id="main" class="image">
+      <h1>{{ item.name(True) }}</h1></a>
+      <table>
+        <tbody>
+{%- for entry in item.get_infos(True) %}
+          <tr>
+            <th>{{ entry.description }}</th>
+  {%- if entry.info is string %}
+            <td style="text-align:right;">{{ entry.info }}</td>
+  {%- else %}
+            <td style="text-align:right;"><a href="{{ entry.info.url }}">{{ entry.info.name }}</a></td>
+  {%- endif %}
+          </tr>
+{%- endfor %}
+        </tbody>
+      </table>
 
-<audio controls autoplay>
-  <source src="{{ item.raw_url() }}" type="{{ item.mime_type() }}">
-Your browser does not support the audio element.
-</audio>
 
+      <audio controls autoplay>
+        <source src="{{ item.raw_url() }}" type="{{ item.mime_type() }}">
+        Your browser does not support the audio element.
+      </audio>
     </div>
 
 

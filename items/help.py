@@ -62,6 +62,16 @@ Without any special activity, the search will find your pattern in the path (ins
       <li>width (NUMERIC)</li>
       <li>duration (NUMERIC)</li>
     </ul>
+<h2> Keys for audio files </h2>
+    <ul>
+      <li>artist (TEXT)</li>
+      <li>album (TEXT)</li>
+      <li>duration (NUMERIC)</li>
+      <li>genre (TEXT)</li>
+      <li>date (DATETIME)</li>
+      <li>track (NUMERIC)</li>
+      <li>bitrate (NUMERIC)</li>
+    </ul>
 <h1> Examples </h1>
     <ul>
       <li><a href="%(search_example1)s">type:video AND date:2018</a> gives results with all videos in year 2018</li>

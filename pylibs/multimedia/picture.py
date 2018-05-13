@@ -454,7 +454,8 @@ class picture_info(base_info):
             except:
                 return {}
 
-    def _get_info(self):
+    def _get_info(self, logger=None):
+        (logger)
         self._info = dict()
         with open(self.filename, 'rb') as ifh:
             im = Image.open(ifh)

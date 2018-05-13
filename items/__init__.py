@@ -12,7 +12,6 @@ from helpers import encode
 from helpers import simple_info
 from helpers import strargs
 import lang
-import logging
 from pylibs.multimedia.picture import picture_info
 from pylibs.multimedia.video import video_info
 import os
@@ -44,7 +43,8 @@ import time
 from sys import path
 
 
-logger = logging.getLogger('pygal.items')
+import logging
+logger = logging.getLogger('app logger')
 
 
 TYPE_ITEMLIST = 0
@@ -66,12 +66,6 @@ TYPE_NAMES = {
     }
 
 
-def multimedia_extentions():
-    from .picture import picture
-    from .video import video
-    return picture.mime_types.keys() + video.mime_types.keys()
-
-
 def get_item_by_path(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
     from .picture import picture
     from .video import video
@@ -82,27 +76,39 @@ def get_item_by_path(rel_path, base_path, slideshow, db_path, cache_path, force_
     bil = itemlist(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
     if bil.exists():
         return bil
-    possible_item_classes = [picture, video, audio]
+    possible_item_classes = []
+    if config.show_other or config.show_pictures:
+        possible_item_classes.append(picture)
+    if config.show_other or config.show_videos:
+        possible_item_classes.append(video)
+    if config.show_other or config.show_audio:
+        possible_item_classes.append(audio)
     for class_for_file in possible_item_classes:
         if ext in class_for_file.mime_types.keys():
             return class_for_file(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
-    if config.multimedia_only:
-        return None
-    else:
+    if config.show_other:
         return base_item(rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
+    else:
+        return None
 
 
 def get_staging_item_by_path(rel_path, base_path, slideshow, db_path, cache_path, force_user):
+    from .picture import picture
+    from .video import video
+    from .audio import audio
+
     (slideshow, db_path, cache_path, force_user)  # unused paramter for compatibility with get_item_by_path
     bil = staging_itemlist(rel_path, base_path, False, None)
     if bil.exists() and not rel_path:
         return bil
-    if os.path.splitext(rel_path)[1][1:].lower() in multimedia_extentions():
+    if (config.show_pictures or config.show_other) and os.path.splitext(rel_path)[1][1:].lower() in picture.mime_types.keys():
         return staging_picviditem(rel_path, base_path, False, None, None, None, False)
-    if config.multimedia_only:
-        return None
-    else:
+    if (config.show_videos or config.show_other) and os.path.splitext(rel_path)[1][1:].lower() in video.mime_types.keys():
+        return staging_picviditem(rel_path, base_path, False, None, None, None, False)
+    if config.show_other or (config.show_audio and os.path.splitext(rel_path)[1][1:].lower() in audio.mime_types.keys()):
         return staging_baseitem(rel_path, base_path, False, None, None, None, False)
+    else:
+        return None
 
 
 class staging_container(report.logit, dict):
@@ -569,6 +575,8 @@ class __itemlist__(base_object):
                     return 0
             #
             self._itemlist.sort(cmp=cmp_objects_reverse_chronologic)
+            if config.inverse_sorting:
+                self._itemlist.reverse()
             #
             self._initialised = True
 
@@ -694,7 +702,7 @@ class __itemlist_prepared_cache__(__itemlist__):
     def data_version(self):
         return self.VERS
 
-    def get(self, key, default=None):
+    def get(self, key, default=None, logger=None):
         if key == self.CACHE_KEY_FILESIZE:
             return __itemlist__.filesize(self)
         elif key == self.CACHE_KEY_ITEM_COMPOSITION:
@@ -770,7 +778,7 @@ class itemlist(__itemlist_prepared_cache__):
             rv[i].append(self.info_url(i))
         return rv
 
-    def get(self, key, default=None):
+    def get(self, key, default=None, logger=None):
         if self.is_a_searchresult():  # no cache for searchresults
             return __itemlist_prepared_cache__.get(self, key, default)
         else:

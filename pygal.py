@@ -4,10 +4,9 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
-# TODO: Add sort order to config-file and new sort order to pygal
-# TODO: Change config strategy (multimedia_only -> picture, video, audio, other)
-# TODO: Add Flat-Download (all files in the root folder of the zip file)
-# TODO: Add id3 information for audio element, improve "def stay_time" and show info in view/ info section
+# TODO: Add clean cache to command line options (gallery-cache, item-cache, whoosh-index)
+# TODO: Check ogg files and wav files (should be okay...)
+# TODO: ??? Add Flat-Download ??? (all files in the root folder of the zip file)
 # TODO: Improve view of checkbox and text (highlighting - red if checked. blue if not) for inverse right management! 
 # TODO: Favoritenentfernung aus der Favouritenansicht vervollständigen
 # TODO: X beim flash hinzu. Click setzt hide.
@@ -49,6 +48,7 @@ from pygal_config import secret_key
 from pygal_config import theme_path
 from auth import user_data_handler
 from items.database import indexed_search
+import sys
 
 static_folder = os.path.join(theme_path, 'static')
 template_folder = os.path.join(theme_path, 'templates')
@@ -58,24 +58,40 @@ if __name__ == "__main__":
 else:
     url_prefix = ''
 
+
 if len(url_prefix) > 1:
     app = flask.Flask('pygal', static_folder=static_folder, template_folder=template_folder, static_url_path=url_prefix + '/static')
 else:
     app = flask.Flask('pygal', static_folder=static_folder, template_folder=template_folder)
+
+
+# creating logger for usage in other modules
+app.debug = DEBUG
+log_level = logging.DEBUG
+#
+logger = logging.getLogger('app logger')
+app.logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
+handlers = []
+
+if DEBUG:
+    lh = logging.StreamHandler(sys.stdout)
+    lh.setLevel(logging.DEBUG)
+    lh.setFormatter(logging.Formatter("""[%(asctime)s] %(levelname)-7s: %(message)s - File "%(pathname)s", line %(lineno)d, in %(funcName)s"""))
+    handlers.append(lh)
+from logging.handlers import RotatingFileHandler
+lh = RotatingFileHandler(os.path.join(os.path.dirname(__file__), 'error.log'), 'a', 50 * 1024 * 1024, 2)
+lh.setLevel(logging.WARNING)
+lh.setFormatter(logging.Formatter("""[%(asctime)s] %(levelname)-7s: %(message)s - File "%(pathname)s", line %(lineno)d, in %(funcName)s"""))
+handlers.append(lh)
+for lh in handlers:
+    logger.addHandler(lh)
 
 # set session lifetime, name, url_prefix
 app.permanent_session_lifetime = timedelta(days=90)
 app.config['SESSION_COOKIE_NAME'] = 'pygal_session'
 app.config['SESSION_COOKIE_PATH'] = url_prefix or '/'
 
-# creating logger for usage in other modules
-app.debug_log_format = """~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-File "%(pathname)s", line %(lineno)d, in %(funcName)s
-%(asctime)s: %(levelname)-7s - %(message)s'"""
-
-app.logger.setLevel(logging.INFO)
-
-app.debug = DEBUG
 app.secret_key = secret_key
 from werkzeug.routing import BaseConverter
 

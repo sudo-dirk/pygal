@@ -305,7 +305,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
                 rv += flask.render_template('modal_json.html', item=item, json_str=json_str, filename=cache_filename)
             else:
                 # TODO: implement a safe way returning the cache data files!
-                if index in range(1, 7):
+                if index in range(1, 7) and not item.is_audio():
                     if index in range(1, 4):
                         url = item.thumbnail_url(index - 1)
                         xy_max = config.thumbnail_size_list[index - 1]
@@ -313,6 +313,13 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
                         url = item.webnail_url(index - 4)
                         xy_max = config.webnail_size_list[index - 4]
                     rv += flask.render_template('modal_picture.html', item=item, x=int(xy_max * item.ratio_x()), y=int(xy_max * item.ratio_y()), xy_max=xy_max, full_url=url, filename=cache_filename)
+                if index is 1 and item.is_audio():
+                    try:
+                        with open(encode(data[index][1]), 'r') as fh:
+                            json_str = fh.read()
+                    except IOError:
+                        json_str = ''
+                    rv += flask.render_template('modal_json.html', item=item, json_str=json_str, filename=cache_filename)
                 if index in [0, 7, 8]:
                     try:
                         with open(encode(data[index][1]), 'r') as fh:
@@ -324,6 +331,10 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
         rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_ITEM and item is not None:
+        if config.inverse_sorting:
+            next_item_url = item.nxt().slideshow_url()
+        else:
+            next_item_url = item.prv().slideshow_url()
         rv = flask.render_template(
             'header.html',
             title=item.name(),
@@ -333,7 +344,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             action_bar=action_bar(item, resp_type),
             url_prefix=config.url_prefix, 
             error=error, hint=hint, info=info,
-            slideshow={'stay_time': item.stay_time(), 'prv_url': item.prv().slideshow_url()} if item.slideshow() else None)
+            slideshow={'stay_time': item.stay_time(), 'prv_url': next_item_url} if item.slideshow() else None)
         rv += flask.render_template('item_view.html', item=item, action_bar_fkt=action_bar)
         rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv

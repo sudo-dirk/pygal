@@ -38,7 +38,7 @@ class base_info(report.logit):
         """
         self.logit_debug(logger, "Property request (%s) for %s", key, os.path.basename(self.filename))
         if self._info is None:
-            self._get_info()
+            self._get_info(logger=logger)
         return self._info.get(key, default)
 
     def keys(self):
@@ -50,5 +50,6 @@ class base_info(report.logit):
         """
         return self.TAG_TYPES.keys()
 
-    def _get_info(self):
+    def _get_info(self, logger=None):
+        (logger)
         self._info = dict()

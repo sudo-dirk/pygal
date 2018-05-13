@@ -1,7 +1,6 @@
 import auth
 from email.mime.text import MIMEText
 import helpers
-import logging
 import pygal_config as config
 from pylibs import report
 from subprocess import Popen, PIPE
@@ -9,7 +8,8 @@ import flask
 from prefixes import prefix_token
 from prefixes import prefix_admin 
 
-logger = logging.getLogger('pygal.helpers.mail')
+import logging
+logger = logging.getLogger('app logger')
 
 
 def to_adr_admins():

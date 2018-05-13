@@ -237,7 +237,7 @@ class property_cache_pickle(report.logit):
     def _load_source(self, logger):
         self.logit_debug(logger, 'Loading all data from source - %s', repr(self._source_instance.keys()))
         for key in self._source_instance.keys():
-            val = self._source_instance.get(key)
+            val = self._source_instance.get(key, logger=logger)
             self._cached_props[self._key_filter(key)] = val
 
     def _save_cache(self, logger):

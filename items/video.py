@@ -5,7 +5,6 @@ from helpers import simple_info
 import items
 from .picture import picture
 import json
-import logging
 import os
 import pygal_config as config
 from pylibs import fstools
@@ -14,9 +13,8 @@ from pylibs.multimedia.video import __version__
 from pylibs.multimedia.video import video_info_cached
 from pylibs.multimedia.video import video_picture_edit
 
-
-logger = logging.getLogger('pygal.items.video')
-
+import logging
+logger = logging.getLogger('app logger')
 
 def is_video(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in video.mime_types.keys()

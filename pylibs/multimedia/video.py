@@ -123,7 +123,7 @@ class video_info(base_info):
     def _avprobe_command(self):
         return ['avprobe', '-v', 'quiet', '-show_format', '-show_streams', self.filename]
 
-    def _get_info(self):
+    def _get_info(self, logger=None):
         TAG_TRANSLATION = {'TAG:creation_time': self.TIME,
                            'creation_time': self.TIME,
                            'duration': self.DURATION,
@@ -132,9 +132,13 @@ class video_info(base_info):
                            'display_aspect_ratio': self.RATIO}
         self._info = dict()
         try:
-            ffprobe_txt = subprocess.check_output(self._avprobe_command())
-        except OSError:
-            ffprobe_txt = subprocess.check_output(self._ffprobe_command())
+            try:
+                ffprobe_txt = subprocess.check_output(self._avprobe_command())
+            except OSError:
+                ffprobe_txt = subprocess.check_output(self._ffprobe_command())
+        except subprocess.CalledProcessError:
+            self.logit_error(logger, "Error processing %s", self.filename)
+            ffprobe_txt = ''
         for line in ffprobe_txt.splitlines():
             try:
                 key, val = [snippet.strip() for snippet in line.split('=')]

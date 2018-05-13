@@ -4,7 +4,6 @@
 import datetime
 import helpers
 import json
-import logging
 import os
 import pygal_config as config
 from pylibs import fstools
@@ -18,7 +17,8 @@ from whoosh.index import EmptyIndexError
 from whoosh.writing import AsyncWriter
 
 
-logger = logging.getLogger('pygal.items.database')
+import logging
+logger = logging.getLogger('app logger')
 
 
 class database_handler(dict, report.logit):
@@ -354,7 +354,12 @@ class indexed_search(report.logit):
             exposure_time=NUMERIC,
             exposure_program=TEXT,
             iso=NUMERIC,
-            duration=NUMERIC)
+            duration=NUMERIC,
+            genre=TEXT,
+            artist=TEXT,
+            album=TEXT,
+            track=NUMERIC,
+            bitrate=NUMERIC)
             #TODO: implement gps data (picture) and possibly ratio (viseo) to index
         if force_creation_from_scratch:
             self.create_index_from_scratch()
@@ -365,7 +370,7 @@ class indexed_search(report.logit):
                 self.logit_info(logger, 'Initialising index from scratch caused by non existing index')
                 self.create_index_from_scratch()
             else:
-                index_version = None
+                index_version = -1
                 with self.ix.searcher() as searcher:
                     for field in searcher.all_stored_fields():
                         index_version = field.get('index_vers')
@@ -405,7 +410,7 @@ class indexed_search(report.logit):
                 index_data['upload_ip'] = helpers.decode(db.get_upload_src_ip())
                 index_data['upload_date'] = datetime.datetime.fromtimestamp(db.get_upload_time()) if db.get_upload_time() is not None else None
         # item content
-        if (os.path.isfile(info_filename) and (is_picture(rel_path) or is_video(rel_path))):
+        if (os.path.isfile(info_filename) and (is_picture(rel_path) or is_video(rel_path) or is_audio(rel_path))):
             with open(info_filename, 'r') as fh:
                 info = json.load(fh)
             # Item-Data
@@ -437,6 +442,17 @@ class indexed_search(report.logit):
                 index_data['height'] = info.get(video_info.HEIGHT) if info.get(video_info.HEIGHT) is not None else None
                 index_data['width'] = info.get(video_info.WIDTH) if info.get(video_info.WIDTH) is not None else None
                 index_data['duration'] = info.get(video_info.DURATION) if info.get(video_info.DURATION) is not None else None
+            elif is_audio(rel_path):
+                from pylibs.audio.mp3 import audio_info
+                year = info.get(audio_info.YEAR)
+                if year >= 1970:
+                    index_data['date'] = datetime.datetime(year, 1, 1) if info.get(audio_info.YEAR) is not None else None
+                index_data['duration'] = info.get(audio_info.DURATION) if info.get(audio_info.DURATION) is not None else None
+                index_data['genre'] = info.get(audio_info.GENRE) if info.get(audio_info.GENRE) is not None else None
+                index_data['artist'] = info.get(audio_info.ARTIST) if info.get(audio_info.ARTIST) is not None else None
+                index_data['album'] = info.get(audio_info.ALBUM) if info.get(audio_info.ALBUM) is not None else None
+                index_data['track'] = info.get(audio_info.TRACK) if info.get(audio_info.TRACK) is not None else None
+                index_data['bitrate'] = info.get(audio_info.BITRATE) if info.get(audio_info.BITRATE) is not None else None
         method(**index_data)
 
     def create_index_from_scratch(self):

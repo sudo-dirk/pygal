@@ -11,7 +11,6 @@ from helpers import simple_info
 import items
 from items.database import indexed_search
 import json
-import logging
 import os
 import pygal_config as config
 from pylibs import fstools
@@ -21,8 +20,8 @@ from pylibs.multimedia.picture import __version__
 from pylibs import osm
 from pylibs import report
 
-
-logger = logging.getLogger('pygal.items.picture')
+import logging
+logger = logging.getLogger('app logger')
 
 
 def is_picture(filename):
