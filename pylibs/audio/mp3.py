@@ -101,6 +101,8 @@ class audio_info(pylibs.multimedia.base_info):
             else:
                 if key in TAG_TRANSLATION and key not in self._info:
                     # some special interpretation
+                    if key == 'bit_rate' and '.' in val:
+                        val = val[:val.index('.')]
                     if key == 'TAG:track' and '/' in val:
                         val = val[:val.index('/')]
                     if key == 'TAG:date' and '-' in val:

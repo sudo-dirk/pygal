@@ -38,7 +38,7 @@ class audio(items.base_item):
         return helpers.decode(self._info.get(self._info.ALBUM, logger=logger) or '-')
 
     def bitrate(self):
-        return self._info.get(self._info.BITRATE, logger=logger)
+        return self._info.get(self._info.BITRATE, logger=logger) or 0
 
     def cache_data(self):
         #return items.base_item.cache_data(self)
