@@ -109,9 +109,9 @@ class audio_info(pylibs.multimedia.base_info):
                     # some special interpretation
                     if key == 'bit_rate' and '.' in val:
                         val = val[:val.index('.')]
-                    if key == 'TAG:track' and '/' in val:
+                    if key in ['TAG:track', 'track'] and '/' in val:
                         val = val[:val.index('/')]
-                    if key == 'TAG:date' and '-' in val:
+                    if key in ['TAG:date', 'date'] and '-' in val:
                         val = val[:val.index('-')]
                     for i in ['utf-8', 'cp1252']:    
                         try:
