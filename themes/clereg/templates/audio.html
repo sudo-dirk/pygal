@@ -10,6 +10,11 @@
 
     <div id="main" class="image">
       <h1>{{ item.name(True) }}</h1></a>
+      <audio controls autoplay>
+        <source src="{{ item.raw_url() }}" type="{{ item.mime_type() }}">
+        Your browser does not support the audio element.
+      </audio>
+
       <table>
         <tbody>
 {%- for entry in item.get_infos(True) %}
@@ -22,14 +27,16 @@
   {%- endif %}
           </tr>
 {%- endfor %}
+{% if not item.is_itemlist() and item.get_tag_id_list()|length > 0 %}
+  {% for tag_id in item.get_tag_id_list() %}
+          <tr>
+            <td>{% if loop.index == 1 %}Tags:{% endif %}</td>
+            <td style="text-align:right;"><a  href="{{item.add_tag_url(tag_id)}}" title="{{item.get_tag_text(tag_id)}}" rel="nofollow">{{item.get_tag_text(tag_id)}}<img src="{{url_prefix}}/static/img/dark_grey/{{item.get_tag_icon(tag_id)}}.png" alt="{{ tag_id }}"></a></td>
+          </tr>
+  {% endfor %}
+{% endif %}
         </tbody>
       </table>
-
-
-      <audio controls autoplay>
-        <source src="{{ item.raw_url() }}" type="{{ item.mime_type() }}">
-        Your browser does not support the audio element.
-      </audio>
     </div>
 
 
