@@ -3,15 +3,12 @@
 #
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
-
-# TODO: Add config specific link-list (Menu-Bar item) for e.g. impressum 
 # TODO: Suchstring verbessern bei Suche mit Start bei Tags. Test 2 führt auch zu Test 1
 # TODO: Link zur Suche in der Navi-Bar geht nicht (%3F statt ? und %3D statt = (quote...)
 # TODO: Play-Symbol in die Mitte bei Videos
 
 # TODO: Implementierung einer zufälligen reproduzierbaren sortierung
 
-# TODO: Flat download implementieren
 # TODO: Add user specified favourite searches (app_views/__init__.py/menu_bar)
 
 # TODO: Implementierung einer Thumbnail-View (template) und Nutzung bei overview und items (next, prev)

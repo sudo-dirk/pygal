@@ -156,7 +156,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('add_tag.html', item=item, tag_id=tag_id)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_ADMIN and item is not None:
         # read staging data
@@ -193,7 +193,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += content
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_DELETE and item is not None:
         rv = flask.render_template(
@@ -206,7 +206,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('delete.html', item=item)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_EMPTY and item is not None:
         rv = flask.render_template(
@@ -218,7 +218,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             action_bar=[],
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_FORM_DATA and item is not None:
         hint = 'Form args:\n' + json.dumps(flask.request.form, indent=4, sort_keys=True) + '\n\nArgs:\n' + json.dumps(flask.request.args, indent=4, sort_keys=True)
@@ -232,7 +232,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             action_bar=[],
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_HELP and item is not None:
         rv = flask.render_template(
@@ -245,7 +245,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += item.help_content()
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_INFO and item is not None:
         rv = flask.render_template(
@@ -293,7 +293,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
                         json_str = ''
                     rv += flask.render_template('modal_json.html', item=item, json_str=json_str, filename=cache_filename)
         rv += flask.render_template('info.html', item=item, pygal_user=auth.pygal_user)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_ITEM and item is not None:
         if item.slideshow():
@@ -312,7 +312,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             error=error, hint=hint, info=info,
             slideshow={'stay_time': item.stay_time(), 'next_url': next_item_url} if item.slideshow() else None)
         rv += flask.render_template('item_view.html', item=item, action_bar_fkt=action_bar)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_LOGIN and item is not None:
         rv = flask.render_template(
@@ -325,7 +325,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('login.html', item=item, lang=lang, url_prefix=config.url_prefix)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_LOSTPASS and item is not None:
         rv = flask.render_template(
@@ -338,7 +338,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('lostpass.html', item=item, lang=lang, url_prefix=config.url_prefix)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_PASSWORD_RECOVERY and item is not None:
         rv = flask.render_template(
@@ -351,7 +351,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('password_recovery.html', lang=lang, target_url=config.url_prefix or '/')
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_REGISTER and item is not None:
         rv = flask.render_template(
@@ -364,7 +364,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('register.html', item=item, lang=lang, url_prefix=config.url_prefix)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_UPLOAD and item is not None:
         rv = flask.render_template(
@@ -377,7 +377,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('upload.html', config=config, item=item)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     elif resp_type is RESP_TYPE_USERPROFILE and item is not None:
         rv = flask.render_template(
@@ -390,7 +390,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             url_prefix=config.url_prefix,
             error=error, hint=hint, info=info)
         rv += flask.render_template('userprofile.html', config=config, item=item, lang=lang, pygal_user=auth.pygal_user)
-        rv += flask.render_template('footer.html', tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
+        rv += flask.render_template('footer.html', user_links=config.user_links, tmc=tmc, url_prefix=config.url_prefix, error=error, hint=hint, info=info, debug=config.DEBUG, full_url=helpers.full_url())
         return rv
     else:
         return make_response(RESP_TYPE_EMPTY, item, error='Internal Error while generating response (unknown response type)!<br>resp_type: %d<br>type(item): %s' % (resp_type, str(type(item))))

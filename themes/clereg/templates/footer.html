@@ -3,12 +3,13 @@
     <div class="menubar">
       <a href=" https://github.com/sudo-dirk/pygal/wiki">PyGal</a>
       <a>{{ tmc.get_time_str() }}</a>
-      <a  style="float:right" href="https://www.python.org"><img src="{{ url_prefix }}/static/img/python_powered.png" alt="Python"></a>
-      <a  style="float:right" href="https://whoosh.readthedocs.io/en/latest"><img src="{{ url_prefix }}/static/img/whoosh.png" alt="Whoosh"></a>
+      <a style="float:right" href="https://www.python.org"><img src="{{ url_prefix }}/static/img/python_powered.png" alt="Python"></a>
+      <a style="float:right" href="https://whoosh.readthedocs.io/en/latest"><img src="{{ url_prefix }}/static/img/whoosh.png" alt="Whoosh"></a>
 {%- if debug %}
-      <li class="menubar" style="float:right"><a href=" https://validator.w3.org/nu/?doc={{ full_url }}">W3-Validator</a></li>
+      <a style="float:right" href=" https://validator.w3.org/nu/?doc={{ full_url }}">W3-Validator</a>
 {%- endif %}
-    </ul>
+    </div>
+{% with menu_bar = user_links %}{% include 'menubar.html' %}{% endwith %}
 
 {%- if (error or info or hint) and not slideshow %}
     <div class="hidden fixed" id="fixed" onclick="myHideFunction()">

@@ -1,7 +1,7 @@
 import binascii
 import flask
 import hashlib
-from helpers import decode
+import helpers
 import json
 import os
 from prefixes import prefix_userprofile
@@ -312,7 +312,7 @@ class user_data_handler(dict):
         for i in range(0, len(rv)):
             entry = os.path.basename(rv[i])
             if entry.startswith(self.USER_FILE_PREFIX) and entry.endswith(self.USER_FILE_EXTENTION):
-                rv[i] = decode(entry[len(self.USER_FILE_PREFIX):-len(self.USER_FILE_EXTENTION) - 1])
+                rv[i] = helpers.decode(entry[len(self.USER_FILE_PREFIX):-len(self.USER_FILE_EXTENTION) - 1])
         return rv
 
     def user_exists(self, username):
@@ -427,7 +427,7 @@ class pygal_auth(object):
             udh = user_data_handler(user)
         al = folder_list()
         for i in range(0, len(folders)):
-            rel_path = decode(folders[i][len(config.item_path) + 1:])
+            rel_path = helpers.decode(folders[i][len(config.item_path) + 1:])
             try:
                 selected = rel_path in udh.get_rights().get(perm_name)
             except (AttributeError, TypeError):
@@ -450,7 +450,7 @@ class pygal_auth(object):
 
         fl = folder_list()
         for i in range(0, len(folders)):
-            rel_path = decode(folders[i][len(config.item_path) + 1:])
+            rel_path = helpers.decode(folders[i][len(config.item_path) + 1:])
             fl.append(rel_path)
         return json.dumps(fl, indent=4, sort_keys=True)
 
@@ -526,9 +526,9 @@ class pygal_auth(object):
     def may_delete(self, item):
         user = self.get_approved_session_user(item)
         if not item.is_itemlist():
-            path = decode(os.path.dirname(item._rel_path))
+            path = helpers.decode(os.path.dirname(item._rel_path))
         else:
-            path = decode(item._rel_path)
+            path = helpers.decode(item._rel_path)
         if user is '':
             rv = public_data_handler().chk_rights_delete(path)
         else:
@@ -541,9 +541,9 @@ class pygal_auth(object):
     def may_download(self, item):
         user = self.get_approved_session_user(item)
         if not item.is_itemlist():
-            path = decode(os.path.dirname(item._rel_path))
+            path = helpers.decode(os.path.dirname(item._rel_path))
         else:
-            path = decode(item._rel_path)
+            path = helpers.decode(item._rel_path)
         if user is '':
             return public_data_handler().chk_rights_download(path)
         else:
@@ -552,9 +552,9 @@ class pygal_auth(object):
     def may_edit(self, item):
         user = self.get_approved_session_user(item)
         if not item.is_itemlist():
-            path = decode(os.path.dirname(item._rel_path))
+            path = helpers.decode(os.path.dirname(item._rel_path))
         else:
-            path = decode(item._rel_path)
+            path = helpers.decode(item._rel_path)
         if user is '':
             rv = public_data_handler().chk_rights_edit(path)
         else:
@@ -577,9 +577,9 @@ class pygal_auth(object):
         if len(item._rel_path) == 0:
             return True
         if not item.is_itemlist():
-            path = decode(os.path.dirname(item._rel_path))
+            path = helpers.decode(os.path.dirname(item._rel_path))
         else:
-            path = decode(item._rel_path)
+            path = helpers.decode(item._rel_path)
         if user is '':
             rv = public_data_handler().chk_rights_view(path)
         else:

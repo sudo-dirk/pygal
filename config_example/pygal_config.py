@@ -1,3 +1,4 @@
+import helpers
 import os
 import urllib
 
@@ -53,3 +54,11 @@ thumbnail_size_default = 1                              #
 webnail_size_list = [1000, 2000]                        #
 webnail_size_default = 1                                #
 #########################################################
+
+############################################################################################################################################
+# Static-User-Links                                                                                                                        #
+############################################################################################################################################
+user_links = helpers.menu.menubar()                                                                                                        #
+#user_links.append(helpers.menu.menuentry('datenschutz', False, 'Datenschutz', False, '#', None))                                          #
+#user_links.append(helpers.menu.menuentry('impressum', False, 'Impressum', False, '#', None))                                              #
+############################################################################################################################################
