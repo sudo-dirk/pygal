@@ -36,11 +36,11 @@
       <input type="text" placeholder="{{ search }}..." name="q">
     </form>
 
-{% include 'menubar.html' %}
+{% with menu_bar = menu_bar.get_reverse() %}{% include 'menubar.html' %}{% endwith %}
 
 {% include 'navigationbar.html' %}
 
-{% include 'actionbar.html' %}
+{% with menu_bar = action_bar %}{% include 'menubar.html' %}{% endwith %}
 
 {%- if (error or info or hint) and not slideshow %}
     <div id="flash">

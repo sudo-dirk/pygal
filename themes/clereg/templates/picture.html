@@ -8,22 +8,7 @@
 
 
     <div id="main" class="image">
-
-        <ul class="imagebar">
-        {%- for tag_id in item.get_tag_id_list() %}
-          {%- if not item.tag_has_coordinates(tag_id) or item.slideshow() %}
-          <li class="imagebar">
-            <a  {% if item.user_may_edit() %}href="{{item.add_tag_url(tag_id)}}"{% endif %} title="{{item.get_tag_text(tag_id)}}" rel="nofollow">
-              <span>
-                <img src="{{ url_prefix }}/static/img/light_red/{{item.get_tag_icon(tag_id)}}.png" alt="{{ tag_id }}">
-              </span>
-              <span class="menu_hide">{{item.get_tag_text(tag_id)}}</span>
-            </a>
-          </li>
-          {%- endif %}
-        {%- endfor %}
-        </ul>
-
+        {% with menu_bar = item.get_tag_menu(), slim=True %}{% include 'menubar.html' %}{% endwith %}
           <div class="image_bg">
             <div class="container">
               {% if item.user_may_download() %}<a href="{{ item.raw_url() }}">{% endif %}<img class="webnail" src="{{ item.webnail_url() }}" alt="{{ item.name() }}">{% if item.user_may_download() %}</a>{% endif %}

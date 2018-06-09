@@ -9,20 +9,7 @@
 
 
     <div id="main" class="image">
-
-      <ul class="imagebar">
-      {%- for tag_id in item.get_tag_id_list() %}
-        <li class="imagebar">
-          <a  {% if item.user_may_edit() %}href="{{item.add_tag_url(tag_id)}}"{% endif %} title="{{item.get_tag_text(tag_id)}}" rel="nofollow">
-            <span>
-              <img src="{{ url_prefix }}/static/img/light_red/{{item.get_tag_icon(tag_id)}}.png" alt="{{ tag_id }}">
-            </span>
-            <span class="menu_hide">{{item.get_tag_text(tag_id)}}</span>
-          </a>
-        </li>
-      {%- endfor %}
-      </ul>
-
+      {% with menu_bar = item.get_tag_menu(), slim=True %}{% include 'menubar.html' %}{% endwith %}
       <div class="image_bg container" >
         <video id="MY_VIDEO_1" class="video-js vjs-default-skin webnail" controls poster="{{item.webnail_url()}}" preload="auto" width="{{ item.webnail_x() }}" height="{{ item.webnail_y() }}" {% if item.slideshow() %}autoplay="true"{% endif %} data-setup="{}">
           <source src="{{ item.raw_url() }}" type='{{ item.mime_type() }}'>

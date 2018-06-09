@@ -225,8 +225,11 @@ class gallery_urls(object):
     def item_url(self):
         return self._url()
 
-    def add_tag_url(self, i=None):
-        return self._url(prefix_add_tag) + strargs({} if i is None else {helpers.STR_ARG_TAG_INDEX: i})
+    def add_tag_url(self, i=None, search=False):
+        if not search:
+            return self._url(prefix_add_tag) + strargs({} if i is None else {helpers.STR_ARG_TAG_INDEX: i})
+        else:
+            return config.url_prefix or '/' + helpers.strargs({'q': self.get_tag_text(i)})
 
     def admin_url(self, args={}):
         return self._url(prefix_admin) + strargs(args)
@@ -234,8 +237,12 @@ class gallery_urls(object):
     def delete_url(self):
         return self._url(prefix_delete)
 
-    def download_url(self):
-        return self._url(prefix_download)
+    def download_url(self, flat=False):
+        args = {}
+        if flat:
+            args[helpers.STR_ARG_ACTION] = helpers.STR_ARG_DOWNLOAD_ACTION_FLAT
+        return self._url(prefix_download)+ helpers.strargs(strargs)
+
 
     def favourite_url(self, action=None, itemlist=False):
         args = {}
@@ -270,6 +277,9 @@ class gallery_urls(object):
 
     def raw_url(self):
         return self._url(prefix_raw)
+
+    def search_url(self, q=None):
+        return config.url_prefix or '/' + helpers.strargs({'q': q})
 
     def slideshow_url(self):
         return self._url(prefix_slideshow) + '#main'
@@ -311,8 +321,13 @@ class base_object(report.logit, gallery_urls):
             rv.append(app_views.ACTION_DOWNLOAD)
         return rv
 
-    def download_url(self):
-        return gallery_urls.download_url(self) + (strargs({'q': flask.request.args.get('q')}) if self.is_a_searchresult() else '')
+    def download_url(self, flat=False):
+        args = {}
+        if flat:
+            args[helpers.STR_ARG_ACTION] = helpers.STR_ARG_DOWNLOAD_ACTION_FLAT
+        if self.is_a_searchresult():
+            args['q'] = flask.request.args.get('q')
+        return self._url(prefix_download)+ helpers.strargs(args)
 
     def exists(self):
         return os.path.isfile(self.raw_path())
@@ -821,7 +836,7 @@ class staging_picviditem(staging_baseitem):
     def thumbnail_url(self, i=None):
         (i)
         return self.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_STAGING,
-                               helpers.STR_ARG_ADMIN_ACTION: helpers.STR_ARG_ADMIN_ACTION_THUMB,
+                               helpers.STR_ARG_ACTION: helpers.STR_ARG_ADMIN_ACTION_THUMB,
                                helpers.STR_ARG_ADMIN_CONTAINER: os.path.basename(self._base_path),
                                helpers.STR_ARG_ADMIN_NAME: self._rel_path})
 

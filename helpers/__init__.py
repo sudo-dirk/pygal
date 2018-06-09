@@ -1,6 +1,7 @@
 import mail
 
 import flask
+import menu
 import os
 import pygal_config as config
 import time
@@ -11,11 +12,14 @@ STR_ARG_CACHEDATA_INDEX = 'cache_data_index'
 STR_ARG_TAG_INDEX = 'tag_index'
 STR_ARG_THUMB_INDEX = 'thumb_index'
 STR_ARG_WEB_INDEX = 'web_index'
-STR_ARG_ADMIN_ACTION = 'action'
+
+STR_ARG_ACTION = 'action'
 STR_ARG_ADMIN_ACTION_COMMIT = 'commit'
 STR_ARG_ADMIN_ACTION_CREATE = 'create'
 STR_ARG_ADMIN_ACTION_DELETE = 'delete'
 STR_ARG_ADMIN_ACTION_THUMB = 'thumb'
+STR_ARG_DOWNLOAD_ACTION_FLAT = 'flat'
+
 STR_ARG_ADMIN_CONTAINER = 'container'
 STR_ARG_ADMIN_ISSUE = 'admin_issue'
 STR_ARG_ADMIN_ISSUE_PERMISSION = 'permission'

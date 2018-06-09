@@ -40,7 +40,7 @@ def admin(item_name):
             return app_views.make_response(app_views.RESP_TYPE_EMPTY, i, tmc, error=lang.error_permission_denied)
         else:
             if flask.request.method == 'GET':
-                action = flask.request.args.get(helpers.STR_ARG_ADMIN_ACTION)
+                action = flask.request.args.get(helpers.STR_ARG_ACTION)
                 admin_issue = flask.request.args.get(helpers.STR_ARG_ADMIN_ISSUE, helpers.STR_ARG_ADMIN_ISSUE_PERMISSION)
                 container_uuid = flask.request.args.get(helpers.STR_ARG_ADMIN_CONTAINER)
                 name = flask.request.args.get(helpers.STR_ARG_ADMIN_NAME)
@@ -71,7 +71,7 @@ def admin(item_name):
                 else:
                     return app_views.make_response(app_views.RESP_TYPE_ADMIN, i, tmc)
             else:
-                action = flask.request.form.get(helpers.STR_ARG_ADMIN_ACTION)
+                action = flask.request.form.get(helpers.STR_ARG_ACTION)
                 admin_issue = flask.request.form.get(helpers.STR_ARG_ADMIN_ISSUE, helpers.STR_ARG_ADMIN_ISSUE_PERMISSION)
                 container_uuid = flask.request.form.get(helpers.STR_ARG_ADMIN_CONTAINER)
                 name = flask.request.form.get(helpers.STR_ARG_ADMIN_NAME)

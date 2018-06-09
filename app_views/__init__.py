@@ -45,46 +45,22 @@ ACTION_DELETE = 'delete'
 ACTION_GPS = 'gps'
 
 def menu_bar(item, resp_type):
-    mbar = {}
-    mbar['keys'] = []
+    mbar = helpers.menu.menubar()
     if item.user_may_admin():
-        mbar['keys'].append('admin')
-        mbar['admin'] = {'name': lang.admin,
-                         'active': resp_type == RESP_TYPE_ADMIN,
-                         'url': item.admin_url(),
-                         'icon': 'admin'}
+        entry = helpers.menu.menuentry('admin', False, lang.admin, resp_type == RESP_TYPE_ADMIN, item.admin_url(), 'admin')
+        mbar.append(entry)
+        for dropdown in admin_actions(item, None):
+            entry.append_dropdown_element(dropdown)
     if item.user_may_upload():
-        mbar['keys'].append('upload')
-        mbar['upload'] = {'name': lang.upload,
-                          'active': resp_type == RESP_TYPE_UPLOAD,
-                          'url': item.upload_url(),
-                          'icon': 'upload'}
+        mbar.append(helpers.menu.menuentry('upload', False, lang.upload, resp_type == RESP_TYPE_UPLOAD, item.upload_url(), 'upload'))
     if pygal_user.get_approved_session_user(item) in pygal_user.users():
-        mbar['keys'].append('user')
-        mbar['user'] = {'name': lang.user,
-                             'active': resp_type == RESP_TYPE_USERPROFILE,
-                             'url': item.userprofile_url(),
-                             'icon': 'user'}
-        mbar['keys'].append('logout')
-        mbar['logout'] = {'name': lang.logout,
-                         'active': False,
-                         'url': item.logout_url(),
-                         'icon': 'logout'}
-        mbar['keys'].append('favourite')
-        mbar['favourite'] = {'name': lang.view_fav,
-                             'active': False,
-                             'url': item.favourite_url(),
-                             'icon': 'favourite'}
+        mbar.append(helpers.menu.menuentry('user', False, lang.user, resp_type == RESP_TYPE_USERPROFILE, item.userprofile_url(), 'user'))
+        mbar.append(helpers.menu.menuentry('logout', False, lang.logout, False, item.logout_url(), 'logout'))
+        entry = helpers.menu.menuentry('favourite', True, lang.view_fav, False, item.favourite_url(), 'favourite')
+        mbar.append(entry)
     else:
-        mbar['keys'].append('login')
-        mbar['login'] = {'name': lang.login,
-                         'active': resp_type == RESP_TYPE_LOGIN,
-                         'url': item.login_url(),
-                         'icon': 'login'}
-    mbar['reverse_keys'] = [key for key in mbar['keys']]
-    mbar['reverse_keys'].reverse()
+        mbar.append(helpers.menu.menuentry('login', False, lang.login, resp_type == RESP_TYPE_LOGIN, item.login_url(), 'login'))
     return mbar
-
 
 def action_bar(item, resp_type=None, itemlist=False):
     try:
@@ -129,14 +105,14 @@ def action_bar(item, resp_type=None, itemlist=False):
                      'url': item.item_url(),
                      'icon': 'stop'},
         }
-    abar = {}
-    abar['keys'] = []
+    abar = helpers.menu.menubar()
     for key in item.actions():
         if key in actions:
-            abar['keys'].append(key)
-            abar[key] = actions[key]
-    abar['reverse_keys'] = [key for key in abar['keys']]
-    abar['reverse_keys'].reverse()
+            entry = helpers.menu.menuentry(key, True, **actions[key])
+            abar.append(entry)
+            if key == ACTION_DOWNLOAD:
+                entry.append_dropdown_element(helpers.menu.menuentry(ACTION_DOWNLOAD, True, 'Download (Folder)', False, item.download_url(), 'download'))
+                entry.append_dropdown_element(helpers.menu.menuentry(ACTION_DOWNLOAD+'_flat', True, 'Download (Flat)', False, item.download_url(True), 'download_flat'))
     return abar
 
 
@@ -153,22 +129,11 @@ def navigation_list(item_name):
 
 
 def admin_actions(item, current_issue):
-    return {'keys': ['permission', 'staging', 'folder'],
-            'reverse_keys': ['folder', 'staging', 'permission'],
-            'permission': {'name': 'Permissions',
-                           'active': helpers.STR_ARG_ADMIN_ISSUE_PERMISSION == current_issue,
-                           'url': item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_PERMISSION}),
-                           'icon': 'permission'},
-            'staging': {'name': 'Staging',
-                        'active': helpers.STR_ARG_ADMIN_ISSUE_STAGING == current_issue,
-                        'url': item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_STAGING}),
-                        'icon': 'staging'},
-            'folder': {'name': 'Folders',
-                       'active': helpers.STR_ARG_ADMIN_ISSUE_FOLDERS == current_issue,
-                       'url': item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_FOLDERS}),
-                       'icon': 'folder'}
-    }
-
+    abar = helpers.menu.menubar()
+    abar.append(helpers.menu.menuentry('permission', True, 'Permissions', helpers.STR_ARG_ADMIN_ISSUE_PERMISSION == current_issue, item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_PERMISSION}), 'permission'))
+    abar.append(helpers.menu.menuentry('staging', True, 'Staging', helpers.STR_ARG_ADMIN_ISSUE_STAGING == current_issue, item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_STAGING}), 'staging'))
+    abar.append(helpers.menu.menuentry('folder', True, 'Folders', helpers.STR_ARG_ADMIN_ISSUE_FOLDERS == current_issue, item.admin_url({helpers.STR_ARG_ADMIN_ISSUE: helpers.STR_ARG_ADMIN_ISSUE_FOLDERS}), 'folder'))
+    return abar
 
 def get_form_user():
     user = flask.request.args.get(helpers.STR_ARG_ADMIN_USER, '')
@@ -204,7 +169,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
                 sc = items.staging_itemlist('', os.path.splitext(scif)[0], False, None)
                 staging_content[sc.get(sc.KEY_UUID)] = sc
             # create response
-            action = flask.request.form.get(helpers.STR_ARG_ADMIN_ACTION) or flask.request.args.get(helpers.STR_ARG_ADMIN_ACTION, helpers.STR_ARG_ADMIN_ACTION_COMMIT)
+            action = flask.request.form.get(helpers.STR_ARG_ACTION) or flask.request.args.get(helpers.STR_ARG_ACTION, helpers.STR_ARG_ADMIN_ACTION_COMMIT)
             if len(staging_content) > 0:
                 container_uuid = flask.request.args.get(helpers.STR_ARG_ADMIN_CONTAINER) or flask.request.args.get(helpers.STR_ARG_ADMIN_CONTAINER, staging_content.keys()[0])
             else:
@@ -213,7 +178,7 @@ def make_response(resp_type, item, tmc, error=None, info=None, hint=None):
             if len(staging_content) == 0:
                 info = 'No data in Staging-Area'
         elif admin_issue == helpers.STR_ARG_ADMIN_ISSUE_FOLDERS:
-            action = flask.request.args.get(helpers.STR_ARG_ADMIN_ACTION, helpers.STR_ARG_ADMIN_ACTION_CREATE)
+            action = flask.request.args.get(helpers.STR_ARG_ACTION, helpers.STR_ARG_ADMIN_ACTION_CREATE)
             content = flask.render_template('admin.html', arg_name=helpers, action=action, admin_issue=admin_issue, item=item, pygal_user=auth.pygal_user)
         else:
             content = ''

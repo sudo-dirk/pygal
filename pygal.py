@@ -4,8 +4,24 @@
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
 
+# TODO: Add config specific link-list (Menu-Bar item) for e.g. impressum 
+# TODO: Suchstring verbessern bei Suche mit Start bei Tags. Test 2 führt auch zu Test 1
+# TODO: Link zur Suche in der Navi-Bar geht nicht (%3F statt ? und %3D statt = (quote...)
+# TODO: Play-Symbol in die Mitte bei Videos
+
+# TODO: Implementierung einer zufälligen reproduzierbaren sortierung
+
+# TODO: Flat download implementieren
+# TODO: Add user specified favourite searches (app_views/__init__.py/menu_bar)
+
+# TODO: Implementierung einer Thumbnail-View (template) und Nutzung bei overview und items (next, prev)
+
+# TODO: Fehler beim Setzen eines Favouriten (aus Suche heraus? Letztes Element einer Suche entfernen?)
+# TODO: Autoplay for Audio/ Video in User Prefs
+
+# TODO: No E-Mails from audio.mount-mockery.de (possibly after intial setup - no admin); Try to add a new user and find the error.
 # TODO: Add clean cache to command line options (gallery-cache, item-cache, whoosh-index)
-# TODO: Check ogg files and wav files (should be okay...)
+# TODO: Add and check ogg files and wav files (should be okay...) and also avprobe on such a system
 # TODO: ??? Add Flat-Download ??? (all files in the root folder of the zip file)
 # TODO: Improve view of checkbox and text (highlighting - red if checked. blue if not) for inverse right management! 
 # TODO: Favoritenentfernung aus der Favouritenansicht vervollständigen

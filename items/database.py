@@ -188,6 +188,15 @@ class database_handler(dict, report.logit):
         rv.sort()
         return rv
 
+    def get_tag_menu(self):
+        tbar = helpers.menu.menubar()
+        for tag_id in self.get_tag_id_list():
+            entry = helpers.menu.menuentry('tag_' + tag_id, True, self.get_tag_text(tag_id), False, '#', '%d' % (int(tag_id) % 10) )
+            entry.append_dropdown_element(helpers.menu.menuentry('tag_' + tag_id, True, 'Edit', False, self.add_tag_url(i=tag_id), 'edit'))
+            entry.append_dropdown_element(helpers.menu.menuentry('tag_' + tag_id, True, 'Search', False, self.search_url(q='tags:'+self.get_tag_text(tag_id)), 'search'))
+            tbar.append(entry)
+        return tbar
+
     def get_tag_wn_x(self, tag_id):
         self._init_database_()
         try:
@@ -296,6 +305,9 @@ class database_handler(dict, report.logit):
             return self[self.KEY_UPLOAD][self.KEY_UPLOAD_USERNAME]
         else:
             return ''
+
+    def has_tags(self):
+        return len(self[self.KEY_TAGS]) > 0
 
     def db_is_empty(self):
         self._init_database_()

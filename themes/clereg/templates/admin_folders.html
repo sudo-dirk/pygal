@@ -39,8 +39,8 @@
     <h1>Folders</h1>
     <form action="{{ item.admin_url() }}" class="form" method="get">
        <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
-       <label class="required" for="f_{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
-       <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" id="f_{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()">
+       <label class="required" for="f_{{ arg_name.STR_ARG_ACTION }}">Choose an Action:</label>
+       <select name="{{ arg_name.STR_ARG_ACTION }}" id="f_{{ arg_name.STR_ARG_ACTION }}" onchange="this.form.submit()">
          {%- for this_action in [arg_name.STR_ARG_ADMIN_ACTION_DELETE, arg_name.STR_ARG_ADMIN_ACTION_CREATE] %}
          <option value="{{ this_action }}" {% if action == this_action %}selected{% endif %}>{{ this_action }}</option>
          {%- endfor %}
@@ -49,7 +49,7 @@
   
     <form name="choose_target" action="{{ item.admin_url() }}" class="form" method="post" onsubmit="submitRightTree()">
        <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
-       <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" value="{{ action }}" />
+       <input type="hidden" name="{{ arg_name.STR_ARG_ACTION }}" value="{{ action }}" />
        <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_TARGET }}" id="{{ arg_name.STR_ARG_ADMIN_TARGET }}" value="" />
        <input type="submit" value="Make it so" class="button" name="button"/>
 {%- if action == 'create' %}

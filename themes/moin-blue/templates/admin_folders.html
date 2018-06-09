@@ -43,10 +43,10 @@
         <dl>
           <div>
             <dt>
-              <label class="required" for="{{ arg_name.STR_ARG_ADMIN_ACTION }}">Choose an Action:</label>
+              <label class="required" for="{{ arg_name.STR_ARG_ACTION }}">Choose an Action:</label>
             </dt>
             <dd>
-              <select name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" onchange="this.form.submit()"/>
+              <select name="{{ arg_name.STR_ARG_ACTION }}" onchange="this.form.submit()"/>
                 {% for this_action in [arg_name.STR_ARG_ADMIN_ACTION_DELETE, arg_name.STR_ARG_ADMIN_ACTION_CREATE] %}
                 <option value="{{ this_action }}" {% if action == this_action %}selected{% endif %}>{{ this_action }}</option>
                 {% endfor %}
@@ -60,7 +60,7 @@
     <div class="moin-form">
       <form name="choose_target" action="{{ item.admin_url() }}" method="post" onsubmit="submitRightTree()">
          <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ISSUE }}" value="{{ arg_name.STR_ARG_ADMIN_ISSUE_FOLDERS }}" />
-         <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_ACTION }}" value="{{ action }}" />
+         <input type="hidden" name="{{ arg_name.STR_ARG_ACTION }}" value="{{ action }}" />
          <input type="hidden" name="{{ arg_name.STR_ARG_ADMIN_TARGET }}" id="{{ arg_name.STR_ARG_ADMIN_TARGET }}" value="" />
          <input type="submit" value="Make it so" class="button" name="button"/><br>
            <div style="float: left;">
