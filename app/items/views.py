@@ -303,6 +303,7 @@ def download(item_name):
     item_name = helpers.encode(item_name)
     i = items.get_item_by_path(item_name, config.item_path, False, config.database_path, config.cache_path, None, False)
     if i is not None:
+        flat = flask.request.args.get(helpers.STR_ARG_ACTION, None) == helpers.STR_ARG_DOWNLOAD_ACTION_FLAT
         if i.user_may_download():
             raw_path = i.raw_path()
             if os.path.isfile(raw_path):
@@ -311,7 +312,10 @@ def download(item_name):
                 def add_to_archive(arc, i):
                     for entry in i.get_itemlist():
                         if os.path.isfile(entry.raw_path()):
-                            arc.write(entry.raw_path(), entry._rel_path)
+                            if flat:
+                                arc.write(entry.raw_path(), os.path.basename(entry._rel_path))
+                            else:
+                                arc.write(entry.raw_path(), entry._rel_path)
                         else:
                             add_to_archive(arc, entry)
                 temp_file = os.path.join(config.temp_path, str(uuid.uuid4()) + '.zip')
