@@ -785,7 +785,7 @@ class itemlist(__itemlist_prepared_cache__):
         rv = list()
         for user in [''] + auth.user_data_handler().users():
             entry = list()
-            entry.append('')
+            entry.append('Itemlist Property')
             entry.append(decode(self._prop_file(user)))
             rv.append(entry)
         # Add Link

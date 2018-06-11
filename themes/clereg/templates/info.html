@@ -15,7 +15,7 @@
         </tbody>
       </table>
 
-{%- if item.has_tags() %}
+{%- if not item.is_itemlist() and item.has_tags() %}
       <h2>Tags</h2>
       {% with menu_bar = item.get_tag_menu(), slim=True %}{% include 'menubar.html' %}{% endwith %}
 {%- endif %}
