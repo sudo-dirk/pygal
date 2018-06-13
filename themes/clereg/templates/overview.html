@@ -1,15 +1,5 @@
-{% for item in itemlist.get_itemlist() %}
-    <div id="{{ item.id() }}" style="height: {{item.thumbnail_xy_max() + 90}}px; float: left; margin: 6px">
-      <div class="itemname">{{ item.name() }}</div>
-      <div class="datetime">{{ item.strtime() }}</div>
-      {% with menu_bar = action_bar_fkt(item, None, True), slim=True, reduced=True %}{% include 'menubar.html' %}{% endwith %}
-      <div class="image" style="margin: 0px;">
-        <a href="{{ item.item_url()|safe }}">
-          <div class="image_bg">
-            <img src="{{ item.thumbnail_url() }}" alt="{{ item.name() }}">
-          </div>
-        </a>
-      </div>
-    </div>
-{% endfor %}
-    <div class="clearfix"></div>
+{%- for item in itemlist.get_itemlist() %}
+  {%- with datetime=True, actionbar=True %}
+    {%- include 'thumbnail.html' %}
+  {%- endwith %}
+{%- endfor %}

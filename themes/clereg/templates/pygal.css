@@ -51,6 +51,7 @@ a:hover {
 }
 
 table {
+  opacity: 0.75;
   background-color: #ffffff;
   border-collapse: collapse;
   width: 100%;

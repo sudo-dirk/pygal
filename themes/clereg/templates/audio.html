@@ -1,13 +1,3 @@
-
-    <div class="image">
-      <a href="{{ item.prv().item_url()|safe }}">
-        <div class="image_bg">
-          <img src="{{ item.prv().thumbnail_url() }}" alt="{{ item.prv().name() }}">
-        </div>
-      </a>
-    </div>
-
-
     <div id="main" class="image">
       {% with menu_bar = item.get_tag_menu(), slim=True %}{% include 'menubar.html' %}{% endwith %}
       <div class="image_bg">
@@ -32,15 +22,3 @@
         </table>
       </div>
     </div>
-
-
-    <div class="image">
-      <a href="{{ item.nxt().item_url()|safe }}">
-        <div class="image_bg">
-          <img src="{{ item.nxt().thumbnail_url() }}" alt="{{ item.nxt().name() }}">
-        </div>
-      </a>
-    </div>
-
-
-    <div class="clearfix"></div>

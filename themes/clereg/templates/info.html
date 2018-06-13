@@ -1,4 +1,4 @@
-    <div {% if item.is_picture() or item.is_video() %}style="background-image:url({{ item.webnail_url() }}); background-repeat: no-repeat; min-height: {{ item.webnail_y() }}px; background-color: rgba(255,255,255,0.75); background-blend-mode: lighten;"{% endif %}>
+    <div {% if item.is_picture() or item.is_video() %}style="background-image:url({{ item.webnail_url() }}); background-repeat: no-repeat; min-height: {{ item.webnail_y() }}px;"{% endif %}>
       <h1>{{ item.name() }}</h1>
       <table>
         <tbody>

@@ -1,0 +1,16 @@
+    <div id="{{ item.id() }}" style="height: {{item.thumbnail_xy_max() + 90}}px; float: left; margin: 6px">
+      <div class="itemname">{{ item.name() }}</div>
+{%- if datetime %}
+      <div class="datetime">{{ item.strtime() }}</div>
+{%- endif %}
+{%- if actionbar %}
+      {% with menu_bar = action_bar_fkt(item, None, True), slim=True, reduced=True %}{% include 'menubar.html' %}{% endwith %}
+{%- endif %}
+      <div class="image" style="margin: 0px;">
+        <a href="{{ item.item_url()|safe }}">
+          <div class="image_bg">
+            <img src="{{ item.thumbnail_url() }}" alt="{{ item.name() }}">
+          </div>
+        </a>
+      </div>
+    </div>
