@@ -196,7 +196,7 @@ class staging_container(report.logit, dict):
     def move(self, items_target_path, database_path, item_path):
         # iteration over files
         for filename in self[self.KEY_FILES].copy():
-            rel_path = os.path.join(items_target_path, filename)
+            rel_path = os.path.join(items_target_path, helpers.encode(filename))
             database_filename = encode(db_filename_by_relpath(database_path, rel_path))
             item_target_filename = encode(os.path.join(item_path, rel_path))
             if not os.path.exists(item_target_filename):
