@@ -162,7 +162,7 @@ class video_info(base_info):
                 self._info[self.TIME] = calendar.timegm(time.strptime(self._info[self.TIME], format_string))
             except ValueError:
                 self._info[self.TIME] = 1
-        if self.WIDTH in self._info and self.RATIO in self._info:
+        if self.WIDTH in self._info and self.RATIO in self._info and self._info[self.RATIO] != 'N/A':
             x, y = [int(num) for num in self._info[self.RATIO].replace('\\', '').split(':')]
             if x != 0 and y != 0:
                 self._info[self.HEIGHT] = int(round(self._info[self.WIDTH] * float(y) / float(x)))
