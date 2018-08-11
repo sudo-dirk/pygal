@@ -300,8 +300,15 @@ li.navigationbar a:hover {
   background-color: #dd0000;
 }
 
-/* When the screen is less than 900px wide, reduce content to be shown */
-@media screen and (max-width: 900px) {
+/* When the screen is less than (n*100+250)px wide, reduce content to be shown */
+@media screen and (max-width: {{action_bar|length * 100 + 250}}px) {
+    .action_menu_hide {
+        display: none
+    }
+}
+
+/* When the screen is less than 775px wide, reduce content to be shown */
+@media screen and (max-width: 775px) {
     .menu_hide {
         display: none
     }

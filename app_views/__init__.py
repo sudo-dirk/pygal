@@ -1,5 +1,6 @@
 import app
 import auth
+import binascii
 import flask
 import helpers
 from helpers import encode
@@ -40,6 +41,7 @@ ACTION_IS_FAVOURITE = 'is_favourite'
 ACTION_FAVOURITE = 'favourite'
 ACTION_EDIT = 'edit'
 ACTION_PLAY = 'play'
+ACTION_SHUFFLE = 'shuffle'
 ACTION_STOP = 'stop'
 ACTION_DELETE = 'delete'
 ACTION_GPS = 'gps'
@@ -100,6 +102,10 @@ def action_bar(item, resp_type=None, itemlist=False):
                      'active': False,
                      'url': item.slideshow_url(),
                      'icon': 'play'},
+        ACTION_SHUFFLE:{'name': 'Shuffle',
+                        'active': helpers.STR_ARG_SHUFFLE in flask.request.args,
+                        'url': item.item_url(mask_request_shuffle=True) if helpers.STR_ARG_SHUFFLE in flask.request.args else item.item_url(shuffle=binascii.hexlify(os.urandom(24))),
+                        'icon': 'shuffle'},
         ACTION_STOP:{'name': 'Stop Slideshow',
                      'active': False,
                      'url': item.item_url(),
@@ -107,7 +113,7 @@ def action_bar(item, resp_type=None, itemlist=False):
         }
     abar = helpers.menu.menubar()
     for key in item.actions():
-        if key in actions:
+        if key in actions and (key != ACTION_SHUFFLE or not itemlist):
             entry = helpers.menu.menuentry(key, True, **actions[key])
             abar.append(entry)
             if key == ACTION_DOWNLOAD:
@@ -119,12 +125,19 @@ def action_bar(item, resp_type=None, itemlist=False):
 def navigation_list(item_name):
     rv = list()
     rel_url = decode(item_name)
+    args = {}
+    if helpers.STR_ARG_SHUFFLE in flask.request.args:
+        args[helpers.STR_ARG_SHUFFLE] = flask.request.args.get(helpers.STR_ARG_SHUFFLE)
     while os.path.basename(rel_url):
-        rv.insert(0, link(os.path.join(config.url_prefix or '/', rel_url), os.path.basename(rel_url)))
+        rv.insert(0, link(os.path.join(config.url_prefix or '/', rel_url), os.path.basename(rel_url), args=args))
         rel_url = os.path.dirname(rel_url)
     if 'q' in flask.request.args:
-        rv.insert(0, link(config.url_prefix + '/' + strargs(flask.request.args), lang.search_results % flask.request.args.get('q')))
+        rv.insert(0, link(config.url_prefix + '/', lang.search_results % flask.request.args.get('q'), flask.request.args))
         rv.insert(1, link(None, ''))
+    args = {}
+    if helpers.STR_ARG_SHUFFLE in flask.request.args:
+        args[helpers.STR_ARG_SHUFFLE] = flask.request.args.get(helpers.STR_ARG_SHUFFLE)
+    rv.insert(0, link(config.url_prefix + '/', 'Home', args))
     return rv
 
 

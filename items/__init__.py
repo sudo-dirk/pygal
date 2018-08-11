@@ -2,6 +2,7 @@ from pylibs import caching
 import auth
 from auth import pygal_user, session_data_handler
 from auth import rights_uid
+import copy
 from database import database_handler
 from database import indexed_search
 import flask
@@ -34,6 +35,7 @@ from prefixes import prefix_userprofile
 from prefixes import prefix_webnail
 from pylibs import fstools
 from pylibs import report
+import random
 import shutil
 import urllib
 import uuid
@@ -317,6 +319,7 @@ class base_object(report.logit, gallery_urls):
     def actions(self):
         import app_views
         rv = [app_views.ACTION_INFO]
+        rv.append(app_views.ACTION_SHUFFLE)
         if self.user_may_download():
             rv.append(app_views.ACTION_DOWNLOAD)
         return rv
@@ -366,8 +369,13 @@ class base_object(report.logit, gallery_urls):
     def is_video(self):
         return self.TYPE == TYPE_VIDEO
 
-    def item_url(self):
-        return gallery_urls.item_url(self) + (strargs({'q': flask.request.args.get('q')}) if self.is_a_searchresult() else '')
+    def item_url(self, shuffle=None, mask_request_shuffle=False):
+        args = {}
+        if self.is_a_searchresult():
+            args['q'] = flask.request.args.get('q')
+        if shuffle is not None or (helpers.STR_ARG_SHUFFLE in flask.request.args and not mask_request_shuffle):
+            args[helpers.STR_ARG_SHUFFLE] = shuffle or flask.request.args.get(helpers.STR_ARG_SHUFFLE)
+        return (gallery_urls.item_url(self) or '/') + strargs(args)
 
     def name(self, full_name=False):
         name = decode(os.path.basename(self._rel_path))
@@ -383,7 +391,12 @@ class base_object(report.logit, gallery_urls):
         return self._slideshow
 
     def slideshow_url(self):
-        return self._url(prefix_slideshow) + (strargs({'q': flask.request.args.get('q')}) if self.is_a_searchresult() else '') + '#main'
+        args = {}
+        if self.is_a_searchresult():
+            args['q'] = flask.request.args.get('q')
+        if helpers.STR_ARG_SHUFFLE in flask.request.args:
+            args[helpers.STR_ARG_SHUFFLE] = flask.request.args.get(helpers.STR_ARG_SHUFFLE)
+        return self._url(prefix_slideshow) + strargs(args) + '#main'
 
     def stay_time(self):
         return '4'
@@ -550,11 +563,11 @@ class __itemlist__(base_object):
         self._itemlist = None
         self._cache_path = cache_path
         self._disable_whoosh = disable_whoosh
-        self._sorted_itemlist = None
+        self._sorted_relpathlist = None
         self._thumb_item = None
 
     def __len__(self):
-        return len(self.get_itemlist())
+        return len(self.get_sorted_itemlist())
 
     def __init_itemlist__(self):
         if not self._itemlist:
@@ -590,18 +603,16 @@ class __itemlist__(base_object):
                     return 0
             #
             self._itemlist.sort(cmp=cmp_objects_reverse_chronologic)
-            if config.inverse_sorting:
-                self._itemlist.reverse()
             #
             self._initialised = True
 
     def create_thumbnail(self, index):
-        for item in self.get_itemlist():
+        for item in self.get_sorted_itemlist():
             if item.is_itemlist() or item.is_picture() or item.is_video():
                 item.create_thumbnail(index)
 
     def create_webnail(self, index):
-        for item in self.get_itemlist():
+        for item in self.get_sorted_itemlist():
             if item.is_itemlist() or item.is_picture() or item.is_video():
                 item.create_webnail(index)
 
@@ -610,9 +621,9 @@ class __itemlist__(base_object):
             d = dict()
             for key in TYPE_NAMES:
                 d[key] = 0
-        if self.user_may_view() and len(self.get_itemlist()) > 0:
+        if self.user_may_view() and len(self.get_sorted_itemlist()) > 0:
             d[self.TYPE] += 1
-            for item in self.get_itemlist():
+            for item in self.get_sorted_itemlist():
                 d = item.count(d)
         return d
 
@@ -621,7 +632,7 @@ class __itemlist__(base_object):
 
     def filesize(self):
         fs = 0
-        for i in self.get_itemlist():
+        for i in self.get_sorted_itemlist():
             fs += i.filesize()
         return fs
 
@@ -632,31 +643,40 @@ class __itemlist__(base_object):
             infos.append(simple_info(TYPE_NAMES[int(key)], '%d' % composition_dict[key]))
         return infos
 
-    def get_itemlist(self):
+    def get_sorted_itemlist(self):
         self.__init_itemlist__()
-        return self._itemlist
+        il = copy.copy(self._itemlist)
+        if config.inverse_sorting:
+            il.reverse()
+        if helpers.STR_ARG_SHUFFLE in flask.request.args:
+            r = random.Random()
+            r.seed(flask.request.args.get(helpers.STR_ARG_SHUFFLE))
+            r.shuffle(il)
+        return il
 
     def get_nxt(self, item):
-        rpl = self.sorted_itemlist()
+        sil = self.get_sorted_itemlist()
+        rpl = [i._rel_path for i in sil]
         try:
             index = rpl.index(item._rel_path)
         except ValueError:
             return None
-        if index + 1 > len(rpl) - 1:
-            return self.get_itemlist()[0]
+        if index + 1 > len(sil) - 1:
+            return sil[0]
         else:
-            return self.get_itemlist()[index + 1]
+            return sil[index + 1]
 
     def get_prv(self, item):
-        rpl = self.sorted_itemlist()
+        sil = self.get_sorted_itemlist()
+        rpl = [i._rel_path for i in sil]
         try:
             index = rpl.index(item._rel_path)
         except ValueError:
             return None
         if index - 1 < 0:
-            return self.get_itemlist()[len(rpl) - 1]
+            return sil[len(sil) - 1]
         else:
-            return self.get_itemlist()[index - 1]
+            return sil[index - 1]
 
     def id(self):
         return self.name().replace(' ', '_')
@@ -670,14 +690,11 @@ class __itemlist__(base_object):
         else:
             return base_object.name(self, full_name=full_name)
 
-    def sorted_itemlist(self):
-        return [item._rel_path for item in self.get_itemlist()]
-
     def thumb_item_rel_path(self):
         item = self
         while item.is_itemlist():
             try:
-                item = item.get_itemlist()[0]
+                item = item.get_sorted_itemlist()[0]
             except IndexError:
                 return None
         return item._rel_path
@@ -706,10 +723,10 @@ class __itemlist__(base_object):
 class __itemlist_prepared_cache__(__itemlist__):
     CACHE_KEY_FILESIZE = 'filesize'
     CACHE_KEY_ITEM_COMPOSITION = 'item_composition'
-    CACHE_KEY_SORTED_ITEMLIST = 'sorted_itemlist'
+    CACHE_KEY_SORTED_RELPATHLIST = 'sorted_relpathlist'
     CACHE_KEY_THUMB_ITEM_REL_PATH = 'thumb_item_rel_path'
-    CACHE_KEYS = [CACHE_KEY_FILESIZE, CACHE_KEY_ITEM_COMPOSITION, CACHE_KEY_SORTED_ITEMLIST, CACHE_KEY_THUMB_ITEM_REL_PATH]
-    VERS = 2
+    CACHE_KEYS = [CACHE_KEY_FILESIZE, CACHE_KEY_ITEM_COMPOSITION, CACHE_KEY_SORTED_RELPATHLIST, CACHE_KEY_THUMB_ITEM_REL_PATH]
+    VERS = 3
 
     def __init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh):
         __itemlist__.__init__(self, rel_path, base_path, slideshow, db_path, cache_path, force_user, disable_whoosh)
@@ -722,9 +739,10 @@ class __itemlist_prepared_cache__(__itemlist__):
             return __itemlist__.filesize(self)
         elif key == self.CACHE_KEY_ITEM_COMPOSITION:
             return __itemlist__.item_composition(self)
-        elif key == self.CACHE_KEY_SORTED_ITEMLIST:
-            self._sorted_itemlist = __itemlist__.sorted_itemlist(self)
-            return self._sorted_itemlist
+        elif key == self.CACHE_KEY_SORTED_RELPATHLIST:
+            self.__init_itemlist__()
+            self._sorted_relpathlist = [item._rel_path for item in self._itemlist]
+            return self._sorted_relpathlist
         elif key == self.CACHE_KEY_THUMB_ITEM_REL_PATH:
             return __itemlist__.thumb_item_rel_path(self)
         return default
@@ -737,14 +755,6 @@ class __itemlist_prepared_cache__(__itemlist__):
 
     def keys(self):
         return self.CACHE_KEYS
-
-    def sorted_itemlist(self):
-        # TODO: check for a better solution to avoid encode decode errors (itemnames are converted from str to unicode after they are stored in cache file)
-        sil = self.get(self.CACHE_KEY_SORTED_ITEMLIST)
-        for i in range(0, len(sil)):
-            if isinstance(sil[i], unicode):
-                sil[i] = sil[i].encode('utf-8')
-        return sil
 
     def thumb_item_rel_path(self):
         # TODO: check for a better solution to avoid encode decode errors (itemnames are converted from str to unicode after they are stored in cache file)
@@ -769,12 +779,15 @@ class itemlist(__itemlist_prepared_cache__):
         if self.is_a_searchresult():
             __itemlist_prepared_cache__.__init_itemlist__(self)
         else:
-            sil = self.sorted_itemlist()
             if not self._itemlist:
+                srl = self.get(self.CACHE_KEY_SORTED_RELPATHLIST)
+                for i in range(0, len(srl)):
+                    if isinstance(srl[i], unicode):
+                        srl[i] = srl[i].encode('utf-8')
+                sil = [get_item_by_path(rel_path, self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user, self._disable_whoosh) for rel_path in srl]
                 logger.info('Building itemlist from cache %s', self._rel_path)
                 self._itemlist = []
-                for itemname in sil:
-                    item = self._get_item_by_path(str(itemname), self._base_path, self._slideshow, self._db_path, self._cache_path, self._force_user, self._disable_whoosh)
+                for item in sil:
                     if item.user_may_view():
                         self._itemlist.append(item)
 

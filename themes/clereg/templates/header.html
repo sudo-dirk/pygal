@@ -40,7 +40,7 @@
 
 {% include 'navigationbar.html' %}
 
-{% with menu_bar = action_bar %}{% include 'menubar.html' %}{% endwith %}
+{% with menu_bar = action_bar, action_bar = True %}{% include 'menubar.html' %}{% endwith %}
 
 {%- if (error or info or hint) and not slideshow %}
     <div id="flash">

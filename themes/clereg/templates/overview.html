@@ -1,4 +1,4 @@
-{%- for item in itemlist.get_itemlist() %}
+{%- for item in itemlist.get_sorted_itemlist() %}
   {%- with datetime=True, actionbar=True %}
     {%- include 'thumbnail.html' %}
   {%- endwith %}

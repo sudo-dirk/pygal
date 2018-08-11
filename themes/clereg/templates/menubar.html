@@ -3,7 +3,7 @@
   {%- for entry in menu_bar %}
     {%- if entry.is_dropdownmenu() %}
     <div class="dropdown{% if entry.active %} active_menu{% endif %}{% if slim %} dropdown-slim{% endif %}" {% if not entry.left %}style="float:right"{% endif %}>
-      <button class="dropbtn{% if slim %} dropbtn-slim{% endif %}" id="{{ entry.uid }}">{% if entry.icon %}<span><img src="{{ url_prefix }}/static/img/light_red/{{entry.icon}}.png" alt="{{ entry.uid }}"></span> {% endif %}{% if not reduced %}<span class="menu_hide">{{ entry.name }}</span>{% endif %}</button>
+      <button class="dropbtn{% if slim %} dropbtn-slim{% endif %}" id="{{ entry.uid }}">{% if entry.icon %}<span><img src="{{ url_prefix }}/static/img/light_red/{{entry.icon}}.png" alt="{{ entry.uid }}"></span> {% endif %}{% if not reduced %}<span class="{% if action_bar == True %}action_{% endif %}menu_hide">{{ entry.name }}</span>{% endif %}</button>
       <div class="dropdown-content" id="{{ entry.uid }}-content">
         {%- for dd in entry.dropdown_elements %}
           <a href="{{ dd.url }}">{% if dd.icon %}<img src="{{ url_prefix }}/static/img/dark_grey/{{dd.icon}}.png" alt="{{ dd.name[0] }}"> {% endif %}{{ dd.name }}</a>
@@ -11,7 +11,7 @@
       </div>
     </div> 
     {%- else %}
-    <a href="{{entry.url}}" {% if not entry.left %}style="float:right"{% endif %}{% if entry.active%}class="active_menu"{% endif%}>{% if entry.icon %}<span><img src="{{ url_prefix }}/static/img/light_red/{{entry.icon}}.png" alt="{{ entry.uid }}"></span> {% endif %}{% if not reduced %}<span class="menu_hide">{{ entry.name }}</span>{% endif %}</a>
+    <a href="{{entry.url}}" {% if not entry.left %}style="float:right"{% endif %}{% if entry.active%}class="active_menu"{% endif%}>{% if entry.icon %}<span><img src="{{ url_prefix }}/static/img/light_red/{{entry.icon}}.png" alt="{{ entry.uid }}"></span> {% endif %}{% if not reduced %}<span class="{% if action_bar == True %}action_{% endif %}menu_hide">{{ entry.name }}</span>{% endif %}</a>
     {%- endif %}
   {%- endfor %}
 </div>

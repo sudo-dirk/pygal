@@ -3,12 +3,15 @@
 #
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
-# TODO: Thumbnail von Videos werden nicht erzeugt (Suche mit: type:video)
+# TODO: Umlaut bei den Tags und in der Suche macht Probleme
+# VIDEO: Ratio nicht berechenbar (sys.stderr.write(...
+
+# GPX-Files hinzufügen (Weg in OSM-Karte + Höhenprofil + Eigenschaften der Fahrt + Filter...)
+
+# TODO: Umzug nach GitLab oder Bitbucket oder so
+
 # TODO: Video-View Höhe wird bei erreichen der maximalen Breite nicht entsprechend reduztiert. Umsetzung wie Picture.
-# TODO: Play-Symbol in die Mitte bei Videos
 # TODO: Suchstring verbessern bei Suche mit Start bei Tags. Test 2 führt auch zu Test 1
-# TODO: Link zur Suche in der Navi-Bar geht nicht (%3F statt ? und %3D statt = (quote...)
-# TODO: Implementierung einer zufälligen reproduzierbaren sortierung
 
 # TODO: Add user specified favourite searches (app_views/__init__.py/menu_bar)
 

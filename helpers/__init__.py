@@ -31,6 +31,7 @@ STR_ARG_ADMIN_TARGET = 'target'
 STR_ARG_FAVOURITE = 'action'
 STR_ARG_FAVOURITE_ADD = 'add'
 STR_ARG_FAVOURITE_REMOVE = 'remove'
+STR_ARG_SHUFFLE = 'shuffle'
 STR_ARG_REDIRECT_PARENT = 'parent'
 
 def full_url():
@@ -72,8 +73,8 @@ class simple_info(object):
 
 
 class link(object):
-    def __init__(self, url, name):
-        self.url = urllib.quote(encode(url)) if url is not None else None
+    def __init__(self, url, name, args={}):
+        self.url = urllib.quote(encode(url)) + strargs(args) if url is not None else None
         self.name = name
 
 
