@@ -310,7 +310,7 @@ def download(item_name):
                 return flask.send_file(raw_path, as_attachment=True)
             elif os.path.isdir(raw_path):
                 def add_to_archive(arc, i):
-                    for entry in i.get_itemlist():
+                    for entry in i.get_sorted_itemlist():
                         if os.path.isfile(entry.raw_path()):
                             if flat:
                                 arc.write(entry.raw_path(), os.path.basename(entry._rel_path))
@@ -327,7 +327,7 @@ def download(item_name):
                 def remove_file(response):
                     os.remove(temp_file)
                     return response
-                return flask.send_file(temp_file, mimetype='application/zip', as_attachment=True, attachment_filename='%s.zip' % helpers.encode(i.name()))
+                return flask.send_file(temp_file, mimetype='application/zip', as_attachment=True, attachment_filename='%s.zip' % helpers.decode(i.name()))
     flask.abort(404)
 
 

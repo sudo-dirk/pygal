@@ -132,7 +132,7 @@ def navigation_list(item_name):
         rv.insert(0, link(os.path.join(config.url_prefix or '/', rel_url), os.path.basename(rel_url), args=args))
         rel_url = os.path.dirname(rel_url)
     if 'q' in flask.request.args:
-        rv.insert(0, link(config.url_prefix + '/', lang.search_results % flask.request.args.get('q'), flask.request.args))
+        rv.insert(0, link(config.url_prefix + '/', lang.search_results % flask.request.args.get('q', ''), flask.request.args))
         rv.insert(1, link(None, ''))
     args = {}
     if helpers.STR_ARG_SHUFFLE in flask.request.args:

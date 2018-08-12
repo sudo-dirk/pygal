@@ -329,7 +329,7 @@ class base_object(report.logit, gallery_urls):
         if flat:
             args[helpers.STR_ARG_ACTION] = helpers.STR_ARG_DOWNLOAD_ACTION_FLAT
         if self.is_a_searchresult():
-            args['q'] = flask.request.args.get('q')
+            args['q'] = flask.request.args.get('q', '')
         return self._url(prefix_download)+ helpers.strargs(args)
 
     def exists(self):
@@ -372,7 +372,7 @@ class base_object(report.logit, gallery_urls):
     def item_url(self, shuffle=None, mask_request_shuffle=False):
         args = {}
         if self.is_a_searchresult():
-            args['q'] = flask.request.args.get('q')
+            args['q'] = flask.request.args.get('q', '')
         if shuffle is not None or (helpers.STR_ARG_SHUFFLE in flask.request.args and not mask_request_shuffle):
             args[helpers.STR_ARG_SHUFFLE] = shuffle or flask.request.args.get(helpers.STR_ARG_SHUFFLE)
         return (gallery_urls.item_url(self) or '/') + strargs(args)
@@ -393,7 +393,7 @@ class base_object(report.logit, gallery_urls):
     def slideshow_url(self):
         args = {}
         if self.is_a_searchresult():
-            args['q'] = flask.request.args.get('q')
+            args['q'] = flask.request.args.get('q', '')
         if helpers.STR_ARG_SHUFFLE in flask.request.args:
             args[helpers.STR_ARG_SHUFFLE] = flask.request.args.get(helpers.STR_ARG_SHUFFLE)
         return self._url(prefix_slideshow) + strargs(args) + '#main'

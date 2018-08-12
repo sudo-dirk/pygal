@@ -3,9 +3,6 @@
 #
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
-# TODO: Umlaut bei den Tags und in der Suche macht Probleme
-# VIDEO: Ratio nicht berechenbar (sys.stderr.write(...
-
 # GPX-Files hinzufügen (Weg in OSM-Karte + Höhenprofil + Eigenschaften der Fahrt + Filter...)
 
 # TODO: Umzug nach GitLab oder Bitbucket oder so
@@ -85,8 +82,8 @@ app.debug = DEBUG
 log_level = logging.DEBUG
 #
 logger = logging.getLogger('app logger')
-app.logger.setLevel(logging.DEBUG)
-logger.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.WARNING)
+logger.setLevel(logging.WARNING)
 handlers = []
 
 if DEBUG:

@@ -85,7 +85,13 @@ class piclink(link):
 
 
 def strargs(args):
-    return '' if len(args) == 0 else '?' + '&'.join([('%s=%s' if args[key] != ''  else '%s%s') % (key, urllib.quote(str(args[key]))) for key in args.keys()])
+    if len(args) == 0:
+        return ''
+    else:
+        try:
+            return '?' + '&'.join([('%s=%s' if args[key] != ''  else '%s%s') % (key, urllib.quote(encode(args[key]))) for key in args.keys()])
+        except AttributeError:
+            return '?' + '&'.join([('%s=%s' if args[key] != ''  else '%s%s') % (key, urllib.quote(str(args[key]))) for key in args.keys()])
 
 
 class time_measurement(object):
