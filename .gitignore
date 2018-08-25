@@ -10,6 +10,7 @@ auth/*.json
 data/
 pygal_config.py
 pygal.wsgi
+pygal_config.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

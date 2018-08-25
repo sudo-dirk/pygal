@@ -3,42 +3,39 @@
 #
 # requirements: python-flask (>= 0.1.), python-pillow, ffmpeg, python-whoosh
 
-# GPX-Files hinzufügen (Weg in OSM-Karte + Höhenprofil + Eigenschaften der Fahrt + Filter...)
+# TODO: Video-View Höhe wird bei erreichen der maximalen Breite nicht entsprechend reduztiert. Umsetzung wie Picture.
+# TODO: Suchstring verbessern bei Suche mit Start bei Tags. Test 2 führt auch zu Test 1
+# TODO: Fehler beim Setzen eines Favouriten (aus Suche heraus? Letztes Element einer Suche entfernen?)
+# TODO: Favoritenentfernung aus der Favouritenansicht vervollständigen
+
+# TODO: GPX-Files hinzufügen (Weg in OSM-Karte + Höhenprofil + Eigenschaften der Fahrt + Filter...)
 
 # TODO: Umzug nach GitLab oder Bitbucket oder so
 
-# TODO: Video-View Höhe wird bei erreichen der maximalen Breite nicht entsprechend reduztiert. Umsetzung wie Picture.
-# TODO: Suchstring verbessern bei Suche mit Start bei Tags. Test 2 führt auch zu Test 1
-
 # TODO: Add user specified favourite searches (app_views/__init__.py/menu_bar)
-
-# TODO: Fehler beim Setzen eines Favouriten (aus Suche heraus? Letztes Element einer Suche entfernen?)
 # TODO: Autoplay for Audio/ Video in User Prefs
-
 # TODO: No E-Mails from audio.mount-mockery.de (possibly after intial setup - no admin); Try to add a new user and find the error.
 # TODO: Add clean cache to command line options (gallery-cache, item-cache, whoosh-index)
 # TODO: Add and check ogg files and wav files (should be okay...) and also avprobe on such a system
-# TODO: ??? Add Flat-Download ??? (all files in the root folder of the zip file)
 # TODO: Improve view of checkbox and text (highlighting - red if checked. blue if not) for inverse right management! 
-# TODO: Favoritenentfernung aus der Favouritenansicht vervollständigen
 # TODO: X beim flash hinzu. Click setzt hide.
 # TODO: Useranlegen ohne E-Mailbestätigung ermöglichen
 # TODO: Intiale Inbetriebnahme erleichtern
 
 # TODO: - Permission check of all pathes in pygal_config at startup to avoid runtime errors and data losses
-#       - Folgeseiten von Staging überarbeiten:
+# TODO: - Folgeseiten von Staging überarbeiten:
 #           - Nach Staging-Commit den Staging-Container beibehalten, wenn er noch existiert, sonst den ersten
 #           - Nach Container delete in stagin bleiben und delete ausgewählt halten
-#       - Bildgröße der Thumbs im Staging conainer ebenfalls mit der url übermitteln (s. thumb beim item - index=X)
-#       - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
+# TODO: - Bildgröße der Thumbs im Staging conainer ebenfalls mit der url übermitteln (s. thumb beim item - index=X)
+# TODO: - Aufklappen der Bäume im Admin-Dialog prüfen und neu festlegen + Bilderliste wie overview erzeugen (ggf. durch import von 'overview.html' im template.
 #          - Admin - Folders: Tree eingeklappt darstellen
-#       - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
-#       - Nutze AJAX in flask für das Suchelement, Aufbau der Seite ohne neu zu laden
-#       - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
-#       - restlichen str_args -> helpers (login, logout, register, lostpass, userprefs, ...?)
-#       - Löschdialog für Ordner (Anzeige aller Elemente)
-#       - Staging Area und Delete-Page: Für delete und commit eine Auswahl ermöglichen (commit und delete aus Ordner)
-#       - logging ergänzen mit erben der classe report.logit (itemlist, picture, ...)
+# TODO: - Markierung des Ordner beibehalten, wenn in folder structure gewechselt wird zwischen delete und create
+# TODO: - Nutze AJAX in flask für das Suchelement, Aufbau der Seite ohne neu zu laden
+# TODO: - DEBUG output bei cache generierung immer aktivieren (unabhängig vom Parameter in der config)
+# TODO: - restlichen str_args -> helpers (login, logout, register, lostpass, userprefs, ...?)
+# TODO: - Löschdialog für Ordner (Anzeige aller Elemente)
+# TODO: - Staging Area und Delete-Page: Für delete und commit eine Auswahl ermöglichen (commit und delete aus Ordner)
+# TODO: - logging ergänzen mit erben der classe report.logit (itemlist, picture, ...)
 #       - required attribut für js-tree in admin.staging
 #       - Zusätzlich Infos auf Info-Seite für itemlist (Datum, uid, ) siehe Bilder
 #       - Select all Button bei der Administration der Rechte hinzufügen
